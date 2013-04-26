@@ -38,16 +38,15 @@ function AutomateSSO(){
 	this.checkEverything = function(){
 		if (that.checked) return;
 		that.checked = true;
+		//init test account name
+		self.port.emit("requestFBAccount",0);
+		self.port.on("requestFBAccount", function (response){
+			that.account = response;
+		});
 		if (checkEnterPassword()) return;
 		if (checkDialogOAuth()) return;
 		if (checkPermissionRequest()) return;
 	};
-	
-	//init test account name
-	self.port.emit("requestFBAccount",0);
-	self.port.on("requestFBAccount", function (response){
-		that.account = response;
-	});
 	
 	return this;
 }
