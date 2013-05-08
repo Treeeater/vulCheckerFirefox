@@ -188,7 +188,6 @@ self.port.on("action",function(action){
 		}
 	}
 );
-//window.addEventListener('load',vulCheckerHelper.delayedPressLoginButton);
-//setTimeout(vulCheckerHelper.delayedPressLoginButton,10000);
-
+//window.addEventListener('load',vulCheckerHelper.delayedPressLoginButton);				//must not do this. FF's gonna give u stupid hidden window error.
+setTimeout(vulCheckerHelper.delayedPressLoginButton,2000);
 console.log("pressLoginButton.js loaded.");

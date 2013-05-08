@@ -6,9 +6,13 @@ function AutomateSSO(){
 	
 	var checkDialogOAuth = function(){
 		if (document.URL.indexOf("https://www.facebook.com/dialog/oauth")==-1) return false;
-		if (document.getElementById('u_0_0') == null) return false;
+		//if (document.getElementById('u_0_0') == null) return false;
 		//try to click it
-		document.getElementById('u_0_0').click();
+		//document.getElementById('u_0_0').click();
+		
+		if (document.getElementsByClassName('selected')[0] == null) return false;
+		//try to click it
+		document.getElementsByClassName('selected')[0].click();
 		return true;
 	};
 	
@@ -29,9 +33,12 @@ function AutomateSSO(){
 	
 	var checkPermissionRequest = function(){
 		if (document.URL.indexOf("https://www.facebook.com/dialog/permissions.request")==-1) return false;
-		if (document.getElementById('u_0_0') == null) return false;
+		//if (document.getElementById('u_0_0') == null) return false;
 		//try to click it
-		document.getElementById('u_0_0').click();
+		//document.getElementById('u_0_0').click();
+		if (document.getElementsByClassName('selected')[0] == null) return false;
+		//try to click it
+		document.getElementsByClassName('selected')[0].click();
 		return true;
 	};
 	
@@ -42,10 +49,10 @@ function AutomateSSO(){
 		self.port.emit("requestFBAccount",0);
 		self.port.on("requestFBAccount", function (response){
 			that.account = response;
+			if (checkEnterPassword()) return;
+			if (checkDialogOAuth()) return;
+			if (checkPermissionRequest()) return;
 		});
-		if (checkEnterPassword()) return;
-		if (checkDialogOAuth()) return;
-		if (checkPermissionRequest()) return;
 	};
 	
 	return this;
@@ -62,6 +69,6 @@ self.port.on("action",function(action){
 );
 //auto-check every time.
 //wait until test account name is inited.
-window.addEventListener('load',function(){setTimeout(automateSSO.checkEverything,500)});
-setTimeout(automateSSO.checkEverything,1000);				//fallback if onload is not fired.	*Note*: This problem can probably be solved by writing 'run_at' : 'document.start' in manifest.json for all content scripts.
+window.addEventListener('load',function(){setTimeout(automateSSO.checkEverything,1000)});
+setTimeout(automateSSO.checkEverything,2000);				//fallback if onload is not fired.	*Note*: This problem can probably be solved by writing 'run_at' : 'document.start' in manifest.json for all content scripts.
 console.log("automateSSO.js loaded.");

@@ -12,7 +12,7 @@ function notifyOnbeforeunload() {
 }
 
 self.port.on("action",function(request){
-	if (request == "testSuiteStart"){
+	if (request.action == "testSuiteStart"){
 		var url = prompt("Enter the URL you want to test","http://www.squidoo.com/");
 		if (url) self.port.emit("siteToTest",url);
 	}
