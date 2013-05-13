@@ -21,10 +21,8 @@ self.port.on("action",function(request){
 	}
 });
 
-window.addEventListener('load',notifyOnload);
+//window.addEventListener('load',notifyOnload);
 
-window.addEventListener('beforeunload', notifyOnbeforeunload);
-
-window.setTimeout(notifyOnload, 10000);				//fall back to setTimeout if page doesn't finish loading after 10 sec.
+window.setTimeout(notifyOnload, 1000);				//fall back to setTimeout if page doesn't finish loading after 10 sec.
 
 console.log("testSuite.js loaded");

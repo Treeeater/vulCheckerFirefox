@@ -60,6 +60,11 @@ function AutomateSSO(){
 
 var automateSSO = new AutomateSSO();
 
+function notifyOnbeforeunload() {
+	self.port.emit("unloadedURL",document.URL);
+}
+
+window.addEventListener('beforeunload', notifyOnbeforeunload);
 //trigger by the popup menu
 self.port.on("action",function(action){
 		if (action == "automateSSO"){
