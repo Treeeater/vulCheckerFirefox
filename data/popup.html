@@ -1,0 +1,67 @@
+<!doctype html>
+<html>
+  <head>
+	<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+	<meta content="utf-8" http-equiv="encoding">
+    <title>Set Page Color Popup</title>
+    <style>
+    body {
+      overflow: hidden;
+      margin: 0px;
+      padding: 0px;
+      background: white;
+    }
+
+    div:first-child {
+      margin-top: 0px;
+    }
+
+    div {
+      text-align: center;
+      padding: 1px 3px;
+      font-family: sans-serif;
+      font-size: 0.8em;
+      width: 100px;
+      margin-top: 1px;
+    }
+	.clickable {
+		cursor: pointer;
+		background: #cccccc;
+	}
+	.clickable:hover{
+		background: #aaaaaa;
+	}
+    #refresh {
+      border: 1px solid blue;
+      color: blue;
+    }
+    #clickLogin {
+      border: 1px solid green;
+      color: green;
+    }
+    #gothroughsso {
+      border: 1px solid red;
+      color: red;
+    }
+    #deleteCookies {
+      border: 1px solid red;
+      color: #610B5E;
+    }
+    #testSuite {
+      border: 1px solid red;
+      color: brown;
+    }
+    </style>
+  </head>
+  <body>
+	<div>Test individual functions here:</div>
+	<hr/>
+    <div id="refresh" class="clickable">Refresh Token Credentials</div>
+    <div id="clickLogin" class="clickable">Click Login Button</div>
+    <div id="gothroughsso" class="clickable">Go through SSO</div>
+	<div id="deleteCookies" class="clickable">Delete Cookies</div>
+	<div id="testSuite" class="clickable">Test suite</div>
+	<hr/>
+	<div id="reload" class="clickable">Reload Extension</div>
+  </body>
+</html>
