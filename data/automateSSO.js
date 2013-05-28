@@ -20,6 +20,7 @@ function AutomateSSO(){
 		if (document.URL.indexOf("https://www.facebook.com/login.php")==-1) return false;
 		
 		if (document.getElementById('email') == null) return false;
+		
 		document.getElementById('email').value = (that.account == 1) ? "t-yuzhou@hotmail.com" : "yuchentesttwo.zhou@facebook.com";	//another one is zhouyuchenking@hotmail.com
 		
 		if (document.getElementById('pass') == null) return false;
