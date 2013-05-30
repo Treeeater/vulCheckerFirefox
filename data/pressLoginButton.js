@@ -133,7 +133,7 @@ function VulCheckerHelper() {
 		self.port.on("pressedLoginButton", function (response){
 			//tell background we are about to press the login button.
 			//response should contain whether background page has detected that FB has been visited.
-			if (response.capturingPhase == 2 || response.capturingPhase == 8) vulCheckerHelper.pressLoginButton();			//this condition ensures that once FB traffic is seen, we do not want to press login button again.
+			if (response.shouldClick) vulCheckerHelper.pressLoginButton();			//this condition ensures that once FB traffic is seen, we do not want to press login button again.
 			else clearInterval(vulCheckerHelper.automaticPressIntervalHandler);
 		});
 	}
@@ -144,7 +144,7 @@ function VulCheckerHelper() {
 		self.port.emit("checkTestingStatus",0);
 		self.port.on("checkTestingStatus", function (response){
 			//check if background is in active checking.
-			if (response.capturingPhase == 2 || response.capturingPhase == 8) vulCheckerHelper.automaticPressIntervalHandler = setInterval(vulCheckerHelper.automaticPressLoginButton, 3000);
+			if (response.shouldClick) vulCheckerHelper.automaticPressIntervalHandler = setInterval(vulCheckerHelper.automaticPressLoginButton, 3000);
 		});
 	}
 	
