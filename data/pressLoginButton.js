@@ -113,15 +113,17 @@ function VulCheckerHelper() {
 	
 	this.sendLoginButtonInformation = function(){
 		//the following two statements need to be called maybe more than 1 time until a popup is presented, because some sites alter dom tree/navigate to new page and does not first present fb login button.
-		that.searchForLoginButton(document.body);
-		//alert(that.sortedAttrInfoMap[0].score);
+		that.searchForLoginButton(document.body);			//this doesn't necessarily mean a login button is found. sortedAttrInfoMap could be empty.
+		//console.log(that.sortedAttrInfoMap[0].score);
+		if (vulCheckerHelper.sortedAttrInfoMap.length == 0) return {"loginButtonXPath":"", "loginButtonOuterHTML":""};			//no login button found.
 		return {"loginButtonXPath":vulCheckerHelper.getXPath(vulCheckerHelper.sortedAttrInfoMap[0].node), "loginButtonOuterHTML":vulCheckerHelper.sortedAttrInfoMap[0].node.outerHTML};
 	}
 	
 	this.pressLoginButton = function(){
 		//the following two statements need to be called maybe more than 1 time until a popup is presented, because some sites alter dom tree/navigate to new page and does not first present fb login button.
 		that.searchForLoginButton(document.body);
-		//alert(that.sortedAttrInfoMap[0].score);
+		//console.log(that.sortedAttrInfoMap[0].score);
+		if (vulCheckerHelper.sortedAttrInfoMap.length == 0) return;			//no login button found.
 		self.port.emit("loginInfo",{"loginButtonXPath":vulCheckerHelper.getXPath(vulCheckerHelper.sortedAttrInfoMap[0].node), "loginButtonOuterHTML":vulCheckerHelper.sortedAttrInfoMap[0].node.outerHTML});
 		self.port.on("readyToClick", function(){vulCheckerHelper.sortedAttrInfoMap[0].node.click();});
 	}
