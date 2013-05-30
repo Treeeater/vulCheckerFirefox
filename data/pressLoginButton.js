@@ -121,6 +121,7 @@ function VulCheckerHelper() {
 	
 	this.pressLoginButton = function(){
 		//the following two statements need to be called maybe more than 1 time until a popup is presented, because some sites alter dom tree/navigate to new page and does not first present fb login button.
+		console.log("pressing Login button...");
 		that.searchForLoginButton(document.body);
 		//console.log(that.sortedAttrInfoMap[0].score);
 		if (vulCheckerHelper.sortedAttrInfoMap.length == 0) return;			//no login button found.
