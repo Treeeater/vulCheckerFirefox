@@ -4,7 +4,7 @@ function AutomateSSO(){
 	this.checked = false;
 	var that = this;
 	
-	var checkDialogOAuth = function(){
+	this.checkDialogOAuth = function(){
 		if (document.URL.indexOf("https://www.facebook.com/dialog/oauth")==-1) return false;
 		//if (document.getElementById('u_0_0') == null) return false;
 		//try to click it
@@ -16,7 +16,7 @@ function AutomateSSO(){
 		return true;
 	};
 	
-	var checkEnterPassword = function(){
+	this.checkEnterPassword = function(){
 		if (document.URL.indexOf("https://www.facebook.com/login.php")==-1) return false;
 		
 		if (document.getElementById('email') == null) return false;
@@ -32,7 +32,7 @@ function AutomateSSO(){
 		return true;
 	};
 	
-	var checkPermissionRequest = function(){
+	this.checkPermissionRequest = function(){
 		if (document.URL.indexOf("https://www.facebook.com/dialog/permissions.request")==-1) return false;
 		//if (document.getElementById('u_0_0') == null) return false;
 		//try to click it
@@ -48,12 +48,6 @@ function AutomateSSO(){
 		that.checked = true;
 		//init test account name
 		self.port.emit("requestFBAccount",0);
-		self.port.on("requestFBAccount", function (response){
-			that.account = response;
-			if (checkEnterPassword()) return;
-			if (checkDialogOAuth()) return;
-			if (checkPermissionRequest()) return;
-		});
 	};
 	
 	return this;
@@ -73,6 +67,12 @@ self.port.on("action",function(action){
 		}
 	}
 );
+self.port.on("requestFBAccount", function (response){
+	automateSSO.account = response;
+	if (automateSSO.checkEnterPassword()) return;
+	if (automateSSO.checkDialogOAuth()) return;
+	if (automateSSO.checkPermissionRequest()) return;
+});
 //auto-check every time.
 //wait until test account name is inited.
 window.addEventListener('load',function(){setTimeout(automateSSO.checkEverything,1000)});
