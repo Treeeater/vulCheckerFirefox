@@ -1,5 +1,4 @@
 notified = false;
-
 function notifyOnload() {
 	if (!notified) {
 		self.port.emit("loadedURL",document.URL);
@@ -11,12 +10,10 @@ function notifyOnbeforeunload() {
 	self.port.emit("unloadedURL",document.URL);
 }
 
-function extractContentFromNode(node){
-	//When called, (recursively) extract the content of this page.
-}
-
 function extractContent(){
-	return document.body.textContent.replace(/[\r\n]/g,'');
+	var str = $("body").children("script").remove().end().text();
+	str = str.replace(/[\r\n\s\t]/g,'');
+	return str;
 }
 
 self.port.on("action",function(request){
