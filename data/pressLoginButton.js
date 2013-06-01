@@ -182,6 +182,9 @@ self.port.on("action",function(action){
 		if (action == "sendLoginButtonInformation") {
 			self.port.emit("sendLoginButtonInformation",vulCheckerHelper.sendLoginButtonInformation());
 		}
+		if (action == "after_modification_sendLoginButtonInformation") {
+			self.port.emit("after_modification_sendLoginButtonInformation",vulCheckerHelper.sendLoginButtonInformation());
+		}
 	}
 );
 self.port.on("pressedLoginButton", function (response){

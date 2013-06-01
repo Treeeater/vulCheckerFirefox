@@ -11,6 +11,14 @@ function notifyOnbeforeunload() {
 	self.port.emit("unloadedURL",document.URL);
 }
 
+function extractContentFromNode(node){
+	//When called, (recursively) extract the content of this page.
+}
+
+function extractContent(){
+	return document.body.textContent.replace(/[\r\n]/g,'');
+}
+
 self.port.on("action",function(request){
 	if (request.action == "testSuiteStart"){
 		var url = prompt("Enter the URL you want to test","http://www.ehow.com/");
@@ -18,6 +26,12 @@ self.port.on("action",function(request){
 	}
 	if (request.action == "navigateTo"){
 		document.location = request.site;
+	}
+	if (request.action == "extractContent"){
+		self.port.emit("extractedContent", extractContent());
+	}
+	if (request.action == "after_modification_extractContent"){
+		self.port.emit("after_modification_extractedContent", extractContent());
 	}
 });
 
