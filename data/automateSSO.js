@@ -4,6 +4,9 @@ function AutomateSSO(){
 	this.checked = false;
 	var that = this;
 	
+	this.accountA = accounts[0];
+	this.accountB = accounts[1];
+	
 	this.checkDialogOAuth = function(){
 		if (document.URL.indexOf("https://www.facebook.com/dialog/oauth")==-1) return false;
 		//if (document.getElementById('u_0_0') == null) return false;
@@ -21,7 +24,7 @@ function AutomateSSO(){
 		
 		if (document.getElementById('email') == null) return false;
 		
-		document.getElementById('email').value = (that.account == 1) ? "t-yuzhou@hotmail.com" : "yuchentesttwo.zhou@facebook.com";	//another one is zhouyuchenking@hotmail.com
+		document.getElementById('email').value = (that.account == 1) ? accounts[0].email : accounts[1].email;	//another one is zhouyuchenking@hotmail.com
 		
 		if (document.getElementById('pass') == null) return false;
 		document.getElementById('pass').value = "msr123456";
