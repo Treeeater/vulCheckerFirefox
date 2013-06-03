@@ -76,6 +76,11 @@ self.port.on("requestFBAccount", function (response){
 	if (automateSSO.checkDialogOAuth()) return;
 	if (automateSSO.checkPermissionRequest()) return;
 });
+
+self.port.on("requestAccountInfo",function(resp){
+	self.port.emit("requestAccountInfo",JSON.stringify(accounts));
+});
+
 //auto-check every time.
 //wait until test account name is inited.
 window.addEventListener('load',function(){setTimeout(automateSSO.checkEverything,1000)});
