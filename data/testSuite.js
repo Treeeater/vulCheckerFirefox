@@ -13,6 +13,9 @@ function notifyOnbeforeunload() {
 function extractContent(){
 	var str = $("body").children("script").remove().end().text();
 	str = str.replace(/[\r\n\s\t]/g,'');
+	$("img[src]").each(function(i){
+		if ($(this).attr && $(this).attr('src')!="") str+=($(this).attr('src')+" ");
+	})
 	return str;
 }
 
