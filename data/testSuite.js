@@ -11,11 +11,12 @@ function notifyOnbeforeunload() {
 }
 
 function extractContent(){
-	var str = $("body").children("script").remove().end().text();
+	/*var str = $("body").children("script").remove().end().text();
 	str = str.replace(/[\r\n\s\t]/g,'');
 	$("img[src]").each(function(i){
 		if ($(this).attr && $(this).attr('src')!="") str+=($(this).attr('src')+" ");
-	})
+	})*/
+	var str = document.documentElement.innerHTML;
 	return str;
 }
 
@@ -25,6 +26,7 @@ self.port.on("action",function(request){
 		if (url) self.port.emit("siteToTest",url);
 	}
 	if (request.action == "navigateTo"){
+		console.log("received");
 		document.location = request.site;
 	}
 	if (request.action == "extractContent"){

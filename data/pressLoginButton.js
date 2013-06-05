@@ -191,11 +191,10 @@ self.port.on("pressedLoginButton", function (response){
 	//tell background we are about to press the login button.
 	//response should contain whether background page has detected that FB has been visited.
 	if (response.shouldClick) vulCheckerHelper.pressLoginButton();			//this condition ensures that once FB traffic is seen, we do not want to press login button again.
-	else clearInterval(vulCheckerHelper.automaticPressIntervalHandler);
 });
 self.port.on("checkTestingStatus", function (response){
 	//check if background is in active checking.
-	if (response.shouldClick) vulCheckerHelper.automaticPressIntervalHandler = setInterval(vulCheckerHelper.automaticPressLoginButton, 5000);		//need to set a lenient timer, since if the fb traffic is not seen in this time, it's going to click the login button again, which resets the connection - this may create an infinite loop. Current setting is that if the login button is pressed more than twice, it gives up.
+	if (response.shouldClick) vulCheckerHelper.automaticPressLoginButton();		//need to set a lenient timer, since if the fb traffic is not seen in this time, it's going to click the login button again, which resets the connection - this may create an infinite loop. Current setting is that if the login button is pressed more than twice, it gives up.
 });
 self.port.on("readyToClick", function(){vulCheckerHelper.sortedAttrInfoMap[0].node.click();});
 //window.addEventListener('load',vulCheckerHelper.delayedPressLoginButton);				//must not do this. FF's gonna give u stupid hidden window error.
