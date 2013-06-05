@@ -2,6 +2,7 @@ function VulCheckerHelper() {
 
 	var that = this;
 	this.clicked = 0;
+	this.tryFindInvisibleLoginButton = false;
 	function createCookie(name,value,days) {
 		if (days) {
 			var date = new Date();
@@ -79,7 +80,7 @@ function VulCheckerHelper() {
 				}*/
 				if (that.hasFB && that.hasLogin) curScore += 4;									//extra score if both terms are found.
 				if (that.hasLikeOrShare && !that.hasLogin) curScore = -1;						//ignore like or share button without login.
-				if (curNode.offsetWidth <= 0 || curNode.offsetHeight <= 0) curScore = -1;		//ignore invisible element.
+				if (!that.tryFindInvisibleLoginButton) {if (curNode.offsetWidth <= 0 || curNode.offsetHeight <= 0) curScore = -1;}		//ignore invisible element.
 				var temp = new AttrInfoClass(curNode, curScore);
 				that.AttrInfoMap[that.count] = temp;
 				that.count++;
@@ -196,6 +197,7 @@ if (self.port)
 	self.port.on("pressedLoginButton", function (response){
 		//tell background we are about to press the login button.
 		//response should contain whether background page has detected that FB has been visited.
+		vulCheckerHelper.tryFindInvisibleLoginButton = response.tryFindInvisibleLoginButton;
 		if (response.shouldClick) vulCheckerHelper.pressLoginButton();			//this condition ensures that once FB traffic is seen, we do not want to press login button again.
 	});
 	self.port.on("checkTestingStatus", function (response){
