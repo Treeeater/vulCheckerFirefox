@@ -123,8 +123,7 @@ function VulCheckerHelper() {
 		//the following two statements need to be called maybe more than 1 time until a popup is presented, because some sites alter dom tree/navigate to new page and does not first present fb login button.
 		console.log("pressing Login button...");
 		if (that.clicked > 2) {
-			console.log("pressed Login button too many times... Give up.");
-			clearInterval(that.automaticPressIntervalHandler);
+			console.log("pressed Login button too many times... Give up.");				//This code is unnecessary (checking logic moved to ccc.js) after 6/5/2013
 			return;
 		}
 		that.clicked++;
@@ -168,7 +167,6 @@ function VulCheckerHelper() {
 	this.hasFB = false;									
 	this.hasLogin = false;								
 	this.hasLikeOrShare = false;
-	this.automaticPressIntervalHandler;
 	
 	return this;
 }
