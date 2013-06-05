@@ -67,10 +67,16 @@ function VulCheckerHelper() {
 					var temp = curNode.attributes[i].name + "=" + curNode.attributes[i].value + ";"
 					curScore += calculateScore(temp);
 				}
-				if (curNode.children != undefined && curNode.firstChild != null && curNode.children.length == 0 && curNode.firstChild.nodeType == 3)
+				var curChild = curNode.firstChild;
+				while (curChild != null && typeof curChild != "undefined")
+				{
+					if (curChild.nodeType == 3) curScore = curScore + calculateScore(curChild.data);
+					curChild = curChild.nextSibling;
+				}
+				/*if (typeof curNode.children != "undefined" && curNode.firstChild != null && curNode.children.length == 0 && curNode.firstChild.nodeType == 3)
 				{
 					curScore = curScore + calculateScore(curNode.firstChild.data);
-				}
+				}*/
 				if (that.hasFB && that.hasLogin) curScore += 4;									//extra score if both terms are found.
 				if (that.hasLikeOrShare && !that.hasLogin) curScore = -1;						//ignore like or share button without login.
 				if (curNode.offsetWidth <= 0 || curNode.offsetHeight <= 0) curScore = -1;		//ignore invisible element.
@@ -173,28 +179,36 @@ function VulCheckerHelper() {
 
 var vulCheckerHelper = new VulCheckerHelper();
 
-self.port.on("action",function(action){
-		if (action == "userClickedPressLoginButton"){
-			vulCheckerHelper.pressLoginButton();
+if (self.port)
+{
+	self.port.on("action",function(action){
+			if (action == "userClickedPressLoginButton"){
+				vulCheckerHelper.pressLoginButton();
+			}
+			if (action == "sendLoginButtonInformation") {
+				self.port.emit("sendLoginButtonInformation",vulCheckerHelper.sendLoginButtonInformation());
+			}
+			if (action == "after_modification_sendLoginButtonInformation") {
+				self.port.emit("after_modification_sendLoginButtonInformation",vulCheckerHelper.sendLoginButtonInformation());
+			}
 		}
-		if (action == "sendLoginButtonInformation") {
-			self.port.emit("sendLoginButtonInformation",vulCheckerHelper.sendLoginButtonInformation());
-		}
-		if (action == "after_modification_sendLoginButtonInformation") {
-			self.port.emit("after_modification_sendLoginButtonInformation",vulCheckerHelper.sendLoginButtonInformation());
-		}
-	}
-);
-self.port.on("pressedLoginButton", function (response){
-	//tell background we are about to press the login button.
-	//response should contain whether background page has detected that FB has been visited.
-	if (response.shouldClick) vulCheckerHelper.pressLoginButton();			//this condition ensures that once FB traffic is seen, we do not want to press login button again.
-});
-self.port.on("checkTestingStatus", function (response){
-	//check if background is in active checking.
-	if (response.shouldClick) vulCheckerHelper.automaticPressLoginButton();		//need to set a lenient timer, since if the fb traffic is not seen in this time, it's going to click the login button again, which resets the connection - this may create an infinite loop. Current setting is that if the login button is pressed more than twice, it gives up.
-});
-self.port.on("readyToClick", function(){vulCheckerHelper.sortedAttrInfoMap[0].node.click();});
-//window.addEventListener('load',vulCheckerHelper.delayedPressLoginButton);				//must not do this. FF's gonna give u stupid hidden window error.
-setTimeout(vulCheckerHelper.delayedPressLoginButton,3000);
-console.log("pressLoginButton.js loaded.");
+	);
+	self.port.on("pressedLoginButton", function (response){
+		//tell background we are about to press the login button.
+		//response should contain whether background page has detected that FB has been visited.
+		if (response.shouldClick) vulCheckerHelper.pressLoginButton();			//this condition ensures that once FB traffic is seen, we do not want to press login button again.
+	});
+	self.port.on("checkTestingStatus", function (response){
+		//check if background is in active checking.
+		if (response.shouldClick) vulCheckerHelper.automaticPressLoginButton();		//need to set a lenient timer, since if the fb traffic is not seen in this time, it's going to click the login button again, which resets the connection - this may create an infinite loop. Current setting is that if the login button is pressed more than twice, it gives up.
+	});
+	self.port.on("readyToClick", function(){vulCheckerHelper.sortedAttrInfoMap[0].node.click();});
+	//window.addEventListener('load',vulCheckerHelper.delayedPressLoginButton);				//must not do this. FF's gonna give u stupid hidden window error.
+	setTimeout(vulCheckerHelper.delayedPressLoginButton,3000);
+	console.log("pressLoginButton.js loaded.");
+}
+else
+{
+	vulCheckerHelper.searchForLoginButton(document.body);
+	console.log(vulCheckerHelper.sortedAttrInfoMap);
+}
