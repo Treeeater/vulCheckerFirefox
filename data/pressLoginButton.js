@@ -79,6 +79,7 @@ function VulCheckerHelper() {
 				{
 					curScore = curScore + calculateScore(curNode.firstChild.data);
 				}*/
+				if (that.hasLogin) curScore += 4;												//this is used to offset a lot of 'follow us on facebook' buttons.
 				if (that.hasFB && that.hasLogin) curScore += 4;									//extra score if both terms are found.
 				if (that.hasLikeOrShare && !that.hasLogin) curScore = -1;						//ignore like or share button without login.
 				if (!that.tryFindInvisibleLoginButton) {if (curNode.offsetWidth <= 0 || curNode.offsetHeight <= 0) curScore = -1;}		//ignore invisible element.
