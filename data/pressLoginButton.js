@@ -96,6 +96,7 @@ function VulCheckerHelper() {
 	}
 
 	this.searchForLoginButton = function(rootNode) {
+		that.init();
 		computeAsRoot(rootNode);
 		var i = 0;
 		var j = 0;
@@ -168,12 +169,17 @@ function VulCheckerHelper() {
 		}
 	}
 	
-	this.sortedAttrInfoMap = [];
-	this.AttrInfoMap = [];
-	this.count = 0;
-	this.hasFB = false;									
-	this.hasLogin = false;								
-	this.hasLikeOrShare = false;
+	this.init = function(){
+	
+		this.sortedAttrInfoMap = [];
+		this.AttrInfoMap = [];
+		this.count = 0;
+		this.hasFB = false;									
+		this.hasLogin = false;								
+		this.hasLikeOrShare = false;
+	}
+	
+	this.init();
 	
 	return this;
 }
