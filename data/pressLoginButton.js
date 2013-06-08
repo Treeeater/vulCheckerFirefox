@@ -3,6 +3,7 @@ function VulCheckerHelper() {
 	var that = this;
 	this.clicked = 0;
 	this.tryFindInvisibleLoginButton = false;
+	this.indexToClick = 0;
 	function createCookie(name,value,days) {
 		if (days) {
 			var date = new Date();
@@ -59,7 +60,8 @@ function VulCheckerHelper() {
 		if (curNode == null || curNode.attributes == null || curNode.nodeName == "SCRIPT" || curNode.nodeName == "EMBED" ) return;		//ignore all script and embed elements
 		if (curNode.nodeName.toLowerCase().indexOf("fb:")!=-1) return;				//to indicate if this tag is fb: something, we want to rule out those.
 		try {
-			if (curNode.nodeName != "IFRAME") {			//ignore iframe, but check its children, since it could have lots of fb/facebook in its url as false positive.
+			//if (curNode.nodeName != "IFRAME") {			//ignore iframe, but check its children, since it could have lots of fb/facebook in its url as false positive.
+			if (curNode.nodeName == "A" || curNode.nodeName == "DIV" || curNode.nodeName == "SPAN" || curNode.nodeName == "IMG") {			//ignore iframe, but check its children, since it could have lots of fb/facebook in its url as false positive.
 				var i = 0;
 				var curScore = 0;
 				that.hasFB = false;									//to indicate if this element has facebook-meaning term.
@@ -125,23 +127,21 @@ function VulCheckerHelper() {
 	this.sendLoginButtonInformation = function(){
 		//the following two statements need to be called maybe more than 1 time until a popup is presented, because some sites alter dom tree/navigate to new page and does not first present fb login button.
 		that.searchForLoginButton(document.body);			//this doesn't necessarily mean a login button is found. sortedAttrInfoMap could be empty.
-		//console.log(that.sortedAttrInfoMap[0].score);
-		if (vulCheckerHelper.sortedAttrInfoMap.length == 0) return {"loginButtonXPath":"", "loginButtonOuterHTML":""};			//no login button found.
-		return {"loginButtonXPath":vulCheckerHelper.getXPath(vulCheckerHelper.sortedAttrInfoMap[0].node), "loginButtonOuterHTML":vulCheckerHelper.sortedAttrInfoMap[0].node.outerHTML};
+		if (vulCheckerHelper.sortedAttrInfoMap.length <= vulCheckerHelper.indexToClick) return {"loginButtonXPath":"", "loginButtonOuterHTML":""};			//no login button found.
+		return {"loginButtonXPath":vulCheckerHelper.getXPath(vulCheckerHelper.sortedAttrInfoMap[vulCheckerHelper.indexToClick].node), "loginButtonOuterHTML":vulCheckerHelper.sortedAttrInfoMap[vulCheckerHelper.indexToClick].node.outerHTML};
 	}
 	
 	this.pressLoginButton = function(){
 		//the following two statements need to be called maybe more than 1 time until a popup is presented, because some sites alter dom tree/navigate to new page and does not first present fb login button.
-		console.log("pressing Login button...");
 		if (that.clicked > 2) {
 			console.log("pressed Login button too many times... Give up.");				//This code is unnecessary (checking logic moved to ccc.js) after 6/5/2013
 			return;
 		}
 		that.clicked++;
 		that.searchForLoginButton(document.body);
-		//console.log(that.sortedAttrInfoMap[0].score);
-		if (vulCheckerHelper.sortedAttrInfoMap.length == 0) return;			//no login button found.
-		self.port.emit("loginInfo",{"loginButtonXPath":vulCheckerHelper.getXPath(vulCheckerHelper.sortedAttrInfoMap[0].node), "loginButtonOuterHTML":vulCheckerHelper.sortedAttrInfoMap[0].node.outerHTML});
+		if (vulCheckerHelper.sortedAttrInfoMap.length <= vulCheckerHelper.indexToClick) return;			//no login button found.
+		console.log("pressing Login button @ XPath: " + vulCheckerHelper.getXPath(vulCheckerHelper.sortedAttrInfoMap[vulCheckerHelper.indexToClick].node));
+		self.port.emit("loginInfo",{"loginButtonXPath":vulCheckerHelper.getXPath(vulCheckerHelper.sortedAttrInfoMap[vulCheckerHelper.indexToClick].node), "loginButtonOuterHTML":vulCheckerHelper.sortedAttrInfoMap[vulCheckerHelper.indexToClick].node.outerHTML});
 	}
 	
 	this.automaticPressLoginButton = function(){
@@ -207,13 +207,14 @@ if (self.port)
 		//tell background we are about to press the login button.
 		//response should contain whether background page has detected that FB has been visited.
 		vulCheckerHelper.tryFindInvisibleLoginButton = response.tryFindInvisibleLoginButton;
+		vulCheckerHelper.indexToClick = response.indexToClick;
 		if (response.shouldClick) vulCheckerHelper.pressLoginButton();			//this condition ensures that once FB traffic is seen, we do not want to press login button again.
 	});
 	self.port.on("checkTestingStatus", function (response){
 		//check if background is in active checking.
 		if (response.shouldClick) vulCheckerHelper.automaticPressLoginButton();		//need to set a lenient timer, since if the fb traffic is not seen in this time, it's going to click the login button again, which resets the connection - this may create an infinite loop. Current setting is that if the login button is pressed more than twice, it gives up.
 	});
-	self.port.on("readyToClick", function(){vulCheckerHelper.sortedAttrInfoMap[0].node.click();});
+	self.port.on("readyToClick", function(){if (vulCheckerHelper.sortedAttrInfoMap.length > vulCheckerHelper.indexToClick) vulCheckerHelper.sortedAttrInfoMap[vulCheckerHelper.indexToClick].node.click();});
 	//window.addEventListener('load',vulCheckerHelper.delayedPressLoginButton);				//must not do this. FF's gonna give u stupid hidden window error.
 	setTimeout(vulCheckerHelper.delayedPressLoginButton,3000);
 	console.log("pressLoginButton.js loaded.");
