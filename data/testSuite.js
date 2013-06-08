@@ -6,8 +6,8 @@ function notifyOnload() {
 	}
 }
 
-function notifyOnbeforeunload() {
-	self.port.emit("unloadedURL",document.URL);
+function getURL() {
+	return document.URL;
 }
 
 function extractContent(){
@@ -33,6 +33,9 @@ self.port.on("action",function(request){
 	}
 	if (request.action == "after_modification_extractContent"){
 		self.port.emit("after_modification_extractedContent", extractContent());
+	}
+	if (request.action == "getURL"){
+		self.port.emit("getURL",getURL());
 	}
 });
 

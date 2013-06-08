@@ -60,8 +60,8 @@ function VulCheckerHelper() {
 		if (curNode == null || curNode.attributes == null || curNode.nodeName == "SCRIPT" || curNode.nodeName == "EMBED" ) return;		//ignore all script and embed elements
 		if (curNode.nodeName.toLowerCase().indexOf("fb:")!=-1) return;				//to indicate if this tag is fb: something, we want to rule out those.
 		try {
-			//if (curNode.nodeName != "IFRAME") {			//ignore iframe, but check its children, since it could have lots of fb/facebook in its url as false positive.
-			if (curNode.nodeName == "A" || curNode.nodeName == "DIV" || curNode.nodeName == "SPAN" || curNode.nodeName == "IMG") {			//ignore iframe, but check its children, since it could have lots of fb/facebook in its url as false positive.
+			
+			if (curNode.nodeName == "A" || curNode.nodeName == "DIV" || curNode.nodeName == "SPAN" || curNode.nodeName == "IMG") {
 				var i = 0;
 				var curScore = 0;
 				that.hasFB = false;									//to indicate if this element has facebook-meaning term.
@@ -89,6 +89,10 @@ function VulCheckerHelper() {
 				var temp = new AttrInfoClass(curNode, curScore);
 				that.AttrInfoMap[that.count] = temp;
 				that.count++;
+			}
+			if (curNode.nodeName == "IFRAME"){
+				//ignore iframe, but check its children, since it could have lots of fb/facebook in its url as false positive.
+				curNode = curNode.contentDocument.body || curNode.contentWindow.document.body;
 			}
 			for (i = 0; i <curNode.children.length; i++)
 			{
