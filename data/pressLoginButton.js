@@ -124,11 +124,11 @@ function VulCheckerHelper() {
 		}
 	}
 	
-	this.sendLoginButtonInformation = function(){
-		//the following two statements need to be called maybe more than 1 time until a popup is presented, because some sites alter dom tree/navigate to new page and does not first present fb login button.
+	this.sendLoginButtonInformation = function(index){
+		//only send the first click, second click shall be ignored.
 		that.searchForLoginButton(document.body);			//this doesn't necessarily mean a login button is found. sortedAttrInfoMap could be empty.
-		if (vulCheckerHelper.sortedAttrInfoMap.length <= vulCheckerHelper.indexToClick) return {"loginButtonXPath":"", "loginButtonOuterHTML":""};			//no login button found.
-		return {"loginButtonXPath":vulCheckerHelper.getXPath(vulCheckerHelper.sortedAttrInfoMap[vulCheckerHelper.indexToClick].node), "loginButtonOuterHTML":vulCheckerHelper.sortedAttrInfoMap[vulCheckerHelper.indexToClick].node.outerHTML};
+		if (vulCheckerHelper.sortedAttrInfoMap.length <= index) return {"loginButtonXPath":"", "loginButtonOuterHTML":""};			//no login button found.
+		return {"loginButtonXPath":vulCheckerHelper.getXPath(vulCheckerHelper.sortedAttrInfoMap[index].node), "loginButtonOuterHTML":vulCheckerHelper.sortedAttrInfoMap[index].node.outerHTML};
 	}
 	
 	this.pressLoginButton = function(){
@@ -191,18 +191,15 @@ var vulCheckerHelper = new VulCheckerHelper();
 
 if (self.port)
 {
-	self.port.on("action",function(action){
-			if (action == "userClickedPressLoginButton"){
-				vulCheckerHelper.pressLoginButton();
-			}
-			if (action == "sendLoginButtonInformation") {
-				self.port.emit("sendLoginButtonInformation",vulCheckerHelper.sendLoginButtonInformation());
-			}
-			if (action == "after_modification_sendLoginButtonInformation") {
-				self.port.emit("after_modification_sendLoginButtonInformation",vulCheckerHelper.sendLoginButtonInformation());
-			}
-		}
-	);
+	self.port.on("userClickedPressLoginButton",function(action){
+		vulCheckerHelper.pressLoginButton();
+	});
+	self.port.on("sendLoginButtonInformation",function(index){
+		self.port.emit("sendLoginButtonInformation",vulCheckerHelper.sendLoginButtonInformation(index));
+	});
+	self.port.on("after_modification_sendLoginButtonInformation",function(index){
+		self.port.emit("after_modification_sendLoginButtonInformation",vulCheckerHelper.sendLoginButtonInformation(index));
+	});
 	self.port.on("pressedLoginButton", function (response){
 		//tell background we are about to press the login button.
 		//response should contain whether background page has detected that FB has been visited.
