@@ -61,7 +61,7 @@ function VulCheckerHelper() {
 		if (curNode.nodeName.toLowerCase().indexOf("fb:")!=-1) return;				//to indicate if this tag is fb: something, we want to rule out those.
 		try {
 			
-			if (curNode.nodeName == "A" || curNode.nodeName == "DIV" || curNode.nodeName == "SPAN" || curNode.nodeName == "IMG") {
+			if (curNode.nodeName == "A" || curNode.nodeName == "DIV" || curNode.nodeName == "SPAN" || curNode.nodeName == "IMG" || curNode.nodeName == "INPUT") {
 				var i = 0;
 				var curScore = 0;
 				that.hasFB = false;									//to indicate if this element has facebook-meaning term.
@@ -78,10 +78,6 @@ function VulCheckerHelper() {
 					if (curChild.nodeType == 3) curScore = curScore + calculateScore(curChild.data);
 					curChild = curChild.nextSibling;
 				}
-				/*if (typeof curNode.children != "undefined" && curNode.firstChild != null && curNode.children.length == 0 && curNode.firstChild.nodeType == 3)
-				{
-					curScore = curScore + calculateScore(curNode.firstChild.data);
-				}*/
 				if (that.hasLogin) curScore += 4;												//this is used to offset a lot of 'follow us on facebook' buttons.
 				if (that.hasFB && that.hasLogin) curScore += 4;									//extra score if both terms are found.
 				if (that.hasLikeOrShare && !that.hasLogin) curScore = -1;						//ignore like or share button without login.
@@ -92,7 +88,11 @@ function VulCheckerHelper() {
 			}
 			if (curNode.nodeName == "IFRAME"){
 				//ignore iframe, but check its children, since it could have lots of fb/facebook in its url as false positive.
-				curNode = curNode.contentDocument.body || curNode.contentWindow.document.body;
+				try {curNode = curNode.contentDocument.body || curNode.contentWindow.document.body;} catch(ex){
+					//console.log(ex.message);
+					//Do nothing here. If it violates SOP we just ignores it.
+					//If we do not catch anything, console is going to output [object object] for each violation.
+				}
 			}
 			for (i = 0; i <curNode.children.length; i++)
 			{
