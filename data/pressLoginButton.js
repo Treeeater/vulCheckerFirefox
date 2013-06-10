@@ -128,11 +128,12 @@ function VulCheckerHelper() {
 		}
 	}
 	
-	this.sendLoginButtonInformation = function(index){
+	this.sendLoginButtonInformation = function(response){
 		//only send the first click, second click shall be ignored.
+		that.tryFindInvisibleLoginButton = response.tryFindInvisibleLoginButton;
 		that.searchForLoginButton(document.body);			//this doesn't necessarily mean a login button is found. sortedAttrInfoMap could be empty.
-		if (vulCheckerHelper.sortedAttrInfoMap.length <= index) return {"loginButtonXPath":"", "loginButtonOuterHTML":""};			//no login button found.
-		return {"loginButtonXPath":vulCheckerHelper.getXPath(vulCheckerHelper.sortedAttrInfoMap[index].node), "loginButtonOuterHTML":vulCheckerHelper.sortedAttrInfoMap[index].node.outerHTML};
+		if (vulCheckerHelper.sortedAttrInfoMap.length <= response.indexToClick) return {"loginButtonXPath":"", "loginButtonOuterHTML":""};			//no login button found.
+		return {"loginButtonXPath":vulCheckerHelper.getXPath(vulCheckerHelper.sortedAttrInfoMap[response.indexToClick].node), "loginButtonOuterHTML":vulCheckerHelper.sortedAttrInfoMap[response.indexToClick].node.outerHTML};
 	}
 	
 	this.pressLoginButton = function(){
@@ -198,11 +199,11 @@ if (self.port)
 	self.port.on("userClickedPressLoginButton",function(action){
 		vulCheckerHelper.pressLoginButton();
 	});
-	self.port.on("sendLoginButtonInformation",function(index){
-		self.port.emit("sendLoginButtonInformation",vulCheckerHelper.sendLoginButtonInformation(index));
+	self.port.on("sendLoginButtonInformation",function(response){
+		self.port.emit("sendLoginButtonInformation",vulCheckerHelper.sendLoginButtonInformation(response));
 	});
-	self.port.on("after_modification_sendLoginButtonInformation",function(index){
-		self.port.emit("after_modification_sendLoginButtonInformation",vulCheckerHelper.sendLoginButtonInformation(index));
+	self.port.on("after_modification_sendLoginButtonInformation",function(response){
+		self.port.emit("after_modification_sendLoginButtonInformation",vulCheckerHelper.sendLoginButtonInformation(response));
 	});
 	self.port.on("pressedLoginButton", function (response){
 		//tell background we are about to press the login button.
