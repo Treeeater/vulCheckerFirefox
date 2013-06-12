@@ -41,15 +41,30 @@ var Registration = function(){
 	}
 	
 	this.tryFindInputForm = function(){
-		that.forms = document.getElementsByTagName('form');
+		that.forms = document.getElementsByTagName('input');
 		var i;
 		for (i = 0; i < that.forms.length; i++)
 		{
-			if (that.forms[i].offsetWidth <= 0 || that.forms[i].offsetHeight <= 0) continue;			//impossible to look at invisible forms.
+			var formWidth = that.forms[i].offsetWidth;
+			var formHeight = that.forms[i].offsetHeight;
+			if (formWidth <= 0 || formHeight <= 0) continue;			//impossible to look at invisible forms.
 			var position = that.getOffset(that.forms[i]);
-			console.log(that.forms[i]);
-			console.log(document.elementFromPoint(position.left+1, position.top+1));
-			console.log(" is" + (that.isChildElement(that.forms[i],document.elementFromPoint(position.left+1, position.top+1)) ? " at top layer" : " at bot layer"));
+			var j;
+			var score = 0;
+			//Don't judge the form unfairly because of the screen/browser window size.
+			var maxHeight = (document.documentElement.clientHeight - position.top > formHeight)? formHeight : document.documentElement.clientHeight - position.top;
+			var maxWidth = (document.documentElement.clientWidth > formWidth)? formWidth : document.documentElement.clientWidth - position.left;
+			//Instead of deciding it on one try, deciding it on 10 tries.  This tackles some weird problems.
+			for (j = 0; j < 10; j++)
+			{
+				score = that.isChildElement(that.forms[i],document.elementFromPoint(position.left+1+j*maxWidth/10, position.top+1+j*maxHeight/10)) ? score + 1 : score;
+			}
+			if (score > 8)
+			{
+				console.log(that.forms[i]);
+				console.log(document.elementFromPoint(position.left+1, position.top+1));
+				console.log(" is" + score.toString());
+			}
 		}
 	}
 }
