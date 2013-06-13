@@ -59,7 +59,7 @@ var Registration = function(){
 			{
 				score = that.isChildElement(that.forms[i],document.elementFromPoint(position.left+1+j*maxWidth/10, position.top+1+j*maxHeight/10)) ? score + 1 : score;
 			}
-			if (score > 8)
+			if (score >= 8)
 			{
 				console.log(that.forms[i]);
 				console.log(document.elementFromPoint(position.left+1, position.top+1));
@@ -71,4 +71,8 @@ var Registration = function(){
 
 var registration = new Registration();
 
+self.port.on("startRegister",function(response){
+	registration.tryFindInputForm();
+	self.port.emit("submitted",{"elementsToClick":[],"buttonToClick":[]});
+})
 //registration.tryFindInputForm();
