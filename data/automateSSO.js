@@ -78,7 +78,7 @@ self.port.on("requestFBAccount", function (response){
 });
 
 self.port.on("requestAccountInfo",function(resp){
-	self.port.emit("requestAccountInfo",JSON.stringify(accounts));
+	self.port.emit("requestAccountInfo",accounts);
 });
 
 //auto-check every time.
