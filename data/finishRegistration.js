@@ -4,7 +4,6 @@ var Registration = function(){
 	this.selects = [];
 	this.sortedSubmitButtons = [];
 	this.account;
-	
 	var uniqueRadioButtons = [];
 	var filledRadioButtonNames = [];
 	/*this.getOffset = function(el) {
@@ -54,7 +53,9 @@ var Registration = function(){
 		//given an element, returns true if it's likely to be on the topmost layer, false if otherwise.
 		var inputWidth = ele.offsetWidth;
 		var inputHeight = ele.offsetHeight;
-		if (inputWidth <= 0 || inputHeight <= 0) return false;			//impossible to look at invisible inputs.
+		//heuristics: any element with a too large dimension cannot be input/submit, it must be just a underlaying div/layer.
+		if (inputWidth >= screen.availWidth/4 || inputHeight >= screen.availHeight/4) return false;
+		if (inputWidth <= 0 || inputHeight <= 0) return false;			//Elements that are on top layer must be visible.
 		var position = that.getOffset(ele);
 		var j;
 		var score = 0;
@@ -66,7 +67,7 @@ var Registration = function(){
 		{
 			score = that.isChildElement(ele,document.elementFromPoint(position.left+1+j*maxWidth/10, position.top+1+j*maxHeight/10)) ? score + 1 : score;
 		}
-		if (score >= 8) return true;
+		if (score >= 5) return true;
 		else return false;
 	}
 	
@@ -75,7 +76,9 @@ var Registration = function(){
 		var i;
 		for (i = 0; i < allInputs.length; i++)
 		{
-			if (that.onTopLayer(allInputs[i])) that.inputs.push(allInputs[i]);
+			if (that.onTopLayer(allInputs[i])) {
+				that.inputs.push(allInputs[i]);
+			}
 		}
 	}
 	
@@ -198,20 +201,69 @@ var Registration = function(){
 		var i = 0;
 		var j = 0;
 		var temp = document.getElementsByTagName('input');
+		var lowerThanAnyInput = false;
 		for (i = 0; i < temp.length; i++){
-			if (that.onTopLayer(temp[i])) suspects.push(temp[i]);
+			//Heuristics: eliminate those suspects whose position is not lower than all input elements:
+			if (!that.onTopLayer(temp[i])) continue;
+			lowerThanAnyInput = false;
+			TLtop = that.getOffset(temp[i]).top;
+			for (j = 0; j < that.inputs.length; j++)
+			{
+				if (TLtop < that.getOffset(that.inputs[j]).top) {
+					lowerThanAnyInput = true;
+					break;
+				}
+			}
+			if (lowerThanAnyInput) continue;
+			suspects.push(temp[i]);
 		}
 		temp = document.getElementsByTagName('button');
 		for (i = 0; i < temp.length; i++){
-			if (that.onTopLayer(temp[i])) suspects.push(temp[i]);
+			//Heuristics: eliminate those suspects whose position is not lower than all input elements:
+			if (!that.onTopLayer(temp[i])) continue;
+			lowerThanAnyInput = false;
+			TLtop = that.getOffset(temp[i]).top;
+			for (j = 0; j < that.inputs.length; j++)
+			{
+				if (TLtop < that.getOffset(that.inputs[j]).top) {
+					lowerThanAnyInput = true;
+					break;
+				}
+			}
+			if (lowerThanAnyInput) continue;
+			suspects.push(temp[i]);
 		}
 		temp = document.getElementsByTagName('div');
 		for (i = 0; i < temp.length; i++){
-			if (that.onTopLayer(temp[i])) suspects.push(temp[i]);
+			//Heuristics: eliminate those suspects whose position is not lower than all input elements:
+			if (!that.onTopLayer(temp[i])) continue;
+			lowerThanAnyInput = false;
+			TLtop = that.getOffset(temp[i]).top;
+			for (j = 0; j < that.inputs.length; j++)
+			{
+				if (TLtop < that.getOffset(that.inputs[j]).top) {
+					lowerThanAnyInput = true;
+					break;
+				}
+			}
+			if (lowerThanAnyInput) continue;
+			suspects.push(temp[i]);
 		}
 		temp = document.getElementsByTagName('a');
 		for (i = 0; i < temp.length; i++){
-			if (that.onTopLayer(temp[i])) suspects.push(temp[i]);
+			//Heuristics: eliminate those suspects whose position is not lower than all input elements:
+			if (!that.onTopLayer(temp[i])) continue;
+			lowerThanAnyInput = false;
+			TLtop = that.getOffset(temp[i]).top;
+			for (j = 0; j < that.inputs.length; j++)
+			{
+				if (TLtop < that.getOffset(that.inputs[j]).top) {
+					lowerThanAnyInput = true;
+					break;
+				}
+			}
+			if (lowerThanAnyInput) continue;
+			suspects.push(temp[i]);
 		}
 		for (i = 0; i < suspects.length; i++){
 			var curScore = 0;
@@ -224,8 +276,9 @@ var Registration = function(){
 				curScore += (temp.indexOf('regist')>-1?3:0);			//include registration and register
 				curScore += (temp.indexOf('sign up')>-1?3:0);
 				curScore += (temp.indexOf('signup')>-1?3:0);
+				curScore += (temp.indexOf('create')>-1?3:0);
 			}
-			if (curScore >= 3){
+			if (curScore >= 1){
 				submitButtons.push({node:suspects[i],score:curScore});
 			}
 		}
@@ -274,7 +327,7 @@ if (self.port){
 else{
 	registration.account = {firstName:"Syxvq",lastName:"Ldswpk",email:"syxvq_ldswpk@yahoo.com"};
 	registration.tryCompleteRegistration();			//for debugging.
-	console.log(registration.inputs);
+	//console.log(registration.inputs);
 	//console.log(registration.selects);
-	//console.log(registration.sortedSubmitButtons[0]);
+	console.log(registration.sortedSubmitButtons[0]);
 }
