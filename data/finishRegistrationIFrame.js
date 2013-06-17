@@ -164,7 +164,7 @@ var Registration = function(){
 		that.processRadio();
 		if (that.inputs.length > 0)
 		{
-			console.log("Top: Fields populated. Ready to click submit button.");
+			console.log("IFrame: Fields populated. Ready to click submit button.");
 		}
 	}
 	
@@ -314,22 +314,28 @@ var Registration = function(){
 		that.tryProcessSelects();
 		that.tryFindSubmitButton();
 		that.attempts++;
-		if (that.sortedSubmitButtons.length == 0 && that.attempts <= 2) setTimeout(that.tryCompleteRegistration,2000);		//tackle situations where page is first created but are blank, and contents are filled in afterwards.
+		if (that.sortedSubmitButtons.length == 0 && that.attempts <= 2) setTimeout(that.tryCompleteRegistration,2000);		//tackle situations like expedia.com, where iframes are first created but are blank, and contents are filled in afterwards.
 	}
 }
 
 var registration = new Registration();
 
 if (self.port){
-	self.port.emit("getUserInfo","");
+	self.port.emit("getCapturingPhase","");							//iframe finish registration worker start automatically, don't need ccc to issue a command; However, they only work if capturingPhase is 4 or 10.
+	self.port.on("getCapturingPhase",function (response){
+		if (response == 4 || response == 10) {
+			console.log("https iframe detected while capturing phase is 4 or 10.");
+			self.port.emit("getUserInfo","");
+		}
+	});
 	self.port.on("issueUserInfo",function(response){
 		//console.log(JSON.stringify(response));
 		registration.account = response;
-	});
-	self.port.on("startRegister",function(response){
 		registration.tryCompleteRegistration();
-		if (registration.sortedSubmitButtons.length>0) console.log(registration.sortedSubmitButtons[0].node.outerHTML);
-		self.port.emit("registrationSubmitted",{"elementsToClick":[],"buttonToClick":[]});
+		if (registration.sortedSubmitButtons.length>0) {
+			console.log(registration.sortedSubmitButtons[0].node.outerHTML);
+			self.port.emit("registrationSubmitted",{"elementsToClick":[],"buttonToClick":[]});
+		}
 	});
 }
 else{
