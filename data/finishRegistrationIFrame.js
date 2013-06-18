@@ -321,14 +321,14 @@ var Registration = function(){
 var registration = new Registration();
 
 var delayedCall = function(){
-	self.port.emit("getCapturingPhase","");							//iframe finish registration worker start automatically, don't need ccc to issue a command; However, they only work if capturingPhase is 4 or 10.
+	self.port.emit("shouldRegisterIframe","");							//iframe finish registration worker start automatically, don't need ccc to issue a command; However, they only work if capturingPhase is 4 or 10.
 }
 
 if (self.port){
 	setTimeout(delayedCall,1000);
-	self.port.on("getCapturingPhase",function (response){
-		if (response == 4 || response == 10) {
-			console.log("https iframe detected while capturing phase is 4 or 10.");
+	self.port.on("shouldRegisterIframe",function (response){
+		if (response) {
+			console.log("https iframe detected while capturing phase is 4 or 10 and the site needs registration.");
 			self.port.emit("getUserInfo","");
 		}
 	});
