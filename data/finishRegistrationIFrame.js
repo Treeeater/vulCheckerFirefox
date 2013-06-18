@@ -314,14 +314,18 @@ var Registration = function(){
 		that.tryProcessSelects();
 		that.tryFindSubmitButton();
 		that.attempts++;
-		if (that.sortedSubmitButtons.length == 0 && that.attempts <= 2) setTimeout(that.tryCompleteRegistration,2000);		//tackle situations like expedia.com, where iframes are first created but are blank, and contents are filled in afterwards.
+		if (that.sortedSubmitButtons.length == 0 && that.attempts <= 2) setTimeout(that.tryCompleteRegistration,2000);		//tackle situations like expedia.com, where iframes are first created but are blank, and contents are filled in afterwards. Also solves two click issue?
 	}
 }
 
 var registration = new Registration();
 
-if (self.port){
+var delayedCall = function(){
 	self.port.emit("getCapturingPhase","");							//iframe finish registration worker start automatically, don't need ccc to issue a command; However, they only work if capturingPhase is 4 or 10.
+}
+
+if (self.port){
+	setTimeout(delayedCall,1000);
 	self.port.on("getCapturingPhase",function (response){
 		if (response == 4 || response == 10) {
 			console.log("https iframe detected while capturing phase is 4 or 10.");
@@ -334,7 +338,7 @@ if (self.port){
 		registration.tryCompleteRegistration();
 		if (registration.sortedSubmitButtons.length>0) {
 			console.log(registration.sortedSubmitButtons[0].node.outerHTML);
-			self.port.emit("registrationSubmitted",{"elementsToClick":[],"buttonToClick":[]});
+			self.port.emit("registrationSubmitted",{"elementsToClick":[],"buttonToClick":[]});			//10 sec delay to refresh homepage, or if refresh traffic is seen, just go to next phase.
 		}
 	});
 }
