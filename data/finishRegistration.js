@@ -323,13 +323,15 @@ var registration = new Registration();
 if (self.port){
 	self.port.emit("getUserInfo","");
 	self.port.on("issueUserInfo",function(response){
-		//console.log(JSON.stringify(response));
 		registration.account = response;
 	});
 	self.port.on("startRegister",function(response){
 		registration.tryCompleteRegistration();
-		if (registration.sortedSubmitButtons.length>0) console.log(registration.sortedSubmitButtons[0].node.outerHTML);
-		self.port.emit("registrationSubmitted",{"elementsToClick":[],"buttonToClick":[]});
+		if (registration.sortedSubmitButtons.length>0) {
+			console.log("Clicking on submit button: " + registration.sortedSubmitButtons[0].node.outerHTML);
+			//registration.sortedSubmitButtons[0].node.click();
+			self.port.emit("registrationSubmitted",{"elementsToClick":[],"buttonToClick":[]});
+		}
 	});
 }
 else{
