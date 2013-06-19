@@ -329,7 +329,7 @@ if (self.port){
 		registration.tryCompleteRegistration();
 		if (registration.sortedSubmitButtons.length>0) {
 			console.log("Clicking on submit button: " + registration.sortedSubmitButtons[0].node.outerHTML);
-			//registration.sortedSubmitButtons[0].node.click();
+			registration.sortedSubmitButtons[0].node.click();
 			self.port.emit("registrationSubmitted",{"elementsToClick":[],"buttonToClick":[]});
 		}
 	});
