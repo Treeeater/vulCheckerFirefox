@@ -328,7 +328,7 @@ if (self.port){
 	self.port.on("startRegister",function(response){
 		registration.tryCompleteRegistration();
 		if (registration.sortedSubmitButtons.length>0) {
-			console.log("Clicking on submit button: " + registration.sortedSubmitButtons[0].node.outerHTML);
+			console.log("Clicking on submit button from main page: " + registration.sortedSubmitButtons[0].node.outerHTML);
 			registration.sortedSubmitButtons[0].node.click();
 			self.port.emit("registrationSubmitted",{"elementsToClick":[],"buttonToClick":[]});
 		}
