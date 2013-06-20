@@ -4,6 +4,7 @@ function VulCheckerHelper() {
 	this.clicked = 0;
 	this.tryFindInvisibleLoginButton = false;
 	this.indexToClick = 0;
+	this.account;
 	function createCookie(name,value,days) {
 		if (days) {
 			var date = new Date();
@@ -104,8 +105,24 @@ function VulCheckerHelper() {
 		}
 	}
 
+	function checkAccountInfoPresense(node){
+		var fullContent = node.innerHTML.toLowerCase();
+		var i = 0;
+		for (i = 0; i < that.account.length; i++){
+			if (fullContent.indexOf(that.account[i].firstName)!=-1) return true;
+			if (fullContent.indexOf(that.account[i].lastName)!=-1) return true;
+			if (fullContent.indexOf(that.account[i].email)!=-1) return true;
+			if (fullContent.indexOf(that.account[i].picSRC)!=-1) return true;
+			if (fullContent.indexOf(that.account[i].picSRC2)!=-1) return true;
+			if (fullContent.indexOf(that.account[i].picSRC3)!=-1) return true;
+			if (fullContent.indexOf(that.account[i].picSRC4)!=-1) return true;
+		}
+		return false;
+	}
+	
 	this.searchForLoginButton = function(rootNode) {
 		that.init();
+		if (checkAccountInfoPresense(rootNode)) return;
 		computeAsRoot(rootNode);
 		var i = 0;
 		var j = 0;
@@ -144,7 +161,7 @@ function VulCheckerHelper() {
 		}
 		that.clicked++;
 		that.searchForLoginButton(document.body);
-		if (vulCheckerHelper.sortedAttrInfoMap.length <= vulCheckerHelper.indexToClick) return;			//no login button found.
+		if (vulCheckerHelper.sortedAttrInfoMap.length <= vulCheckerHelper.indexToClick) return;			//no login button found, don't do anything.
 		console.log("pressing Login button @ XPath: " + vulCheckerHelper.getXPath(vulCheckerHelper.sortedAttrInfoMap[vulCheckerHelper.indexToClick].node));
 		self.port.emit("loginInfo",{"loginButtonXPath":vulCheckerHelper.getXPath(vulCheckerHelper.sortedAttrInfoMap[vulCheckerHelper.indexToClick].node), "loginButtonOuterHTML":vulCheckerHelper.sortedAttrInfoMap[vulCheckerHelper.indexToClick].node.outerHTML});
 	}
@@ -197,12 +214,15 @@ var vulCheckerHelper = new VulCheckerHelper();
 if (self.port)
 {
 	self.port.on("userClickedPressLoginButton",function(action){
+		vulCheckerHelper.account = [];
 		vulCheckerHelper.pressLoginButton();
 	});
 	self.port.on("sendLoginButtonInformation",function(response){
+		vulCheckerHelper.account = response.account;
 		self.port.emit("sendLoginButtonInformation",vulCheckerHelper.sendLoginButtonInformation(response));
 	});
 	self.port.on("after_modification_sendLoginButtonInformation",function(response){
+		vulCheckerHelper.account = response.account;
 		self.port.emit("after_modification_sendLoginButtonInformation",vulCheckerHelper.sendLoginButtonInformation(response));
 	});
 	self.port.on("pressedLoginButton", function (response){
@@ -214,6 +234,7 @@ if (self.port)
 	});
 	self.port.on("checkTestingStatus", function (response){
 		//check if background is in active checking.
+		vulCheckerHelper.account = response.account;
 		if (response.shouldClick) vulCheckerHelper.automaticPressLoginButton();		//need to set a lenient timer, since if the fb traffic is not seen in this time, it's going to click the login button again, which resets the connection - this may create an infinite loop. Current setting is that if the login button is pressed more than twice, it gives up.
 	});
 	self.port.on("readyToClick", function(){if (vulCheckerHelper.sortedAttrInfoMap.length > vulCheckerHelper.indexToClick) vulCheckerHelper.sortedAttrInfoMap[vulCheckerHelper.indexToClick].node.click();});

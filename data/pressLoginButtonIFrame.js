@@ -4,6 +4,7 @@ function VulCheckerHelper() {
 	this.clicked = 0;
 	this.tryFindInvisibleLoginButton = false;
 	this.indexToClick = 0;
+	this.account;
 	function createCookie(name,value,days) {
 		if (days) {
 			var date = new Date();
@@ -103,9 +104,25 @@ function VulCheckerHelper() {
 			console.log(e);
 		}
 	}
-
+	
+	function checkAccountInfoPresense(node){
+		var fullContent = node.innerHTML.toLowerCase();
+		var i = 0;
+		for (i = 0; i < that.account.length; i++){
+			if (fullContent.indexOf(that.account[i].firstName)!=-1) return true;
+			if (fullContent.indexOf(that.account[i].lastName)!=-1) return true;
+			if (fullContent.indexOf(that.account[i].email)!=-1) return true;
+			if (fullContent.indexOf(that.account[i].picSRC)!=-1) return true;
+			if (fullContent.indexOf(that.account[i].picSRC2)!=-1) return true;
+			if (fullContent.indexOf(that.account[i].picSRC3)!=-1) return true;
+			if (fullContent.indexOf(that.account[i].picSRC4)!=-1) return true;
+		}
+		return false;
+	}
+	
 	this.searchForLoginButton = function(rootNode) {
 		that.init();
+		if (checkAccountInfoPresense(rootNode)) return;
 		computeAsRoot(rootNode);
 		var i = 0;
 		var j = 0;
@@ -185,6 +202,7 @@ if (self.port)
 {
 	setTimeout(delayedCall,2000);
 	self.port.on("checkTestingStatus",function(response){
+		vulCheckerHelper.account = response.account;
 		if (response.shouldClick) {
 			console.log("https iframe detected while press login button should be clicked...");
 			vulCheckerHelper.indexToClick = response.indexToClick;
