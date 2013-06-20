@@ -85,4 +85,4 @@ self.port.on("requestAccountInfo",function(resp){
 //wait until test account name is inited.
 window.addEventListener('load',function(){setTimeout(automateSSO.checkEverything,1000)});
 setTimeout(automateSSO.checkEverything,2000);				//fallback if onload is not fired.	*Note*: This problem can probably be solved by writing 'run_at' : 'document.start' in manifest.json for all content scripts.
-console.log("automateSSO.js loaded.");
+//console.log("automateSSO.js loaded.");

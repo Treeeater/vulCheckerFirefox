@@ -43,4 +43,4 @@ self.port.on("action",function(request){
 
 window.setTimeout(notifyOnload, 1000);				//fall back to setTimeout if page doesn't finish loading after 10 sec.
 
-console.log("testSuite.js loaded");
+//console.log("testSuite.js loaded");

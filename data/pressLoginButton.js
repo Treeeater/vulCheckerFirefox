@@ -219,7 +219,7 @@ if (self.port)
 	self.port.on("readyToClick", function(){if (vulCheckerHelper.sortedAttrInfoMap.length > vulCheckerHelper.indexToClick) vulCheckerHelper.sortedAttrInfoMap[vulCheckerHelper.indexToClick].node.click();});
 	//window.addEventListener('load',vulCheckerHelper.delayedPressLoginButton);				//must not do this. FF's gonna give u stupid hidden window error.
 	setTimeout(vulCheckerHelper.delayedPressLoginButton,3000);
-	console.log("pressLoginButton.js loaded.");
+	//console.log("pressLoginButton.js loaded.");
 }
 else
 {
