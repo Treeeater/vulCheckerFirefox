@@ -177,24 +177,25 @@ var Registration = function(){
 		}
 	}
 	
-	this.tryProcessSelects = function(selectEle){
+	this.tryProcessSelects = function(){
 		var i,j,k;
 		for (i = 0; i < that.selects.length; i++)
 		{
 			//select a random one.
 			//currently we only select the first level children, however, because the existence of optgroup element, option elements may appear in second level.
 			//This is true for dailymail.co.uk.
-			j = Math.floor(Math.random()*that.selects[i].children.length);
+			var allOptions = $(that.selects[i]).find('option');
+			j = Math.floor(Math.random()*allOptions.length);
 			k = 0;
-			while ((typeof that.selects[i].children[j]=="undefined"||that.selects[i].children[j].disabled)&&k<10) {
-				j = Math.floor(Math.random()*that.selects[i].children.length); 
+			while ((typeof allOptions[j]=="undefined"||allOptions[j].disabled)&&k<10) {
+				j = Math.floor(Math.random()*allOptions.length); 
 				k++;
 			}
-			if (that.selects[i].children[j].disabled) {
+			if (allOptions[j].disabled) {
 				console.log("Error! All options are disabled.");
 			}
 			else {
-				that.selects[i].children[j].selected = true;
+				allOptions[j].selected = true;
 			}
 		}
 	}
