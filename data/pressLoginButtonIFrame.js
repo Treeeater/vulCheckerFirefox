@@ -204,7 +204,7 @@ if (self.port)
 	self.port.on("checkTestingStatus",function(response){
 		vulCheckerHelper.account = response.account;
 		if (response.shouldClick) {
-			console.log("https iframe detected while press login button should be clicked...");
+			console.log("Legitimate iframe detected while press login button should be clicked, searching in this iframe...");
 			vulCheckerHelper.indexToClick = response.indexToClick;
 			vulCheckerHelper.pressLoginButton();
 		}

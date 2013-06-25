@@ -4,7 +4,7 @@ function VulCheckerHelper() {
 	this.clicked = 0;
 	this.tryFindInvisibleLoginButton = false;
 	this.indexToClick = 0;
-	this.account;
+	this.account=[];
 	function createCookie(name,value,days) {
 		if (days) {
 			var date = new Date();
