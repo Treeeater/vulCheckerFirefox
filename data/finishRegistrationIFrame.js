@@ -105,8 +105,26 @@ var Registration = function(){
 				return;
 			}
 		}
-		inputEle.value = randomString(8, 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ');
-		console.log("Random string inserted.");
+		var inputLength = inputEle.maxLength;
+		if (typeof inputLength == 'undefined') inputLength = inputEle.size;
+		if (typeof inputLength == 'undefined') inputLength = 8;
+		var numericalInput = false;
+		var i = 0;
+		for (i = 0; i < inputEle.attributes.length; i++)
+		{
+			if (inputEle.attributes[i].value.indexOf('number')>-1 || inputEle.attributes[i].value.indexOf('numeric')>-1 || inputEle.attributes[i].value.indexOf('phone')>-1 || inputEle.attributes[i].value.indexOf('number')>-1) {
+				numericalInput = true;
+				break;
+			}
+		}
+		if (numericalInput){
+			inputEle.value = randomString(inputLength, '1234567890');
+			console.log("Random numbers inserted.");
+		}
+		else {
+			inputEle.value = randomString(inputLength, 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ');
+			console.log("Random alphabets inserted.");
+		}
 	}
 	
 	this.fill = function(inputEle){
