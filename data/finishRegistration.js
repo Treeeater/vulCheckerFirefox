@@ -72,17 +72,6 @@ var Registration = function(){
 		else return false;
 	}
 	
-	this.tryFindInputs = function(){
-		var allInputs = document.getElementsByTagName('input');
-		var i;
-		for (i = 0; i < allInputs.length; i++)
-		{
-			if (that.onTopLayer(allInputs[i])) {
-				that.inputs.push(allInputs[i]);
-			}
-		}
-	}
-	
 	this.fillText = function(inputEle){
 		if (inputEle == null || typeof inputEle == "undefined") return;
 		if (inputEle.value != "") return;			//auto-filled by the application, presumbly by SSO process.  We don't do anything here.
@@ -157,52 +146,73 @@ var Registration = function(){
 		}
 	}
 	
-	this.processRadio = function(){
-		//second pass, go through the radio inputs and give a value to those that don't have value.
-		for (i = 0; i < that.inputs.length; i++)
-		{
-			if (that.inputs[i].type == "radio")
-			{
-				if (!that.inputs[i].checked && filledRadioButtonNames.indexOf(that.inputs[i].name) == -1)
-				{
-					//this entire class is not chosen, we need to choose one (this one).
-					that.inputs[i].checked = true;
-					filledRadioButtonNames.push(that.inputs[i].name);
-				}
-			}
-		}
-	}
-	
 	this.tryFillInInputs = function(){
-		var i;
-		for (i = 0; i < that.inputs.length; i++)
-		{
-			that.fill(that.inputs[i]);
+		var i = 0;
+		var processedInputs = [];
+		while ( i < document.getElementsByTagName('input').length ){
+			var currentInput = document.getElementsByTagName('input')[i];
+			if (processedInputs.indexOf(currentInput) > -1 || currentInput.type == "radio"){
+				i++;
+				continue;
+			}
+			if (!that.onTopLayer(currentInput)) {
+				//ignore elements that are not on top.
+				i++;
+				continue;
+			}
+			that.fill(currentInput);
+			processedInputs.push(currentInput);
+			i = 0;
 		}
-		that.processRadio();
-		if (that.inputs.length > 0)
+		if (i > 0)
 		{
 			console.log("Top: Fields populated. Ready to click submit button.");
 		}
 	}
 	
-	this.tryFindSelects = function(){
-		var allSelects = document.getElementsByTagName('select');
-		var i;
-		for (i = 0; i < allSelects.length; i++)
-		{
-			if (that.onTopLayer(allSelects[i])) that.selects.push(allSelects[i]);
+	this.tryProcessRadio = function(){
+		//second pass, go through the radio inputs and give a value to those that don't have value.
+		var i = 0;
+		var processedRadioNames = [];
+		while ( i < document.getElementsByTagName('input').length ){
+			//process selects one by one, and rescan them after processing, make sure no new selects show up after selecting one previously.
+			var currentRadioElement = document.getElementsByTagName('input')[i];
+			if (processedRadioNames.indexOf(currentRadioElement.name) > -1 || currentRadioElement.type != "radio") {
+				//ignore elements that are already processed
+				//also ignore all non-radio inputs.
+				i++;
+				continue;
+			}
+			if (!that.onTopLayer(currentRadioElement)) {
+				//ignore elements that are not on top.
+				i++;
+				continue;
+			}
+			currentRadioElement.checked = true;
+			processedRadioNames.push(currentRadioElement.name);
+			i = 0;
 		}
 	}
 	
 	this.tryProcessSelects = function(){
 		var i,j,k;
-		for (i = 0; i < that.selects.length; i++)
-		{
-			//select a random one.
-			//currently we only select the first level children, however, because the existence of optgroup element, option elements may appear in second level.
-			//This is true for dailymail.co.uk.
-			var allOptions = $(that.selects[i]).find('option');
+		i = 0;
+		var processedSelects = [];
+		while ( i < document.getElementsByTagName('select').length ){
+			//process selects one by one, and rescan them after processing, make sure no new selects show up after selecting one previously.
+			var currentSelectElement = document.getElementsByTagName('select')[i];
+			if (processedSelects.indexOf(currentSelectElement)>-1) {
+				//ignore elements that are already processed
+				i++;
+				continue;
+			}
+			if (!that.onTopLayer(currentSelectElement)) {
+				//ignore elements that are not on top.
+				i++;
+				continue;
+			}
+			//process this element.
+			var allOptions = $(currentSelectElement).find('option');
 			j = Math.floor(Math.random()*allOptions.length);
 			k = 0;
 			while ((typeof allOptions[j]=="undefined"||allOptions[j].disabled)&&k<10) {
@@ -215,6 +225,8 @@ var Registration = function(){
 			else {
 				allOptions[j].selected = true;
 			}
+			processedSelects.push(currentSelectElement);
+			i = 0;
 		}
 	}
 	
@@ -327,10 +339,9 @@ var Registration = function(){
 	
 	this.tryCompleteRegistration = function(){
 		if (that.sortedSubmitButtons.length > 0) return;
-		that.tryFindInputs();
-		that.tryFillInInputs();
-		that.tryFindSelects();
+		that.tryProcessRadio();
 		that.tryProcessSelects();
+		that.tryFillInInputs();
 		that.tryFindSubmitButton();
 		that.attempts++;
 		if (that.sortedSubmitButtons.length == 0 && that.attempts <= 2) setTimeout(that.tryCompleteRegistration,2000);		//tackle situations where page is first created but are blank, and contents are filled in afterwards.
