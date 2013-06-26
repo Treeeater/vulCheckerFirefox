@@ -24,17 +24,20 @@ var Registration = function(){
 	}
 	
 	this.getOffset = function(ele) {
-		var top = 0;
-		var left = 0;
-		while(ele.tagName != "BODY") {
-			top += ele.offsetTop;
-			left += ele.offsetLeft;
-			if (getComputedStyle(ele).position == "fixed") {
-				break;
+		if (!!ele){
+			var top = 0;
+			var left = 0;
+			while(ele.tagName != "BODY") {
+				top += ele.offsetTop;
+				left += ele.offsetLeft;
+				if (getComputedStyle(ele).position == "fixed") {
+					break;
+				}
+				ele = ele.offsetParent;
 			}
-			ele = ele.offsetParent;
+			return { top: top, left: left };
 		}
-		return { top: top, left: left };
+		return {top:0, left:0};
 	}
 	
 	this.isChildElement = function(parent, child){
@@ -52,6 +55,7 @@ var Registration = function(){
 	
 	this.onTopLayer = function(ele){
 		//given an element, returns true if it's likely to be on the topmost layer, false if otherwise.
+		if (!ele) return false;
 		var inputWidth = ele.offsetWidth;
 		var inputHeight = ele.offsetHeight;
 		//heuristics: any element with a too large dimension cannot be input/submit, it must be just a underlaying div/layer.
