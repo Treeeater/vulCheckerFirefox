@@ -307,11 +307,11 @@ var Registration = function(){
 				var temp = suspects[i].attributes[j].name + "=" + suspects[i].attributes[j].value;
 				temp = temp.toLowerCase();
 				curScore += (temp.indexOf('submit')>-1?10:0);			//submit is a really strong one as an attribute.
+				curScore += (temp.indexOf('regist')>-1?5:0);			//include registration and register
+				curScore += (temp.indexOf('sign up')>-1?5:0);
+				curScore += (temp.indexOf('signup')>-1?5:0);
+				curScore += (temp.indexOf('create')>-1?3:0);			//this is less used.
 				curScore += (temp.indexOf('confirm')>-1?2:0);			//confirm is a bad one, because a lot of registration forms have 'confirm password' in it.
-				curScore += (temp.indexOf('regist')>-1?3:0);			//include registration and register
-				curScore += (temp.indexOf('sign up')>-1?3:0);
-				curScore += (temp.indexOf('signup')>-1?3:0);
-				curScore += (temp.indexOf('create')>-1?3:0);
 			}
 			if (curScore >= 1){
 				submitButtons.push({node:suspects[i],score:curScore});
@@ -378,5 +378,5 @@ else{
 	registration.tryCompleteRegistration();			//for debugging.
 	//console.log(registration.inputs);
 	//console.log(registration.selects);
-	if (registration.sortedSubmitButtons.length>0) console.log(registration.sortedSubmitButtons[0].node.outerHTML);
+	if (registration.sortedSubmitButtons.length>0) console.log(registration.sortedSubmitButtons);
 }
