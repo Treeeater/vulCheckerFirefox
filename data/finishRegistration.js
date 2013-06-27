@@ -98,7 +98,8 @@ var Registration = function(){
 				return;
 			}
 		}
-		var inputLength = inputEle.maxLength;
+		var inputLength;
+		if (inputEle.maxLength <= 50) inputLength = inputEle.maxLength;
 		if (typeof inputLength == 'undefined') inputLength = inputEle.size;
 		if (typeof inputLength == 'undefined') inputLength = 8;
 		var numericalInput = false;
@@ -112,11 +113,11 @@ var Registration = function(){
 		}
 		if (numericalInput){
 			inputEle.value = randomString(inputLength, '1234567890');
-			console.log("Random numbers inserted.");
+			console.log("Random numbers inserted into "+inputEle.outerHTML);
 		}
 		else {
 			inputEle.value = randomString(inputLength, 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ');
-			console.log("Random alphabets inserted.");
+			console.log("Random alphabets inserted into "+inputEle.outerHTML);
 		}
 	}
 	
@@ -170,7 +171,7 @@ var Registration = function(){
 		}
 		if (i > 0)
 		{
-			console.log("Top: Fields populated. Ready to click submit button.");
+			console.log(inputFilledMessage);
 		}
 	}
 	
@@ -316,6 +317,7 @@ var Registration = function(){
 				curScore += (temp.indexOf('signup')>-1?5:0);
 				curScore += (temp.indexOf('create')>-1?3:0);			//this is less used.
 				curScore += (temp.indexOf('confirm')>-1?2:0);			//confirm is a bad one, because a lot of registration forms have 'confirm password' in it.
+				curScore += (temp.indexOf('start')>-1?2:0);				//start is a bad one.
 			}
 			if (curScore >= 1){
 				submitButtons.push({node:suspects[i],score:curScore});
@@ -349,10 +351,12 @@ var Registration = function(){
 		that.tryFindSubmitButton();
 		that.attempts++;
 		if (that.sortedSubmitButtons.length == 0 && that.attempts <= 2) setTimeout(that.tryCompleteRegistration,2000);		//tackle situations where page is first created but are blank, and contents are filled in afterwards.
+		if (that.sortedSubmitButtons.length == 0 && that.attempts > 2) self.port.emit("registrationFailed",{"errorMsg":"Failed to find submit button, registration failed."});		//iframe worker shouldn't have this, they can fail because they are not necessarily the login iframe.
 	}
 }
 
 var registration = new Registration();
+var inputFilledMessage = "Top: All fields populated. Ready to click submit button.";
 
 if (self.port){
 	self.port.emit("getUserInfo","");
@@ -360,9 +364,10 @@ if (self.port){
 		registration.account = response;
 	});
 	self.port.on("startRegister",function(response){
+		console.log("Yet to see submit button clicked from iframes, starting to register from Top...");
 		registration.tryCompleteRegistration();
 		if (registration.sortedSubmitButtons.length>0) {
-			console.log("Clicking on submit button from main page: " + registration.sortedSubmitButtons[0].node.outerHTML);
+			console.log("Clicking on submit button from Top: " + registration.sortedSubmitButtons[0].node.outerHTML);
 			registration.sortedSubmitButtons[0].node.click();
 			self.port.emit("registrationSubmitted",{"elementsToClick":[],"buttonToClick":[]});
 		}

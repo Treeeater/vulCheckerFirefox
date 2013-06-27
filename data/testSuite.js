@@ -22,7 +22,7 @@ function extractContent(){
 
 self.port.on("action",function(request){
 	if (request.action == "testSuiteStart"){
-		var url = prompt("Enter the URL you want to test","http://www.ehow.com/");
+		var url = prompt("Enter the URL you want to test","http://www..com/");
 		if (url) self.port.emit("siteToTest",url);
 	}
 	if (request.action == "navigateTo"){

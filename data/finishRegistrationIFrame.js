@@ -98,7 +98,8 @@ var Registration = function(){
 				return;
 			}
 		}
-		var inputLength = inputEle.maxLength;
+		var inputLength;
+		if (inputEle.maxLength <= 50) inputLength = inputEle.maxLength;
 		if (typeof inputLength == 'undefined') inputLength = inputEle.size;
 		if (typeof inputLength == 'undefined') inputLength = 8;
 		var numericalInput = false;
@@ -112,11 +113,11 @@ var Registration = function(){
 		}
 		if (numericalInput){
 			inputEle.value = randomString(inputLength, '1234567890');
-			console.log("Random numbers inserted.");
+			console.log("Random numbers inserted into "+inputEle.outerHTML);
 		}
 		else {
 			inputEle.value = randomString(inputLength, 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ');
-			console.log("Random alphabets inserted.");
+			console.log("Random alphabets inserted into "+inputEle.outerHTML);
 		}
 	}
 	
@@ -170,7 +171,7 @@ var Registration = function(){
 		}
 		if (i > 0)
 		{
-			console.log("Top: Fields populated. Ready to click submit button.");
+			console.log(inputFilledMessage);
 		}
 	}
 	
@@ -316,6 +317,7 @@ var Registration = function(){
 				curScore += (temp.indexOf('signup')>-1?5:0);
 				curScore += (temp.indexOf('create')>-1?3:0);			//this is less used.
 				curScore += (temp.indexOf('confirm')>-1?2:0);			//confirm is a bad one, because a lot of registration forms have 'confirm password' in it.
+				curScore += (temp.indexOf('start')>-1?2:0);				//start is a bad one.
 			}
 			if (curScore >= 1){
 				submitButtons.push({node:suspects[i],score:curScore});
@@ -353,7 +355,7 @@ var Registration = function(){
 }
 
 var registration = new Registration();
-
+var inputFilledMessage = "Iframe: All fields populated. Ready to click submit button.";
 var delayedCall = function(){
 	if (window.innerHeight < 100 || window.innerWidth < 200) return;	//shouldn't cope with iframe that's too small, this eliminate some FPs.
 	self.port.emit("shouldRegisterIframe","");							//iframe finish registration worker start automatically, don't need ccc to issue a command; However, they only work if capturingPhase is 4 or 10.
