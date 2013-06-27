@@ -78,6 +78,9 @@ var Registration = function(){
 	
 	this.fillText = function(inputEle){
 		if (inputEle == null || typeof inputEle == "undefined") return;
+		if (inputEle.name.toLowerCase().indexOf('year') !=-1 && inputEle.value == "YYYY") inputEle.value = "";
+		if (inputEle.name.toLowerCase().indexOf('month') !=-1 && inputEle.value == "MM") inputEle.value = "";
+		if (inputEle.name.toLowerCase().indexOf('day') !=-1 && inputEle.value == "DD") inputEle.value = "";
 		if (inputEle.value != "") return;			//auto-filled by the application, presumbly by SSO process.  We don't do anything here.
 		if (inputEle.name && inputEle.name!="")
 		{
@@ -97,6 +100,10 @@ var Registration = function(){
 				inputEle.value = "20002";
 				return;
 			}
+			if (inputEle.name.toLowerCase().indexOf('year') !=-1 || inputEle.name.indexOf('birth')!=-1){
+				inputEle.value = "1980";
+				return;
+			}
 		}
 		var inputLength;
 		if (inputEle.maxLength <= 50) inputLength = inputEle.maxLength;
@@ -106,7 +113,7 @@ var Registration = function(){
 		var i = 0;
 		for (i = 0; i < inputEle.attributes.length; i++)
 		{
-			if (inputEle.attributes[i].value.indexOf('number')>-1 || inputEle.attributes[i].value.indexOf('numeric')>-1 || inputEle.attributes[i].value.indexOf('phone')>-1 || inputEle.attributes[i].value.indexOf('number')>-1) {
+			if (inputEle.attributes[i].value.indexOf('number')>-1 || inputEle.attributes[i].value.indexOf('numeric')>-1 || inputEle.attributes[i].value.indexOf('phone')>-1 || inputEle.attributes[i].value.indexOf('number')>-1 || inputEle.attributes[i].value.indexOf('year')>-1 || inputEle.attributes[i].value.indexOf('month')>-1 || inputEle.attributes[i].value.indexOf('day')>-1) {
 				numericalInput = true;
 				break;
 			}
@@ -220,12 +227,18 @@ var Registration = function(){
 			var allOptions = $(currentSelectElement).find('option');
 			j = Math.floor(Math.random()*allOptions.length);
 			k = 0;
-			while ((typeof allOptions[j]=="undefined"||allOptions[j].disabled)&&k<10) {
+			while ((typeof allOptions[j]=="undefined" ||			//safe guard
+			allOptions[j].disabled||								//disabled option
+			allOptions[j].value==""||								//option w/o value
+			typeof allOptions[j].value=="undefined"||				//option w/o value
+			allOptions[j].innerHTML.toLowerCase().indexOf('select')>-1||		//option w/ innerHTML which has select
+			allOptions[j].innerHTML.toLowerCase().indexOf('choose')>-1)&&		//option w/ innerHTML which has choose
+			k<10) {
 				j = Math.floor(Math.random()*allOptions.length); 
 				k++;
 			}
 			if (allOptions[j].disabled) {
-				console.log("Error! All options are disabled.");
+				console.log("Error! All options are disabled/illegal.");
 			}
 			else {
 				allOptions[j].selected = true;
@@ -358,6 +371,12 @@ var Registration = function(){
 var registration = new Registration();
 var inputFilledMessage = "Top: All fields populated. Ready to click submit button.";
 
+function clickSubmitButton(){
+	console.log("Clicking on submit button from Top: " + registration.sortedSubmitButtons[0].node.outerHTML);
+	registration.sortedSubmitButtons[0].node.click();
+	self.port.emit("registrationSubmitted",{"elementsToClick":[],"buttonToClick":[]});
+}
+
 if (self.port){
 	self.port.emit("getUserInfo","");
 	self.port.on("issueUserInfo",function(response){
@@ -367,9 +386,7 @@ if (self.port){
 		console.log("Yet to see submit button clicked from iframes, starting to register from Top...");
 		registration.tryCompleteRegistration();
 		if (registration.sortedSubmitButtons.length>0) {
-			console.log("Clicking on submit button from Top: " + registration.sortedSubmitButtons[0].node.outerHTML);
-			registration.sortedSubmitButtons[0].node.click();
-			self.port.emit("registrationSubmitted",{"elementsToClick":[],"buttonToClick":[]});
+			setTimeout(clickSubmitButton,500);			//give some time for all the shenanigans to settle
 		}
 	});
 }
