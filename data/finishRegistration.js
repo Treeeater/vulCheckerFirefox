@@ -84,10 +84,6 @@ var Registration = function(){
 		if (inputEle.value != "") return;			//auto-filled by the application, presumbly by SSO process.  We don't do anything here.
 		if (inputEle.name && inputEle.name!="")
 		{
-			if (inputEle.name.toLowerCase().indexOf('name')!=-1){
-				inputEle.value = that.account.firstName;
-				return;
-			}
 			if (inputEle.name.toLowerCase().indexOf('email')!=-1 || inputEle.name.indexOf('e-mail')!=-1){
 				inputEle.value = that.account.email;
 				return;
@@ -102,6 +98,10 @@ var Registration = function(){
 			}
 			if (inputEle.name.toLowerCase().indexOf('year') !=-1 || inputEle.name.indexOf('birth')!=-1){
 				inputEle.value = "1980";
+				return;
+			}
+			if (inputEle.name.toLowerCase().indexOf('name')!=-1){
+				inputEle.value = that.account.firstName;
 				return;
 			}
 		}
@@ -242,6 +242,7 @@ var Registration = function(){
 			}
 			else {
 				allOptions[j].selected = true;
+				$(currentSelectElement).change();
 			}
 			processedSelects.push(currentSelectElement);
 			i = 0;
