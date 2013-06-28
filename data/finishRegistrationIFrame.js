@@ -106,8 +106,8 @@ var Registration = function(){
 			}
 		}
 		var inputLength;
-		if (inputEle.maxLength <= 50) inputLength = inputEle.maxLength;
-		if (typeof inputLength == 'undefined') inputLength = inputEle.size;
+		if (inputEle.maxLength <= 50 && inputEle.maxLength > 0) inputLength = inputEle.maxLength;
+		if (typeof inputLength == 'undefined' && inputEle.size > 0 && inputEle.size <= 50) inputLength = inputEle.size;
 		if (typeof inputLength == 'undefined') inputLength = 8;
 		var numericalInput = false;
 		var i = 0;
@@ -119,12 +119,14 @@ var Registration = function(){
 			}
 		}
 		if (numericalInput){
-			inputEle.value = randomString(inputLength, '1234567890');
-			console.log("Random numbers inserted into "+inputEle.outerHTML);
+			var rn = randomString(inputLength, '1234567890');
+			inputEle.value = rn;
+			console.log("Random numbers " + rn + " inserted into "+inputEle.outerHTML);
 		}
 		else {
-			inputEle.value = randomString(inputLength, 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ');
-			console.log("Random alphabets inserted into "+inputEle.outerHTML);
+			var rs = randomString(inputLength, 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ');
+			inputEle.value = rs;
+			console.log("Random alphabets " + rs + " inserted into "+inputEle.outerHTML);
 		}
 	}
 	
@@ -173,6 +175,9 @@ var Registration = function(){
 				continue;
 			}
 			that.fill(currentInput);
+			var trigger = document.createEvent('HTMLEvents');
+			trigger.initEvent('change', true, true);
+			currentInput.dispatchEvent(trigger);
 			processedInputs.push(currentInput);
 			i = 0;
 		}
@@ -201,6 +206,9 @@ var Registration = function(){
 				continue;
 			}
 			currentRadioElement.checked = true;
+			var trigger = document.createEvent('HTMLEvents');
+			trigger.initEvent('change', true, true);
+			currentRadioElement.dispatchEvent(trigger);
 			processedRadioNames.push(currentRadioElement.name);
 			i = 0;
 		}
@@ -241,8 +249,10 @@ var Registration = function(){
 				console.log("Error! All options are disabled/illegal.");
 			}
 			else {
-				allOptions[j].selected = true;
-				$(currentSelectElement).change();
+				allOptions[j].selected = "selected";
+				var trigger = document.createEvent('HTMLEvents');
+				trigger.initEvent('change', true, true);
+				currentSelectElement.dispatchEvent(trigger);
 			}
 			processedSelects.push(currentSelectElement);
 			i = 0;
