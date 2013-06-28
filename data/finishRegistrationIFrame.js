@@ -5,6 +5,7 @@ var Registration = function(){
 	this.sortedSubmitButtons = [];
 	this.account;
 	this.attempts = 0;
+	this.submitButtonClicked = false;
 	var uniqueRadioButtons = [];
 	var filledRadioButtonNames = [];
 	/*this.getOffset = function(el) {
@@ -365,10 +366,17 @@ var Registration = function(){
 				submitButtons[maxindex].score = -1;
 			}
 		}
+		/*if (submitButtons.length > 0) 
+		{	
+			console.log("submit button is:" + submitButtons[0].node.outerHTML);
+			console.log("sortedsubmit button is:" + that.sortedSubmitButtons[0].node.outerHTML);
+		}*/
 	}
 	
 	this.tryCompleteRegistration = function(){
-		if (that.sortedSubmitButtons.length > 0) return;
+		//need to confirm that this iframe is on top layer in the first place before searching for all the inputs/buttons.
+		//if (that.sortedSubmitButtons.length > 0) return;
+		if (that.submitButtonClicked) return;
 		that.tryProcessRadio();
 		that.tryProcessSelects();
 		that.tryFillInInputs();
@@ -387,6 +395,7 @@ var delayedCall = function(){
 
 function clickSubmitButton(){
 	console.log("Clicking on submit button from IFrame: " + registration.sortedSubmitButtons[0].node.outerHTML);
+	registration.submitButtonClicked = true;
 	registration.sortedSubmitButtons[0].node.click();
 	self.port.emit("registrationSubmitted",{"elementsToClick":[],"buttonToClick":[]});
 }
