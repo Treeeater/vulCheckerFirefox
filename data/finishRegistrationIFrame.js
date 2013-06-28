@@ -146,7 +146,7 @@ var Registration = function(){
 				break;
 			case "checkbox":
 				//check all checkboxes for now:
-				inputEle.checked = true;
+				if (!inputEle.checked) inputEle.click();				//This is to tackle pogo.com, wierd event handler stuff.
 			case "submit":
 				//don't do anything, wait for form to populate and then click submit.
 				break;
