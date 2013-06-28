@@ -375,6 +375,7 @@ var Registration = function(){
 	
 	this.tryCompleteRegistration = function(){
 		//need to confirm that this iframe is on top layer in the first place before searching for all the inputs/buttons.
+		//This is however hard to do because of SOP restriction and also possible redirection at iframe src. We cannot simply compare src attribute and worker.url to get the iframe handle from host page.
 		//if (that.sortedSubmitButtons.length > 0) return;
 		if (that.submitButtonClicked) return;
 		that.tryProcessRadio();
