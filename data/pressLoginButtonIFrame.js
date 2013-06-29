@@ -56,13 +56,75 @@ function VulCheckerHelper() {
 		return this;
 	}
 
+	var getOffset = function(ele) {
+		if (ele!=null && typeof ele != "undefined"){
+			var top = 0;
+			var left = 0;
+			while( ele!=null && typeof ele != "undefined" && ele.tagName != "BODY") {
+				top += ele.offsetTop;
+				left += ele.offsetLeft;
+				if (getComputedStyle(ele).position == "fixed") {
+					break;
+				}
+				ele = ele.offsetParent;
+			}
+			return { top: top, left: left };
+		}
+		return {top:0, left:0};
+	}
+	
+	var isChildElement = function(parent, child){
+		if (child == null) return false;
+		if (parent == child) return true;
+		if (parent == null || typeof parent == "undefined") return false;
+		if (parent.children.length == 0) return false;
+		var i = 0;
+		for (i = 0; i < parent.children.length; i++)
+		{
+			if (isChildElement(parent.children[i],child)) return true;
+		}
+		return false;
+	}
+	
+	var onTopLayer = function(ele){
+		//This doesn't really work on section/canvas HTML5 element. TODO:Fix this.
+		//given an element, returns true if it's likely to be on the topmost layer, false if otherwise.
+		if (!ele) return false;
+		var inputWidth = ele.offsetWidth;
+		var inputHeight = ele.offsetHeight;
+		//heuristics: any element with a too large dimension cannot be input/submit, it must be just a underlaying div/layer.
+		if (inputWidth >= screen.availWidth/4 || inputHeight >= screen.availHeight/4) return false;
+		if (inputWidth <= 0 || inputHeight <= 0) return false;			//Elements that are on top layer must be visible.
+		var position = getOffset(ele);
+		var j;
+		var score = 0;
+		//Don't judge the input unfairly because of the screen/browser window size.
+		var maxHeight = (document.documentElement.clientHeight - position.top > inputHeight)? inputHeight : document.documentElement.clientHeight - position.top;
+		var maxWidth = (document.documentElement.clientWidth > inputWidth)? inputWidth : document.documentElement.clientWidth - position.left;
+		//Instead of deciding it on one try, deciding it on 10 tries.  This tackles some weird problems.
+		for (j = 0; j < 10; j++)
+		{
+			score = isChildElement(ele,document.elementFromPoint(position.left+1+j*maxWidth/10, position.top+1+j*maxHeight/10)) ? score + 1 : score;
+		}
+		if (score >= 5) return true;
+		else return false;
+	}
+	
+	function preFilter(curNode) {
+		if (curNode.nodeName != "A" && curNode.nodeName != "DIV" && curNode.nodeName != "SPAN" && curNode.nodeName != "IMG" && curNode.nodeName != "INPUT") return false;
+		if (curNode.nodeName == "INPUT") {
+			if (curNode.type != "button" && curNode.type != "image" && curNode.type != "submit") return false;
+		}
+		return onTopLayer(curNode);
+	}
+	
 	function computeAsRoot(curNode)
 	{
 		if (curNode == null || curNode.attributes == null || curNode.nodeName == "SCRIPT" || curNode.nodeName == "EMBED" ) return;		//ignore all script and embed elements
 		if (curNode.nodeName.toLowerCase().indexOf("fb:")!=-1) return;				//to indicate if this tag is fb: something, we want to rule out those.
 		try {
-			
-			if (curNode.nodeName == "A" || curNode.nodeName == "DIV" || curNode.nodeName == "SPAN" || curNode.nodeName == "IMG" || curNode.nodeName == "INPUT") {
+			//pre filter out buttons that are in the background, input whose type is not submit
+			if (preFilter(curNode)) {
 				var i = 0;
 				var curScore = 0;
 				that.hasFB = false;									//to indicate if this element has facebook-meaning term.
