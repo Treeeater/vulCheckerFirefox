@@ -1,11 +1,10 @@
 var Registration = function(){
 	var that = this;
-	this.inputs = [];
-	this.selects = [];
 	this.sortedSubmitButtons = [];
 	this.account;
 	this.attempts = 0;
 	this.submitButtonClicked = false;
+	this.inputBotEdge = 0;
 	var uniqueRadioButtons = [];
 	var filledRadioButtonNames = [];
 	/*this.getOffset = function(el) {
@@ -25,10 +24,10 @@ var Registration = function(){
 	}
 	
 	this.getOffset = function(ele) {
-		if (!!ele){
+		if (ele!=null && typeof ele != "undefined"){
 			var top = 0;
 			var left = 0;
-			while(ele.tagName != "BODY") {
+			while( ele!=null && typeof ele != "undefined" && ele.tagName != "BODY") {
 				top += ele.offsetTop;
 				left += ele.offsetLeft;
 				if (getComputedStyle(ele).position == "fixed") {
@@ -266,71 +265,25 @@ var Registration = function(){
 		var i = 0;
 		var j = 0;
 		var temp = document.getElementsByTagName('input');
-		var lowerThanAnyInput = false;
 		for (i = 0; i < temp.length; i++){
-			//Heuristics: eliminate those suspects whose position is not lower than all input elements:
-			if (!that.onTopLayer(temp[i])) continue;
-			lowerThanAnyInput = false;
-			TLtop = that.getOffset(temp[i]).top;
-			for (j = 0; j < that.inputs.length; j++)
-			{
-				if (TLtop < that.getOffset(that.inputs[j]).top) {
-					lowerThanAnyInput = true;
-					break;
-				}
-			}
-			if (lowerThanAnyInput) continue;
 			suspects.push(temp[i]);
 		}
 		temp = document.getElementsByTagName('button');
 		for (i = 0; i < temp.length; i++){
-			//Heuristics: eliminate those suspects whose position is not lower than all input elements:
-			if (!that.onTopLayer(temp[i])) continue;
-			lowerThanAnyInput = false;
-			TLtop = that.getOffset(temp[i]).top;
-			for (j = 0; j < that.inputs.length; j++)
-			{
-				if (TLtop < that.getOffset(that.inputs[j]).top) {
-					lowerThanAnyInput = true;
-					break;
-				}
-			}
-			if (lowerThanAnyInput) continue;
 			suspects.push(temp[i]);
 		}
 		temp = document.getElementsByTagName('div');
 		for (i = 0; i < temp.length; i++){
-			//Heuristics: eliminate those suspects whose position is not lower than all input elements:
-			if (!that.onTopLayer(temp[i])) continue;
-			lowerThanAnyInput = false;
-			TLtop = that.getOffset(temp[i]).top;
-			for (j = 0; j < that.inputs.length; j++)
-			{
-				if (TLtop < that.getOffset(that.inputs[j]).top) {
-					lowerThanAnyInput = true;
-					break;
-				}
-			}
-			if (lowerThanAnyInput) continue;
 			suspects.push(temp[i]);
 		}
 		temp = document.getElementsByTagName('a');
 		for (i = 0; i < temp.length; i++){
-			//Heuristics: eliminate those suspects whose position is not lower than all input elements:
-			if (!that.onTopLayer(temp[i])) continue;
-			lowerThanAnyInput = false;
-			TLtop = that.getOffset(temp[i]).top;
-			for (j = 0; j < that.inputs.length; j++)
-			{
-				if (TLtop < that.getOffset(that.inputs[j]).top) {
-					lowerThanAnyInput = true;
-					break;
-				}
-			}
-			if (lowerThanAnyInput) continue;
 			suspects.push(temp[i]);
 		}
 		for (i = 0; i < suspects.length; i++){
+			//Heuristics: eliminate those suspects whose position is not lower than all input text elements:
+			var TLtop = that.getOffset(suspects[i]).top;
+			if (TLtop < that.inputBotEdge) continue;
 			var curScore = 0;
 			for (j = 0; j < suspects[i].attributes.length; j++)
 			{
@@ -373,6 +326,27 @@ var Registration = function(){
 		}*/
 	}
 	
+	this.findInputBottomEdge = function(){
+		var allInputs = document.getElementsByTagName('input');
+		var allTextInputs = [];
+		var i;
+		for (i = 0; i < allInputs.length; i++)
+		{
+			if (allInputs[i].type == 'text') allTextInputs.push(allInputs[i]);
+		}
+		var allTopTextInputs = [];		//stores all text inputs that are on top layer.
+		for (i = 0; i < allTextInputs.length; i++)
+		{
+			if (that.onTopLayer(allTextInputs[i])) allTopTextInputs.push(allTextInputs[i]);
+		}
+		//find the bot edge for those inputs
+		for (i = 0; i < allTopTextInputs.length; i++)
+		{
+			var offSetY = that.getOffset(allTopTextInputs[i]).top;
+			if (offSetY > that.inputBotEdge) that.inputBotEdge = offSetY;
+		}
+	}
+	
 	this.tryCompleteRegistration = function(){
 		//need to confirm that this iframe is on top layer in the first place before searching for all the inputs/buttons.
 		//This is however hard to do because of SOP restriction and also possible redirection at iframe src. We cannot simply compare src attribute and worker.url to get the iframe handle from host page.
@@ -381,6 +355,7 @@ var Registration = function(){
 		that.tryProcessRadio();
 		that.tryProcessSelects();
 		that.tryFillInInputs();
+		that.findInputBottomEdge();
 		that.tryFindSubmitButton();
 		that.attempts++;
 		if (that.sortedSubmitButtons.length == 0 && that.attempts <= 2) setTimeout(that.tryCompleteRegistration,2000);		//tackle situations where page is first created but are blank, and contents are filled in afterwards.
@@ -420,7 +395,5 @@ if (self.port){
 else{
 	registration.account = {firstName:"Syxvq",lastName:"Ldswpk",email:"syxvq_ldswpk@yahoo.com"};
 	registration.tryCompleteRegistration();			//for debugging.
-	//console.log(registration.inputs);
-	//console.log(registration.selects);
 	if (registration.sortedSubmitButtons.length>0) console.log(registration.sortedSubmitButtons);
 }
