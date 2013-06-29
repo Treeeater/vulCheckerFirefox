@@ -78,29 +78,46 @@ var Registration = function(){
 	
 	this.fillText = function(inputEle){
 		if (inputEle == null || typeof inputEle == "undefined") return;
-		if (inputEle.name.toLowerCase().indexOf('year') !=-1 && inputEle.value == "YYYY") inputEle.value = "";
-		if (inputEle.name.toLowerCase().indexOf('month') !=-1 && inputEle.value == "MM") inputEle.value = "";
-		if (inputEle.name.toLowerCase().indexOf('day') !=-1 && inputEle.value == "DD") inputEle.value = "";
+		var inputName = "";
+		var inputValue = "";
+		if (inputEle.name && inputEle.name != "") inputName = inputEle.name.toLowerCase();
+		if (inputEle.value && inputEle.value != "") inputValue = inputEle.value.toLowerCase();
+		//clear pre-populated fields that shows something like 'your name here' or 'choose a screen name'.
+		if (inputEle.name && inputEle.name!="")
+		{
+			if (inputName.indexOf('email')!=-1 || inputName.indexOf('e-mail')!=-1){
+				if (inputValue.indexOf('email') != -1 || inputValue.indexOf('e-mail') != -1) inputEle.value = "";
+			}
+			if (inputName.indexOf('zip') !=-1 || inputName.indexOf('postal')!=-1){
+				if (inputValue.indexOf('zip') != -1 || inputValue.indexOf('postal') != -1) inputEle.value = "";
+			}
+			if (inputName.indexOf('name')!=-1){
+				if (inputValue.indexOf('name') != -1) inputEle.value = "";
+			}
+			if (inputName.indexOf('year') !=-1 && (inputEle.value == "YYYY" || inputValue.indexOf('year') != -1)) inputEle.value = "";
+			if (inputName.indexOf('month') !=-1 && (inputEle.value == "MM" || inputValue.indexOf('month') != -1)) inputEle.value = "";
+			if (inputName.indexOf('day') !=-1 && (inputEle.value == "DD" || inputValue.indexOf('day') != -1)) inputEle.value = "";
+		}
 		if (inputEle.value != "") return;			//auto-filled by the application, presumbly by SSO process.  We don't do anything here.
 		if (inputEle.name && inputEle.name!="")
 		{
-			if (inputEle.name.toLowerCase().indexOf('email')!=-1 || inputEle.name.indexOf('e-mail')!=-1){
+			if (inputName.indexOf('email')!=-1 || inputName.indexOf('e-mail')!=-1){
 				inputEle.value = that.account.email;
 				return;
 			}
-			if (inputEle.name.toLowerCase().indexOf('pass')!=-1){
+			if (inputName.indexOf('pass')!=-1){
 				inputEle.value = "msr123456";
 				return;
 			}
-			if (inputEle.name.toLowerCase().indexOf('zip') !=-1 || inputEle.name.indexOf('postal')!=-1){
+			if (inputName.indexOf('zip') !=-1 || inputName.indexOf('postal')!=-1){
 				inputEle.value = "20002";
 				return;
 			}
-			if (inputEle.name.toLowerCase().indexOf('year') !=-1 || inputEle.name.indexOf('birth')!=-1){
+			if (inputName.indexOf('year') !=-1){
 				inputEle.value = "1980";
 				return;
 			}
-			if (inputEle.name.toLowerCase().indexOf('name')!=-1){
+			if (inputName.indexOf('name')!=-1){
 				inputEle.value = that.account.firstName;
 				return;
 			}
