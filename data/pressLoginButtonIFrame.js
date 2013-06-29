@@ -4,7 +4,7 @@ function VulCheckerHelper() {
 	this.clicked = 0;
 	this.tryFindInvisibleLoginButton = false;
 	this.indexToClick = 0;
-	this.account;
+	this.account = [];
 	function createCookie(name,value,days) {
 		if (days) {
 			var date = new Date();
@@ -82,6 +82,7 @@ function VulCheckerHelper() {
 				if (that.hasLogin) curScore += 4;												//this is used to offset a lot of 'follow us on facebook' buttons.
 				if (that.hasFB && that.hasLogin) curScore += 4;									//extra score if both terms are found.
 				if (that.hasLikeOrShare && !that.hasLogin) curScore = -1;						//ignore like or share button without login.
+				if (curNode.offsetHeight > 150 || curNode.offsetWidth > 300) curScore = -1;		//ignore login buttons that are too large, they may just be overlays.
 				if (!that.tryFindInvisibleLoginButton) {if (curNode.offsetWidth <= 0 || curNode.offsetHeight <= 0) curScore = -1;}		//ignore invisible element.
 				var temp = new AttrInfoClass(curNode, curScore);
 				that.AttrInfoMap[that.count] = temp;
@@ -95,7 +96,7 @@ function VulCheckerHelper() {
 					//If we do not catch anything, console is going to output [object object] for each violation.
 				}
 			}
-			for (i = 0; i <curNode.children.length; i++)
+			for (i = 0; i < curNode.children.length; i++)
 			{
 				computeAsRoot(curNode.children[i]);
 			}
