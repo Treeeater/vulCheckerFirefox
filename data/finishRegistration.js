@@ -283,24 +283,30 @@ var Registration = function(){
 		var j = 0;
 		var temp = document.getElementsByTagName('input');
 		for (i = 0; i < temp.length; i++){
+			if (!that.onTopLayer(temp[i])) continue;
 			suspects.push(temp[i]);
 		}
 		temp = document.getElementsByTagName('button');
 		for (i = 0; i < temp.length; i++){
+			if (!that.onTopLayer(temp[i])) continue;
 			suspects.push(temp[i]);
 		}
 		temp = document.getElementsByTagName('div');
 		for (i = 0; i < temp.length; i++){
+			if (!that.onTopLayer(temp[i])) continue;
 			suspects.push(temp[i]);
 		}
 		temp = document.getElementsByTagName('a');
 		for (i = 0; i < temp.length; i++){
+			if (!that.onTopLayer(temp[i])) continue;
 			suspects.push(temp[i]);
 		}
 		for (i = 0; i < suspects.length; i++){
-			//Heuristics: eliminate those suspects whose position is not lower than all input text elements:
+			//Heuristic: eliminate those suspects whose position is not lower than all input text elements:
 			var TLtop = that.getOffset(suspects[i]).top;
 			if (TLtop < that.inputBotEdge) continue;
+			//Heuristic: submit button cannot be too large:
+			if (suspects[i].offsetHeight > 150 || suspects[i].offsetWidth > 300) continue;
 			var curScore = 0;
 			for (j = 0; j < suspects[i].attributes.length; j++)
 			{

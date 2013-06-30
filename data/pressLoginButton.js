@@ -5,6 +5,7 @@ function VulCheckerHelper() {
 	this.tryFindInvisibleLoginButton = false;
 	this.indexToClick = 0;
 	this.account=[];
+	this.clickedButtons = [];
 	function createCookie(name,value,days) {
 		if (days) {
 			var date = new Date();
@@ -115,7 +116,11 @@ function VulCheckerHelper() {
 		if (curNode.nodeName == "INPUT") {
 			if (curNode.type != "button" && curNode.type != "image" && curNode.type != "submit") return false;
 		}
-		return onTopLayer(curNode);
+		if (that.clickedButtons.indexOf(that.getXPath(curNode)) != -1) {
+			console.log("avoiding clicking on the same button twice, now ignoring the duplicate button.");
+			return false;
+		}
+		return (that.tryFindInvisibleLoginButton || onTopLayer(curNode));
 	}
 	
 	function computeAsRoot(curNode)
@@ -300,7 +305,12 @@ if (self.port)
 		vulCheckerHelper.account = response.account;
 		if (response.shouldClick) vulCheckerHelper.automaticPressLoginButton();		//need to set a lenient timer, since if the fb traffic is not seen in this time, it's going to click the login button again, which resets the connection - this may create an infinite loop. Current setting is that if the login button is pressed more than twice, it gives up.
 	});
-	self.port.on("readyToClick", function(){if (vulCheckerHelper.sortedAttrInfoMap.length > vulCheckerHelper.indexToClick) vulCheckerHelper.sortedAttrInfoMap[vulCheckerHelper.indexToClick].node.click();});
+	self.port.on("readyToClick", function(){
+		if (vulCheckerHelper.sortedAttrInfoMap.length > vulCheckerHelper.indexToClick) {
+			vulCheckerHelper.sortedAttrInfoMap[vulCheckerHelper.indexToClick].node.click();
+			vulCheckerHelper.clickedButtons.push(vulCheckerHelper.getXPath(vulCheckerHelper.sortedAttrInfoMap[vulCheckerHelper.indexToClick].node));		//record the clicked button, so that we don't click the same button next time if the page doesn't nav away.
+		}
+	});
 	//window.addEventListener('load',vulCheckerHelper.delayedPressLoginButton);				//must not do this. FF's gonna give u stupid hidden window error.
 	setTimeout(vulCheckerHelper.delayedPressLoginButton,3000);
 	//console.log("pressLoginButton.js loaded.");

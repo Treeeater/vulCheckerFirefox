@@ -5,6 +5,7 @@ function VulCheckerHelper() {
 	this.tryFindInvisibleLoginButton = false;
 	this.indexToClick = 0;
 	this.account = [];
+	this.clickedButtons = [];
 	function createCookie(name,value,days) {
 		if (days) {
 			var date = new Date();
@@ -115,7 +116,11 @@ function VulCheckerHelper() {
 		if (curNode.nodeName == "INPUT") {
 			if (curNode.type != "button" && curNode.type != "image" && curNode.type != "submit") return false;
 		}
-		return onTopLayer(curNode);
+		if (that.clickedButtons.indexOf(that.getXPath(curNode)) != -1) {
+			console.log("avoiding clicking on the same button twice, now ignoring the duplicate button.");
+			return false;
+		}
+		return (that.tryFindInvisibleLoginButton || onTopLayer(curNode));
 	}
 	
 	function computeAsRoot(curNode)
@@ -219,6 +224,7 @@ function VulCheckerHelper() {
 		if (vulCheckerHelper.sortedAttrInfoMap.length <= vulCheckerHelper.indexToClick) return;			//no login button found.
 		console.log("pressing Login button @ XPath in iframe: " + vulCheckerHelper.getXPath(vulCheckerHelper.sortedAttrInfoMap[vulCheckerHelper.indexToClick].node));
 		vulCheckerHelper.sortedAttrInfoMap[vulCheckerHelper.indexToClick].node.click();
+		vulCheckerHelper.clickedButtons.push(vulCheckerHelper.getXPath(vulCheckerHelper.sortedAttrInfoMap[vulCheckerHelper.indexToClick].node));
 	}
 	
 	this.getXPath = function(element) {
