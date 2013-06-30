@@ -117,7 +117,11 @@ var Registration = function(){
 				inputEle.value = "1980";
 				return;
 			}
-			if (inputName.indexOf('name')!=-1){
+			if (inputName.indexOf('name')!=-1 && inputName.indexOf('last')!=-1){
+				inputEle.value = that.account.lastName;
+				return;
+			}
+			if (inputName.indexOf('name')!=-1 || inputName.indexOf('user')!=-1){
 				inputEle.value = that.account.firstName;
 				return;
 			}
@@ -166,6 +170,7 @@ var Registration = function(){
 			case "checkbox":
 				//check all checkboxes for now:
 				if (!inputEle.checked) inputEle.click();				//This is to tackle pogo.com, wierd event handler stuff.
+				if (!inputEle.checked) inputEle.checked = true;			//Fail safe.
 			case "submit":
 				//don't do anything, wait for form to populate and then click submit.
 				break;
