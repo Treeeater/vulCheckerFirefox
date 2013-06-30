@@ -4,8 +4,9 @@ function VulCheckerHelper() {
 	this.clicked = 0;
 	this.tryFindInvisibleLoginButton = false;
 	this.indexToClick = 0;
-	this.account=[];
+	this.account = [];
 	this.clickedButtons = [];
+	this.loginClickAttempts = 1;
 	function createCookie(name,value,days) {
 		if (days) {
 			var date = new Date();
@@ -32,8 +33,16 @@ function VulCheckerHelper() {
 
 	function calculateFBScore(inputStr)
 	{
-		var output = (inputStr.match(/FB/gi)!=null) ? 1 : 0;
-		output += (inputStr.match(/facebook/gi)!=null) ? 1 : 0;
+		var output = 0;
+		if (that.loginClickAttempts == 1) {
+			output = (inputStr.match(/FB/gi)!=null) ? 1 : 0;
+			output += (inputStr.match(/facebook/gi)!=null) ? 1 : 0;
+		}
+		else if (that.loginClickAttempts > 1) {
+			//after the first click, the page/iframe supposedly should nav to a sign-in heavy content, in this case we should emphasize on facebook string detection, instead of 'sign in' pattern.
+			output = (inputStr.match(/FB/gi)!=null) ? 10 : 0;
+			output += (inputStr.match(/facebook/gi)!=null) ? 10 : 0;
+		}
 		output += (inputStr.match(/login/gi)!=null) ? 1 : 0;
 		output += (inputStr.match(/log\sin/gi)!=null) ? 1 : 0;
 		output += (inputStr.match(/sign\sin/gi)!=null) ? 1 : 0;
@@ -298,6 +307,7 @@ if (self.port)
 		//response should contain whether background page has detected that FB has been visited.
 		vulCheckerHelper.tryFindInvisibleLoginButton = response.tryFindInvisibleLoginButton;
 		vulCheckerHelper.indexToClick = response.indexToClick;
+		vulCheckerHelper.loginClickAttempts = response.loginClickAttempts;
 		if (response.shouldClick) vulCheckerHelper.pressLoginButton();			//this condition ensures that once FB traffic is seen, we do not want to press login button again.
 	});
 	self.port.on("checkTestingStatus", function (response){

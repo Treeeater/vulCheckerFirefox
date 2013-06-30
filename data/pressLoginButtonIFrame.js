@@ -6,6 +6,7 @@ function VulCheckerHelper() {
 	this.indexToClick = 0;
 	this.account = [];
 	this.clickedButtons = [];
+	this.loginClickAttempts = 1;
 	function createCookie(name,value,days) {
 		if (days) {
 			var date = new Date();
@@ -32,8 +33,16 @@ function VulCheckerHelper() {
 
 	function calculateFBScore(inputStr)
 	{
-		var output = (inputStr.match(/FB/gi)!=null) ? 1 : 0;
-		output += (inputStr.match(/facebook/gi)!=null) ? 1 : 0;
+		var output = 0;
+		if (that.loginClickAttempts == 1) {
+			output = (inputStr.match(/FB/gi)!=null) ? 1 : 0;
+			output += (inputStr.match(/facebook/gi)!=null) ? 1 : 0;
+		}
+		else if (that.loginClickAttempts > 1) {
+			//after the first click, the page/iframe supposedly should nav to a sign-in heavy content, in this case we should emphasize on facebook string detection, instead of 'sign in' pattern.
+			output = (inputStr.match(/FB/gi)!=null) ? 10 : 0;
+			output += (inputStr.match(/facebook/gi)!=null) ? 10 : 0;
+		}
 		output += (inputStr.match(/login/gi)!=null) ? 1 : 0;
 		output += (inputStr.match(/log\sin/gi)!=null) ? 1 : 0;
 		output += (inputStr.match(/sign\sin/gi)!=null) ? 1 : 0;
@@ -275,6 +284,7 @@ if (self.port)
 		if (response.shouldClick) {
 			console.log("Legitimate iframe detected while press login button should be clicked, searching in this iframe...");
 			vulCheckerHelper.indexToClick = response.indexToClick;
+			vulCheckerHelper.loginClickAttempts = response.loginClickAttempts;
 			vulCheckerHelper.pressLoginButton();
 		}
 	});
