@@ -47,6 +47,8 @@ function VulCheckerHelper() {
 		output += (inputStr.match(/log\sin/gi)!=null) ? 1 : 0;
 		output += (inputStr.match(/sign\sin/gi)!=null) ? 1 : 0;
 		output += (inputStr.match(/signin/gi)!=null) ? 1 : 0;
+		output += (inputStr.match(/sign-in/gi)!=null) ? 1 : 0;
+		output += (inputStr.match(/sign_in/gi)!=null) ? 1 : 0;
 		output += (inputStr.match(/connect/gi)!=null) ? 1 : 0;
 		
 		//penalty on share/like
