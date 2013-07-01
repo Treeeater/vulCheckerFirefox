@@ -1,3 +1,10 @@
+var debug = true;
+
+var log = function (str){
+	if (debug) console.log(str);
+	if (self.port) self.port.emit("writeToFileRequest",str);
+}
+
 var Registration = function(){
 	var that = this;
 	this.sortedSubmitButtons = [];
@@ -142,12 +149,12 @@ var Registration = function(){
 		if (numericalInput){
 			var rn = randomString(inputLength, '1234567890');
 			inputEle.value = rn;
-			console.log("Random numbers " + rn + " inserted into "+inputEle.outerHTML);
+			log("Random numbers " + rn + " inserted into top");
 		}
 		else {
 			var rs = randomString(inputLength, 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ');
 			inputEle.value = rs;
-			console.log("Random alphabets " + rs + " inserted into "+inputEle.outerHTML);
+			log("Random alphabets " + rs + " inserted into top");
 		}
 	}
 	
@@ -178,7 +185,7 @@ var Registration = function(){
 				//ignore all buttons.
 				break;
 			default:
-				console.log("cannot handle this input type: " + inputEle.type + "...");
+				log("cannot handle this input type from top: " + inputEle.type + "...");
 		}
 	}
 	
@@ -205,7 +212,7 @@ var Registration = function(){
 		}
 		if (i > 0)
 		{
-			console.log(inputFilledMessage);
+			log(inputFilledMessage);
 		}
 	}
 	
@@ -268,7 +275,7 @@ var Registration = function(){
 				k++;
 			}
 			if (allOptions[j].disabled) {
-				console.log("Error! All options are disabled/illegal.");
+				log("Error! All options are disabled/illegal from top.");
 			}
 			else {
 				allOptions[j].selected = "selected";
@@ -357,7 +364,7 @@ var Registration = function(){
 	}
 	
 	this.clickSubmitButton = function(){
-		console.log("Clicking on submit button from Top: " + that.sortedSubmitButtons[0].node.outerHTML);
+		log("Clicking on submit button from Top: " + that.sortedSubmitButtons[0].node.outerHTML);
 		that.sortedSubmitButtons[0].node.click();
 		self.port.emit("registrationSubmitted",{"elementsToClick":[],"buttonToClick":[]});
 	}
@@ -407,15 +414,16 @@ var inputFilledMessage = "Top: All fields populated. Ready to click submit butto
 if (self.port){
 	self.port.emit("getUserInfo","");
 	self.port.on("issueUserInfo",function(response){
-		registration.account = response;
+		registration.account = response.accountsInfo;
+		debug = response.debug;
 	});
 	self.port.on("startRegister",function(response){
 		if (response.manualClick){
-			console.log('manual clicked from popup.html to finish registration...');
+			log('manual clicked from popup.html to finish registration...');
 			registration.tryCompleteRegistration();
 		}
 		else{
-			console.log("Yet to see submit button clicked from iframes, starting to register from Top...");
+			log("Yet to see submit button clicked from iframes, starting to register from Top...");
 			registration.shouldClickSubmitButton = true;
 			setTimeout(registration.tryCompleteRegistration,2000);			//wait for extra js to load.
 		}
@@ -424,5 +432,5 @@ if (self.port){
 else{
 	registration.account = {firstName:"Syxvq",lastName:"Ldswpk",email:"syxvq_ldswpk@yahoo.com"};
 	registration.tryCompleteRegistration();			//for debugging.
-	if (registration.sortedSubmitButtons.length>0) console.log(registration.sortedSubmitButtons);
+	if (registration.sortedSubmitButtons.length>0) log(registration.sortedSubmitButtons);
 }

@@ -1,3 +1,10 @@
+var debug = true;
+
+var log = function (str){
+	if (debug) console.log(str);
+	if (self.port) self.port.emit("writeToFileRequest",str);
+}
+
 var Registration = function(){
 	var that = this;
 	this.sortedSubmitButtons = [];
@@ -142,12 +149,12 @@ var Registration = function(){
 		if (numericalInput){
 			var rn = randomString(inputLength, '1234567890');
 			inputEle.value = rn;
-			console.log("Random numbers " + rn + " inserted into "+inputEle.outerHTML);
+			log("Random numbers " + rn + " inserted into iframe");
 		}
 		else {
 			var rs = randomString(inputLength, 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ');
 			inputEle.value = rs;
-			console.log("Random alphabets " + rs + " inserted into "+inputEle.outerHTML);
+			log("Random alphabets " + rs + " inserted into iframe");
 		}
 	}
 	
@@ -178,7 +185,7 @@ var Registration = function(){
 				//ignore all buttons.
 				break;
 			default:
-				console.log("cannot handle this input type: " + inputEle.type + "...");
+				log("cannot handle this input type in iframe: " + inputEle.type + "...");
 		}
 	}
 	
@@ -205,7 +212,7 @@ var Registration = function(){
 		}
 		if (i > 0)
 		{
-			console.log(inputFilledMessage);
+			log(inputFilledMessage);
 		}
 	}
 	
@@ -268,7 +275,7 @@ var Registration = function(){
 				k++;
 			}
 			if (allOptions[j].disabled) {
-				console.log("Error! All options are disabled/illegal.");
+				log("Error! All options are disabled/illegal in iframe.");
 			}
 			else {
 				allOptions[j].selected = "selected";
@@ -347,11 +354,6 @@ var Registration = function(){
 				submitButtons[maxindex].score = -1;
 			}
 		}
-		/*if (submitButtons.length > 0) 
-		{	
-			console.log("submit button is:" + submitButtons[0].node.outerHTML);
-			console.log("sortedsubmit button is:" + that.sortedSubmitButtons[0].node.outerHTML);
-		}*/
 	}
 	
 	this.findInputBottomEdge = function(){
@@ -398,7 +400,7 @@ var delayedCall = function(){
 }
 
 function clickSubmitButton(){
-	console.log("Clicking on submit button from IFrame: " + registration.sortedSubmitButtons[0].node.outerHTML);
+	log("Clicking on submit button from IFrame: " + registration.sortedSubmitButtons[0].node.outerHTML);
 	registration.submitButtonClicked = true;
 	registration.sortedSubmitButtons[0].node.click();
 	self.port.emit("registrationSubmitted",{"elementsToClick":[],"buttonToClick":[]});
@@ -407,8 +409,9 @@ function clickSubmitButton(){
 if (self.port){
 	setTimeout(delayedCall,1000);
 	self.port.on("shouldRegisterIframe",function (response){
-		if (response) {
-			console.log("https iframe detected while capturing phase is 4 or 10 and the site needs registration.");
+		debug = response.debug;
+		if (response.shouldRegisterIframe) {
+			log("https iframe detected while capturing phase is 4 or 10 and the site needs registration.");
 			self.port.emit("getUserInfo","");
 		}
 	});
@@ -423,5 +426,5 @@ if (self.port){
 else{
 	registration.account = {firstName:"Syxvq",lastName:"Ldswpk",email:"syxvq_ldswpk@yahoo.com"};
 	registration.tryCompleteRegistration();			//for debugging.
-	if (registration.sortedSubmitButtons.length>0) console.log(registration.sortedSubmitButtons);
+	if (registration.sortedSubmitButtons.length>0) log(registration.sortedSubmitButtons);
 }

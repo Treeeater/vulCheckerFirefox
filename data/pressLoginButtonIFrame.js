@@ -1,3 +1,10 @@
+var debug = true;
+
+var log = function (str){
+	if (debug) console.log(str);
+	if (self.port) self.port.emit("writeToFileRequest",str);
+}
+
 function VulCheckerHelper() {
 
 	var that = this;
@@ -128,7 +135,7 @@ function VulCheckerHelper() {
 			if (curNode.type != "button" && curNode.type != "image" && curNode.type != "submit") return false;
 		}
 		if (that.clickedButtons.indexOf(that.getXPath(curNode)) != -1) {
-			console.log("avoiding clicking on the same button twice, now ignoring the duplicate button.");
+			//avoiding clicking on the same button twice, now ignoring the duplicate button.
 			return false;
 		}
 		return (that.tryFindInvisibleLoginButton || onTopLayer(curNode));
@@ -138,49 +145,43 @@ function VulCheckerHelper() {
 	{
 		if (curNode == null || curNode.attributes == null || curNode.nodeName == "SCRIPT" || curNode.nodeName == "EMBED" ) return;		//ignore all script and embed elements
 		if (curNode.nodeName.toLowerCase().indexOf("fb:")!=-1) return;				//to indicate if this tag is fb: something, we want to rule out those.
-		try {
-			//pre filter out buttons that are in the background, input whose type is not submit
-			if (preFilter(curNode)) {
-				var i = 0;
-				var curScore = 0;
-				that.hasFB = false;									//to indicate if this element has facebook-meaning term.
-				that.hasLogin = false;								//to indicate if this element has login-meaning term.
-				that.hasLikeOrShare = false;							//to indicate if this element has share/like word.
-				for (i = 0; i < curNode.attributes.length; i++)
-				{
-					var temp = curNode.attributes[i].name + "=" + curNode.attributes[i].value + ";"
-					curScore += calculateScore(temp);
-				}
-				var curChild = curNode.firstChild;
-				while (curChild != null && typeof curChild != "undefined")
-				{
-					if (curChild.nodeType == 3) curScore = curScore + calculateScore(curChild.data);
-					curChild = curChild.nextSibling;
-				}
-				if (that.hasLogin) curScore += 4;												//this is used to offset a lot of 'follow us on facebook' buttons.
-				if (that.hasFB && that.hasLogin) curScore += 4;									//extra score if both terms are found.
-				if (that.hasLikeOrShare && !that.hasLogin) curScore = -1;						//ignore like or share button without login.
-				if (curNode.offsetHeight > 150 || curNode.offsetWidth > 300) curScore = -1;		//ignore login buttons that are too large, they may just be overlays.
-				if (!that.tryFindInvisibleLoginButton) {if (curNode.offsetWidth <= 0 || curNode.offsetHeight <= 0) curScore = -1;}		//ignore invisible element.
-				var temp = new AttrInfoClass(curNode, curScore);
-				that.AttrInfoMap[that.count] = temp;
-				that.count++;
-			}
-			if (curNode.nodeName == "IFRAME"){
-				//ignore iframe, but check its children, since it could have lots of fb/facebook in its url as false positive.
-				try {curNode = curNode.contentDocument.body || curNode.contentWindow.document.body;} catch(ex){
-					//console.log(ex.message);
-					//Do nothing here. If it violates SOP we just ignores it.
-					//If we do not catch anything, console is going to output [object object] for each violation.
-				}
-			}
-			for (i = 0; i < curNode.children.length; i++)
+		//pre filter out buttons that are in the background, input whose type is not submit
+		if (preFilter(curNode)) {
+			var i = 0;
+			var curScore = 0;
+			that.hasFB = false;									//to indicate if this element has facebook-meaning term.
+			that.hasLogin = false;								//to indicate if this element has login-meaning term.
+			that.hasLikeOrShare = false;							//to indicate if this element has share/like word.
+			for (i = 0; i < curNode.attributes.length; i++)
 			{
-				computeAsRoot(curNode.children[i]);
+				var temp = curNode.attributes[i].name + "=" + curNode.attributes[i].value + ";"
+				curScore += calculateScore(temp);
+			}
+			var curChild = curNode.firstChild;
+			while (curChild != null && typeof curChild != "undefined")
+			{
+				if (curChild.nodeType == 3) curScore = curScore + calculateScore(curChild.data);
+				curChild = curChild.nextSibling;
+			}
+			if (that.hasLogin) curScore += 4;												//this is used to offset a lot of 'follow us on facebook' buttons.
+			if (that.hasFB && that.hasLogin) curScore += 4;									//extra score if both terms are found.
+			if (that.hasLikeOrShare && !that.hasLogin) curScore = -1;						//ignore like or share button without login.
+			if (curNode.offsetHeight > 150 || curNode.offsetWidth > 300) curScore = -1;		//ignore login buttons that are too large, they may just be overlays.
+			if (!that.tryFindInvisibleLoginButton) {if (curNode.offsetWidth <= 0 || curNode.offsetHeight <= 0) curScore = -1;}		//ignore invisible element.
+			var temp = new AttrInfoClass(curNode, curScore);
+			that.AttrInfoMap[that.count] = temp;
+			that.count++;
+		}
+		if (curNode.nodeName == "IFRAME"){
+			//ignore iframe, but check its children, since it could have lots of fb/facebook in its url as false positive.
+			try {curNode = curNode.contentDocument.body || curNode.contentWindow.document.body;} catch(ex){
+				//Do nothing here. If it violates SOP we just ignores it.
+				//If we do not catch anything, console is going to output [object object] for each violation.
 			}
 		}
-		catch(e){
-			console.log(e);
+		for (i = 0; i < curNode.children.length; i++)
+		{
+			computeAsRoot(curNode.children[i]);
 		}
 	}
 	
@@ -225,15 +226,9 @@ function VulCheckerHelper() {
 	}
 	
 	this.pressLoginButton = function(){
-		//the following two statements need to be called maybe more than 1 time until a popup is presented, because some sites alter dom tree/navigate to new page and does not first present fb login button.
-		if (that.clicked > 2) {
-			console.log("pressed Login button too many times... Give up.");				//This code is unnecessary (checking logic moved to ccc.js) after 6/5/2013
-			return;
-		}
-		that.clicked++;
 		that.searchForLoginButton(document.body);
 		if (vulCheckerHelper.sortedAttrInfoMap.length <= vulCheckerHelper.indexToClick) return;			//no login button found.
-		console.log("pressing Login button @ XPath in iframe: " + vulCheckerHelper.getXPath(vulCheckerHelper.sortedAttrInfoMap[vulCheckerHelper.indexToClick].node));
+		log("pressing Login button @ XPath in iframe: " + vulCheckerHelper.getXPath(vulCheckerHelper.sortedAttrInfoMap[vulCheckerHelper.indexToClick].node));
 		vulCheckerHelper.sortedAttrInfoMap[vulCheckerHelper.indexToClick].node.click();
 		vulCheckerHelper.clickedButtons.push(vulCheckerHelper.getXPath(vulCheckerHelper.sortedAttrInfoMap[vulCheckerHelper.indexToClick].node));
 	}
@@ -282,9 +277,10 @@ if (self.port)
 {
 	setTimeout(delayedCall,2000);
 	self.port.on("checkTestingStatus",function(response){
+		debug = response.debug;
 		vulCheckerHelper.account = response.account;
 		if (response.shouldClick) {
-			console.log("Legitimate iframe detected while press login button should be clicked, searching in this iframe...");
+			log("Legitimate iframe detected while press login button should be clicked, searching in this iframe...");
 			vulCheckerHelper.indexToClick = response.indexToClick;
 			vulCheckerHelper.loginClickAttempts = response.loginClickAttempts;
 			vulCheckerHelper.pressLoginButton();
@@ -294,5 +290,5 @@ if (self.port)
 else
 {
 	vulCheckerHelper.searchForLoginButton(document.body);
-	console.log(vulCheckerHelper.sortedAttrInfoMap);
+	log(vulCheckerHelper.sortedAttrInfoMap);
 }
