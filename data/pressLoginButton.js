@@ -66,23 +66,6 @@ function VulCheckerHelper() {
 		this.score = thisScore;
 		return this;
 	}
-
-	var getOffset = function(ele) {
-		if (ele!=null && typeof ele != "undefined"){
-			var top = 0;
-			var left = 0;
-			while( ele!=null && typeof ele != "undefined" && ele.tagName != "BODY") {
-				top += ele.offsetTop;
-				left += ele.offsetLeft;
-				if (getComputedStyle(ele).position == "fixed") {
-					break;
-				}
-				ele = ele.offsetParent;
-			}
-			return { top: top, left: left };
-		}
-		return {top:0, left:0};
-	}
 	
 	var isChildElement = function(parent, child){
 		if (child == null) return false;
@@ -106,7 +89,7 @@ function VulCheckerHelper() {
 		//heuristics: any element with a too large dimension cannot be input/submit, it must be just a underlaying div/layer.
 		if (inputWidth >= screen.availWidth/4 || inputHeight >= screen.availHeight/4) return false;
 		if (inputWidth <= 0 || inputHeight <= 0) return false;			//Elements that are on top layer must be visible.
-		var position = getOffset(ele);
+		var position = $(ele).offset();
 		var j;
 		var score = 0;
 		//Don't judge the input unfairly because of the screen/browser window size.

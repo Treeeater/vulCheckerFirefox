@@ -13,37 +13,10 @@ var Registration = function(){
 	this.inputBotEdge = 0;
 	var uniqueRadioButtons = [];
 	var filledRadioButtonNames = [];
-	/*this.getOffset = function(el) {
-		var _x = 0;
-		var _y = 0;
-		while( el && !isNaN( el.offsetLeft ) && !isNaN( el.offsetTop ) ) {
-			_x += el.offsetLeft - el.scrollLeft;
-			_y += el.offsetTop - el.scrollTop;
-			el = el.offsetParent;
-		}
-		return { top: _y, left: _x };
-	}*/
 	var randomString = function(length, chars) {
 		var result = '';
 		for (var i = length; i > 0; --i) result += chars[Math.round(Math.random() * (chars.length - 1))];
 		return result;
-	}
-	
-	this.getOffset = function(ele) {
-		if (ele!=null && typeof ele != "undefined"){
-			var top = 0;
-			var left = 0;
-			while( ele!=null && typeof ele != "undefined" && ele.tagName != "BODY") {
-				top += ele.offsetTop;
-				left += ele.offsetLeft;
-				if (getComputedStyle(ele).position == "fixed") {
-					break;
-				}
-				ele = ele.offsetParent;
-			}
-			return { top: top, left: left };
-		}
-		return {top:0, left:0};
 	}
 	
 	this.isChildElement = function(parent, child){
@@ -68,7 +41,7 @@ var Registration = function(){
 		//heuristics: any element with a too large dimension cannot be input/submit, it must be just a underlaying div/layer.
 		if (inputWidth >= screen.availWidth/4 || inputHeight >= screen.availHeight/4) return false;
 		if (inputWidth <= 0 || inputHeight <= 0) return false;			//Elements that are on top layer must be visible.
-		var position = that.getOffset(ele);
+		var position = $(ele).offset();
 		var j;
 		var score = 0;
 		//Don't judge the input unfairly because of the screen/browser window size.
