@@ -210,7 +210,10 @@ function VulCheckerHelper() {
 	
 	this.pressLoginButton = function(){
 		that.searchForLoginButton(document.body);
-		if (vulCheckerHelper.sortedAttrInfoMap.length <= vulCheckerHelper.indexToClick) return;			//no login button found, don't do anything.
+		if (vulCheckerHelper.sortedAttrInfoMap.length <= vulCheckerHelper.indexToClick) {
+			self.port.emit("noLoginButtonFound","");
+			return;			//no login button found, tell ccc that.
+		}
 		self.port.emit("loginInfo",{"loginButtonXPath":vulCheckerHelper.getXPath(vulCheckerHelper.sortedAttrInfoMap[vulCheckerHelper.indexToClick].node), "loginButtonOuterHTML":vulCheckerHelper.sortedAttrInfoMap[vulCheckerHelper.indexToClick].node.outerHTML});
 	}
 	

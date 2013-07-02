@@ -288,7 +288,7 @@ var Registration = function(){
 		}
 		for (i = 0; i < suspects.length; i++){
 			//Heuristic: eliminate those suspects whose position is not lower than all input text elements:
-			var TLtop = that.getOffset(suspects[i]).top;
+			var TLtop = $(suspects[i]).offset().top;
 			if (TLtop < that.inputBotEdge) continue;
 			//Heuristic: submit button cannot be too large:
 			if (suspects[i].offsetHeight > 150 || suspects[i].offsetWidth > 300) continue;
@@ -345,7 +345,7 @@ var Registration = function(){
 		//find the bot edge for those inputs
 		for (i = 0; i < allTopTextInputs.length; i++)
 		{
-			var offSetY = that.getOffset(allTopTextInputs[i]).top;
+			var offSetY = $(allTopTextInputs[i]).offset().top;
 			if (offSetY > that.inputBotEdge) that.inputBotEdge = offSetY;
 		}
 	}
