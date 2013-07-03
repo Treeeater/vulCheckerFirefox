@@ -27,7 +27,7 @@ function AutomateSSO(){
 		document.getElementById('email').value = (that.account == 1) ? accounts[0].email : accounts[1].email;	//another one is zhouyuchenking@hotmail.com
 		
 		if (document.getElementById('pass') == null) return false;
-		document.getElementById('pass').value = "msr123456";
+		document.getElementById('pass').value = (that.account == 1) ? accounts[0].passwd : accounts[1].passwd;
 		
 		if (document.getElementById('u_0_1') == null) return false;
 		//try to click it

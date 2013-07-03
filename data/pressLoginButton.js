@@ -222,6 +222,8 @@ function VulCheckerHelper() {
 	}
 	
 	this.delayedPressLoginButton = function(){
+		//content = document.innerHTML.toLowerCase();
+		//self.port.emit("checkTestingStatus",(content.indexOf('facebook') == -1 && content.indexOf('fb') == -1));
 		self.port.emit("checkTestingStatus",0);
 	}
 	
@@ -232,7 +234,7 @@ function VulCheckerHelper() {
 			return '/HTML/' + element.tagName;
 
 		var ix = 0;
-		if (typeof element.parentNode != 'undefined')
+		if (typeof element.parentNode != 'undefined' && element.parentNode != null)
 		{
 			var siblings = element.parentNode.childNodes;
 			for (var i= 0; i<siblings.length; i++) {

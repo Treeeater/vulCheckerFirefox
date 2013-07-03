@@ -223,7 +223,7 @@ function VulCheckerHelper() {
 			return '/HTML/' + element.tagName;
 
 		var ix = 0;
-		if (typeof element.parentNode != 'undefined')
+		if (typeof element.parentNode != 'undefined' && element.parentNode != null)
 		{
 			var siblings = element.parentNode.childNodes;
 			for (var i= 0; i<siblings.length; i++) {
