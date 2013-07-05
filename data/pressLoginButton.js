@@ -5,6 +5,7 @@ function VulCheckerHelper() {
 	this.indexToClick = 0;
 	this.account = [];
 	this.clickedButtons = [];
+	this.userInfoFound = false;
 	this.loginClickAttempts = 1;
 	function createCookie(name,value,days) {
 		if (days) {
@@ -177,7 +178,10 @@ function VulCheckerHelper() {
 	
 	this.searchForLoginButton = function(rootNode) {
 		that.init();
-		if (checkAccountInfoPresense(rootNode)) return;
+		if (checkAccountInfoPresense(rootNode)) {
+			that.userInfoFound = true;
+			return;
+		}
 		computeAsRoot(rootNode);
 		var i = 0;
 		var j = 0;
@@ -204,6 +208,7 @@ function VulCheckerHelper() {
 		//only send the first click, second click shall be ignored.
 		that.tryFindInvisibleLoginButton = response.tryFindInvisibleLoginButton;
 		that.searchForLoginButton(document.body);			//this doesn't necessarily mean a login button is found. sortedAttrInfoMap could be empty.
+		if (that.userInfoFound) return {"loginButtonXPath":"USER_INFO_EXISTS!", "loginButtonOuterHTML":"USER_INFO_EXISTS!"};
 		if (vulCheckerHelper.sortedAttrInfoMap.length <= response.indexToClick) return {"loginButtonXPath":"", "loginButtonOuterHTML":""};			//no login button found.
 		return {"loginButtonXPath":vulCheckerHelper.getXPath(vulCheckerHelper.sortedAttrInfoMap[response.indexToClick].node), "loginButtonOuterHTML":vulCheckerHelper.sortedAttrInfoMap[response.indexToClick].node.outerHTML};
 	}
