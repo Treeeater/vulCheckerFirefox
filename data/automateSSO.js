@@ -12,7 +12,6 @@ function AutomateSSO(){
 		//if (document.getElementById('u_0_0') == null) return false;
 		//try to click it
 		//document.getElementById('u_0_0').click();
-		
 		if (document.getElementsByClassName('selected')[0] == null) return false;
 		//try to click it
 		document.getElementsByClassName('selected')[0].click();
@@ -83,5 +82,5 @@ self.port.on("requestAccountInfo",function(resp){
 
 //auto-check every time.
 //wait until test account name is inited.
-window.addEventListener('load',function(){setTimeout(automateSSO.checkEverything,1000)});
-setTimeout(automateSSO.checkEverything,2000);				//fallback if onload is not fired.	*Note*: This problem can probably be solved by writing 'run_at' : 'document.start' in manifest.json for all content scripts.
+window.addEventListener('load',function(){window.setTimeout(automateSSO.checkEverything,2000);});
+//window.setTimeout(automateSSO.checkEverything,2000);				//fallback if onload is not fired.	*Note*: This problem can probably be solved by writing 'run_at' : 'document.start' in manifest.json for all content scripts.
