@@ -227,8 +227,6 @@ function VulCheckerHelper() {
 	}
 	
 	this.delayedPressLoginButton = function(){
-		//content = document.innerHTML.toLowerCase();
-		//self.port.emit("checkTestingStatus",(content.indexOf('facebook') == -1 && content.indexOf('fb') == -1));
 		self.port.emit("checkTestingStatus",0);
 	}
 	
@@ -303,6 +301,7 @@ if (self.port)
 		}
 	});
 	//window.addEventListener('load',vulCheckerHelper.delayedPressLoginButton);				//must not do this. FF's gonna give u stupid hidden window error.
+	self.port.emit("clearPressLoginButtonTimer",0);
 	setTimeout(vulCheckerHelper.delayedPressLoginButton,3000);
 }
 else
