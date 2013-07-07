@@ -349,6 +349,13 @@ var Registration = function(){
 			if (offSetY > that.inputBotEdge) that.inputBotEdge = offSetY;
 		}
 	}
+
+	var clickSubmitButton = function(){
+		log("Clicking on submit button from IFrame: " + that.sortedSubmitButtons[0].node.outerHTML);
+		that.submitButtonClicked = true;
+		that.sortedSubmitButtons[0].node.click();
+		self.port.emit("registrationSubmitted",{"elementsToClick":[],"buttonToClick":[]});
+	}
 	
 	this.tryCompleteRegistration = function(){
 		//need to confirm that this iframe is on top layer in the first place before searching for all the inputs/buttons.
@@ -361,6 +368,9 @@ var Registration = function(){
 		that.findInputBottomEdge();
 		that.tryFindSubmitButton();
 		that.attempts++;
+		if (typeof self.port != "undefined" && registration.sortedSubmitButtons.length>0) {
+			setTimeout(clickSubmitButton,500);			//give some time for all the shenanigans to settle
+		}
 		if (that.sortedSubmitButtons.length == 0 && that.attempts <= 2) setTimeout(that.tryCompleteRegistration,2000);		//tackle situations where page is first created but are blank, and contents are filled in afterwards.
 	}
 }
@@ -370,13 +380,6 @@ var inputFilledMessage = "Iframe: All fields populated. Ready to click submit bu
 var delayedCall = function(){
 	if (window.innerHeight < 100 || window.innerWidth < 200) return;	//shouldn't cope with iframe that's too small, this eliminate some FPs.
 	self.port.emit("shouldRegisterIframe","");							//iframe finish registration worker start automatically, don't need ccc to issue a command; However, they only work if capturingPhase is 4 or 10.
-}
-
-function clickSubmitButton(){
-	log("Clicking on submit button from IFrame: " + registration.sortedSubmitButtons[0].node.outerHTML);
-	registration.submitButtonClicked = true;
-	registration.sortedSubmitButtons[0].node.click();
-	self.port.emit("registrationSubmitted",{"elementsToClick":[],"buttonToClick":[]});
 }
 
 if (self.port){
@@ -391,13 +394,10 @@ if (self.port){
 	self.port.on("issueUserInfo",function(response){
 		registration.account = response;
 		registration.tryCompleteRegistration();
-		if (registration.sortedSubmitButtons.length>0) {
-			setTimeout(clickSubmitButton,500);			//give some time for all the shenanigans to settle
-		}
 	});
 }
 else{
-	registration.account = {firstName:"Syxvq",lastName:"Ldswpk",email:"syxvq_ldswpk@yahoo.com"};
+	registration.account = {firstName:"chadadarnya",lastName:"isackaldon",email:"chadadarnyaisackaldon@outlook.com"};
 	registration.tryCompleteRegistration();			//for debugging.
 	if (registration.sortedSubmitButtons.length>0) log(registration.sortedSubmitButtons);
 }
