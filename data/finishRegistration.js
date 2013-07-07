@@ -403,7 +403,7 @@ if (self.port){
 	});
 }
 else{
-	registration.account = {firstName:"Syxvq",lastName:"Ldswpk",email:"syxvq_ldswpk@yahoo.com"};
+	registration.account = {firstName:"chadadarnya",lastName:"isackaldon",email:"chadadarnyaisackaldon@outlook.com"};
 	registration.tryCompleteRegistration();			//for debugging.
 	if (registration.sortedSubmitButtons.length>0) log(registration.sortedSubmitButtons);
 }
