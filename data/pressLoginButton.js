@@ -302,7 +302,7 @@ if (self.port)
 	});
 	//window.addEventListener('load',vulCheckerHelper.delayedPressLoginButton);				//must not do this. FF's gonna give u stupid hidden window error.
 	self.port.emit("clearPressLoginButtonTimer",0);
-	setTimeout(vulCheckerHelper.delayedPressLoginButton,3000);
+	setTimeout(vulCheckerHelper.delayedPressLoginButton,5000);
 }
 else
 {

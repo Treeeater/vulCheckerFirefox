@@ -286,6 +286,11 @@ var Registration = function(){
 			if (!that.onTopLayer(temp[i])) continue;
 			suspects.push(temp[i]);
 		}
+		temp = document.getElementsByTagName('img');
+		for (i = 0; i < temp.length; i++){
+			if (!that.onTopLayer(temp[i])) continue;
+			suspects.push(temp[i]);
+		}
 		for (i = 0; i < suspects.length; i++){
 			//Heuristic: eliminate those suspects whose position is not lower than all input text elements:
 			var TLtop = $(suspects[i]).offset().top;
