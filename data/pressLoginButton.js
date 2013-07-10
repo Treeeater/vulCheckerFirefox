@@ -7,6 +7,7 @@ function VulCheckerHelper() {
 	this.clickedButtons = [];
 	this.userInfoFound = false;
 	this.loginClickAttempts = 1;
+	this.searchForSignUpForFB = false;
 	function createCookie(name,value,days) {
 		if (days) {
 			var date = new Date();
@@ -43,22 +44,39 @@ function VulCheckerHelper() {
 			output = (inputStr.match(/FB/gi)!=null) ? 10 : 0;
 			output += (inputStr.match(/facebook/gi)!=null) ? 10 : 0;
 		}
-		output += (inputStr.match(/login/gi)!=null) ? 1 : 0;
-		output += (inputStr.match(/log\sin/gi)!=null) ? 1 : 0;
-		output += (inputStr.match(/sign\sin/gi)!=null) ? 1 : 0;
-		output += (inputStr.match(/signin/gi)!=null) ? 1 : 0;
-		output += (inputStr.match(/sign-in/gi)!=null) ? 1 : 0;
-		output += (inputStr.match(/sign_in/gi)!=null) ? 1 : 0;
-		output += (inputStr.match(/connect/gi)!=null) ? 1 : 0;
+		if (!that.searchForSignUpForFB)
+		{
+			output += (inputStr.match(/login/gi)!=null) ? 1 : 0;
+			output += (inputStr.match(/log\sin/gi)!=null) ? 1 : 0;
+			output += (inputStr.match(/sign\sin/gi)!=null) ? 1 : 0;
+			output += (inputStr.match(/signin/gi)!=null) ? 1 : 0;
+			output += (inputStr.match(/sign-in/gi)!=null) ? 1 : 0;
+			output += (inputStr.match(/sign_in/gi)!=null) ? 1 : 0;
+			output += (inputStr.match(/connect/gi)!=null) ? 1 : 0;
+			
+			that.hasLogin = that.hasLogin || (inputStr.match(/login/gi)!=null || inputStr.match(/log\sin/gi)!=null || inputStr.match(/sign\sin/gi)!=null || inputStr.match(/signin/gi)!=null || inputStr.match(/sign-in/gi)!=null || inputStr.match(/sign_in/gi)!=null || (inputStr.match(/connect/gi)!=null && inputStr.match(/connect[a-zA-Z]/gi)==null));
+			//connect is a more common word, we need to at least restrict its existence, for example, we want to rule out "Connecticut" and "connection".
+			//More heuristics TODO: give more weight to inputStr if it contains the exact strings: 'login with Facebook', 'connect with Facebook', 'sign in with facebook', etc.
+		}
+		else {
+			//search for sign up with facebook, etc.
+			output += (inputStr.match(/signup/gi)!=null) ? 1 : 0;
+			output += (inputStr.match(/sign\sup/gi)!=null) ? 1 : 0;
+			output += (inputStr.match(/sign_up/gi)!=null) ? 1 : 0;
+			output += (inputStr.match(/sign-up/gi)!=null) ? 1 : 0;
+			output += (inputStr.match(/register/gi)!=null) ? 1 : 0;
+			output += (inputStr.match(/create/gi)!=null) ? 1 : 0;
+			output += (inputStr.match(/join/gi)!=null) ? 1 : 0;
+			that.hasLogin = that.hasLogin || (inputStr.match(/signup/gi)!=null || inputStr.match(/sign\sup/gi)!=null || inputStr.match(/sign_up/gi)!=null || inputStr.match(/sign-up/gi)!=null || inputStr.match(/create/gi)!=null || inputStr.match(/join/gi)!=null);				//semantically this should be that.hasSignUp, but we just put hasLogin here for simplicity.	
+			
+		}
+			
+		//bonus to fb and login existing both.
+		that.hasFB = that.hasFB || (inputStr.match(/FB/gi)!=null || inputStr.match(/facebook/gi)!=null);
 		
 		//penalty on share/like
 		that.hasLikeOrShare = that.hasLikeOrShare || (inputStr.match(/share/gi)!=null || inputStr.match(/like/gi)!=null);
 		
-		//bonus to fb and login existing both.
-		that.hasFB = that.hasFB || (inputStr.match(/FB/gi)!=null || inputStr.match(/facebook/gi)!=null);
-		that.hasLogin = that.hasLogin || (inputStr.match(/login/gi)!=null || inputStr.match(/log\sin/gi)!=null || inputStr.match(/sign\sin/gi)!=null || inputStr.match(/signin/gi)!=null || (inputStr.match(/connect/gi)!=null && inputStr.match(/connect[a-zA-Z]/gi)==null));				
-		//connect is a more common word, we need to at least restrict its existence, for example, we want to rule out "Connecticut" and "connection".
-		//More heuristics TODO: give more weight to inputStr if it contains the exact strings: 'login with Facebook', 'connect with Facebook', 'sign in with facebook', etc.
 		return output;
 	}
 
@@ -142,7 +160,7 @@ function VulCheckerHelper() {
 			if (that.hasLogin) curScore += 4;												//this is used to offset a lot of 'follow us on facebook' buttons.
 			if (that.hasFB && that.hasLogin) curScore += 4;									//extra score if both terms are found.
 			if (that.hasLikeOrShare && !that.hasLogin) curScore = -1;						//ignore like or share button without login.
-			if (curNode.offsetHeight > 150 || curNode.offsetWidth > 300) curScore = -1;		//ignore login buttons that are too large, they may just be overlays.
+			if (curNode.offsetHeight > 150 || curNode.offsetWidth > 400) curScore = -1;		//ignore login buttons that are too large, they may just be overlays.
 			if (!that.tryFindInvisibleLoginButton) {if (curNode.offsetWidth <= 0 || curNode.offsetHeight <= 0) curScore = -1;}		//ignore invisible element.
 			var temp = new AttrInfoClass(curNode, curScore);
 			that.AttrInfoMap[that.count] = temp;
@@ -292,6 +310,7 @@ if (self.port)
 	self.port.on("checkTestingStatus", function (response){
 		//check if background is in active checking.
 		vulCheckerHelper.account = response.account;
+		vulCheckerHelper.searchForSignUpForFB = response.searchForSignUpForFB;
 		if (response.shouldClick) vulCheckerHelper.automaticPressLoginButton();		//need to set a lenient timer, since if the fb traffic is not seen in this time, it's going to click the login button again, which resets the connection - this may create an infinite loop. Current setting is that if the login button is pressed more than twice, it gives up.
 	});
 	self.port.on("readyToClick", function(){
