@@ -11,7 +11,9 @@ var Registration = function(){
 	this.account;
 	this.attempts = 0;
 	this.submitButtonClicked = false;
-	this.inputBotEdge = 0;
+	this.allTopTextInputs = [];		//stores all text inputs that are on top layer.
+	this.allTopTextInputBottomEdges = [];		//stores bottom edges of all inputs.
+	this.inputBotEdge = 0;			//stores the bottommost edge of all inputs
 	var uniqueRadioButtons = [];
 	var filledRadioButtonNames = [];
 	var randomString = function(length, chars) {
@@ -261,6 +263,30 @@ var Registration = function(){
 		}
 	}
 	
+	this.commonParentDistance = function(nodeA, nodeB){
+		if (nodeA == null || nodeB == null || typeof nodeA == "undefined" || typeof nodeB == "undefined") return 9999;
+		var aList = [];
+		var bList = [];
+		var rootNode = nodeA.parentNode;
+		while (rootNode != null && typeof rootNode != "undefined") {
+			aList.push(rootNode);
+			rootNode = rootNode.parentNode;
+		}
+		var rootNode = nodeB.parentNode;
+		while (rootNode != null && typeof rootNode != "undefined") {
+			bList.push(rootNode);
+			rootNode = rootNode.parentNode;
+		}
+		var i = 0;
+		while (i < aList.length){
+			if (bList.indexOf(aList[i]) != -1) {
+				return (i >= bList.indexOf(aList[i]) ? i + 1 : bList.indexOf(aList[i]) + 1);
+			}
+			i++;
+		}
+		return 9999;
+	}
+	
 	this.tryFindSubmitButton = function(){
 		var suspects = [];
 		var submitButtons = [];
@@ -314,6 +340,37 @@ var Registration = function(){
 				submitButtons.push({node:suspects[i],score:curScore});
 			}
 		}
+		if (submitButtons.length == 0){
+			//Cannot find submit button after eliminating all buttons that are above all inputs, relax this a bit now.
+			for (i = 0; i < suspects.length; i++){
+				//Heuristic: eliminate those suspects whose position is not lower than all input text elements that have a close common parent with this suspect:
+				var TLtop = $(suspects[i]).offset().top;
+				var eliminated = false;
+				var j = 0;
+				for (j = 0; j < that.allTopTextInputs.length; j++){
+					if (that.commonParentDistance(suspects[i],that.allTopTextInputs[j]) < 2 && TLtop < that.allTopTextInputBottomEdges[j]) eliminated = true;
+				}
+				if (eliminated) continue;
+				//Heuristic: submit button cannot be too large:
+				if (suspects[i].offsetHeight > 150 || suspects[i].offsetWidth > 300) continue;
+				var curScore = 0;
+				for (j = 0; j < suspects[i].attributes.length; j++)
+				{
+					var temp = suspects[i].attributes[j].name + "=" + suspects[i].attributes[j].value;
+					temp = temp.toLowerCase();
+					curScore += (temp.indexOf('submit')>-1?10:0);			//submit is a really strong one as an attribute.
+					curScore += (temp.indexOf('regist')>-1?5:0);			//include registration and register
+					curScore += (temp.indexOf('sign up')>-1?5:0);
+					curScore += (temp.indexOf('signup')>-1?5:0);
+					curScore += (temp.indexOf('create')>-1?3:0);			//this is less used.
+					curScore += (temp.indexOf('confirm')>-1?2:0);			//confirm is a bad one, because a lot of registration forms have 'confirm password' in it.
+					curScore += (temp.indexOf('start')>-1?2:0);				//start is a bad one.
+				}
+				if (curScore >= 1){
+					submitButtons.push({node:suspects[i],score:curScore});
+				}
+			}
+		}
 		for (i = 0; i < submitButtons.length; i++)
 		{
 			//sort the submitButtons.
@@ -335,6 +392,7 @@ var Registration = function(){
 	}
 	
 	this.findInputBottomEdge = function(){
+		//used for submit button elimination.
 		var allInputs = document.getElementsByTagName('input');
 		var allTextInputs = [];
 		var i;
@@ -342,15 +400,17 @@ var Registration = function(){
 		{
 			if (allInputs[i].type == 'text') allTextInputs.push(allInputs[i]);
 		}
-		var allTopTextInputs = [];		//stores all text inputs that are on top layer.
 		for (i = 0; i < allTextInputs.length; i++)
 		{
-			if (that.onTopLayer(allTextInputs[i])) allTopTextInputs.push(allTextInputs[i]);
+			if (that.onTopLayer(allTextInputs[i])) {
+				that.allTopTextInputs.push(allTextInputs[i]);
+				that.allTopTextInputBottomEdges.push($(allTextInputs[i]).offset().top);
+			}
 		}
 		//find the bot edge for those inputs
-		for (i = 0; i < allTopTextInputs.length; i++)
+		for (i = 0; i < that.allTopTextInputs.length; i++)
 		{
-			var offSetY = $(allTopTextInputs[i]).offset().top;
+			var offSetY = $(that.allTopTextInputs[i]).offset().top;
 			if (offSetY > that.inputBotEdge) that.inputBotEdge = offSetY;
 		}
 	}
