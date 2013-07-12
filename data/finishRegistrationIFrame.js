@@ -309,12 +309,14 @@ var Registration = function(){
 	
 	this.computeSubmitButtonTextScore = function(lowerCasedInput){
 		if (typeof lowerCasedInput != "string") return 0;
+		if (lowerCasedInput.indexOf('search') != -1) return -999;				//Heuristics: search should not be present there.
 		var curScore = (lowerCasedInput.indexOf('submit')>-1?10:0);			//submit is a really strong one as an attribute.
 		curScore += (lowerCasedInput.indexOf('regist')>-1?5:0);			//include registration and register
 		curScore += (lowerCasedInput.indexOf('sign up')>-1?5:0);
 		curScore += (lowerCasedInput.indexOf('signup')>-1?5:0);
 		curScore += (lowerCasedInput.indexOf('create')>-1?3:0);			//this is less used.
 		curScore += (lowerCasedInput.indexOf('confirm')>-1?2:0);			//confirm is a bad one, because a lot of registration forms have 'confirm password' in it.
+		curScore += (lowerCasedInput.indexOf('continue')>-1?2:0);			
 		curScore += (lowerCasedInput.indexOf('start')>-1?2:0);				//start is a bad one.
 		return curScore;
 	}
@@ -327,6 +329,8 @@ var Registration = function(){
 		var temp = document.getElementsByTagName('input');
 		for (i = 0; i < temp.length; i++){
 			//Warning: This part will be different than finishRegistration.js: in an iframe setting, requiring the submit button to be at least 200px lower is unreasonable.
+			//Heuristic: If it's input element, must be one of the three types for us to consider.
+			if (temp[i].type != "submit" && temp[i].type != "button" && temp[i].type != "radio") continue;
 			if (!that.onTopLayer(temp[i])) continue;
 			//Heuristic: Ignore input submit buttons whose form only has 2 text inputs, one of which is of password type.
 			//This is used to battle linking accounts situation.
@@ -367,10 +371,15 @@ var Registration = function(){
 			for (j = 0; j < suspects[i].attributes.length; j++)
 			{
 				var temp = suspects[i].attributes[j].name + "=" + suspects[i].attributes[j].value;
-				curScore = that.computeSubmitButtonTextScore(temp.toLowerCase());
+				curScore += that.computeSubmitButtonTextScore(temp.toLowerCase());
 			}
 			var directChildrenTextContent = $(suspects[i]).contents().filter(function() {
-				return this.nodeType == 3;
+				if (this.nodeType == 3) return true;
+				if (this.nodeName == "EM") return true;
+				if (this.nodeName == "B") return true;
+				if (this.nodeName == "I") return true;
+				if (this.nodeName == "U") return true;
+				return false;
 			}).text().toLowerCase();
 			curScore += that.computeSubmitButtonTextScore(directChildrenTextContent);
 			if (curScore >= 1){
@@ -386,7 +395,7 @@ var Registration = function(){
 				var eliminated = false;
 				var j = 0;
 				for (j = 0; j < that.allTopTextInputs.length; j++){
-					if (that.commonParentDistance(suspects[i],that.allTopTextInputs[j]) < 2 && TLtop < that.allTopTextInputBottomEdges[j]) eliminated = true;
+					if (that.commonParentDistance(suspects[i],that.allTopTextInputs[j]) < 2 && TLtop < that.allTopTextInputBottomEdges[j] - that.allTopTextInputs[j].offsetHeight/2) eliminated = true;
 				}
 				if (eliminated) continue;
 				//Heuristic: submit button cannot be too large:
@@ -395,10 +404,15 @@ var Registration = function(){
 				for (j = 0; j < suspects[i].attributes.length; j++)
 				{
 					var temp = suspects[i].attributes[j].name + "=" + suspects[i].attributes[j].value;
-					curScore = that.computeSubmitButtonTextScore(temp.toLowerCase());
+					curScore += that.computeSubmitButtonTextScore(temp.toLowerCase());
 				}
 				var directChildrenTextContent = $(suspects[i]).contents().filter(function() {
-					return this.nodeType == 3;
+					if (this.nodeType == 3) return true;
+					if (this.nodeName == "EM") return true;
+					if (this.nodeName == "B") return true;
+					if (this.nodeName == "I") return true;
+					if (this.nodeName == "U") return true;
+					return false;
 				}).text().toLowerCase();
 				curScore += that.computeSubmitButtonTextScore(directChildrenTextContent);
 				if (curScore >= 1){
@@ -431,6 +445,7 @@ var Registration = function(){
 		var allInputs = document.getElementsByTagName('input');
 		var allTextInputs = [];
 		var i;
+		var isSearchRelated;
 		for (i = 0; i < allInputs.length; i++)
 		{
 			if (allInputs[i].type == 'text') allTextInputs.push(allInputs[i]);
@@ -438,6 +453,17 @@ var Registration = function(){
 		for (i = 0; i < allTextInputs.length; i++)
 		{
 			if (that.onTopLayer(allTextInputs[i])) {
+				var j;
+				isSearchRelated = false;
+				for (j = 0; j < allTextInputs[i].attributes.length; j++)
+				{
+					var temp = allTextInputs[i].attributes[j].name + "=" + allTextInputs[i].attributes[j].value;
+					if (temp.toLowerCase().indexOf('search') != -1) {
+						isSearchRelated = true;
+						break;
+					}
+				}
+				if (isSearchRelated) continue;
 				that.allTopTextInputs.push(allTextInputs[i]);
 				that.allTopTextInputBottomEdges.push($(allTextInputs[i]).offset().top);
 			}
@@ -445,7 +471,7 @@ var Registration = function(){
 		//find the bot edge for those inputs
 		for (i = 0; i < that.allTopTextInputs.length; i++)
 		{
-			var offSetY = $(that.allTopTextInputs[i]).offset().top;
+			var offSetY = $(that.allTopTextInputs[i]).offset().top - that.allTopTextInputs[i].offsetHeight/2;		//some submit button is parallel to the input, this leaves some margin for it, if the submit button is bigger than the input textbox.
 			if (offSetY > that.inputBotEdge) that.inputBotEdge = offSetY;
 		}
 	}
