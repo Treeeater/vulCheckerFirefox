@@ -287,6 +287,26 @@ var Registration = function(){
 		return 9999;
 	}
 	
+	this.isLinkingForm = function(submitButton){
+		var curNode = submitButton;
+		var parentFormNode = null;
+		while (curNode != null && typeof curNode != "undefined")
+		{
+			if (curNode.nodeName == "FORM") {
+				parentFormNode = curNode;
+				break;
+			}
+			curNode = curNode.parentNode;
+		}
+		if (!parentFormNode) return false;
+		if ($(parentFormNode).find("input[type='text'],input[type='email']").length == 1 && $(parentFormNode).find("input[type='password']").length == 1)
+		{
+			//console.log("Ignored submit button that's probably in a linking form.");
+			return true;
+		}
+		return false;
+	}
+	
 	this.tryFindSubmitButton = function(){
 		var suspects = [];
 		var submitButtons = [];
@@ -295,26 +315,33 @@ var Registration = function(){
 		var temp = document.getElementsByTagName('input');
 		for (i = 0; i < temp.length; i++){
 			if (!that.onTopLayer(temp[i])) continue;
+			//Ignore input submit buttons whose form only has 2 text inputs, one of which is of password type.
+			//This is used to battle linking accounts situation.
+			if (that.isLinkingForm(temp[i])) continue;
 			suspects.push(temp[i]);
 		}
 		temp = document.getElementsByTagName('button');
 		for (i = 0; i < temp.length; i++){
 			if (!that.onTopLayer(temp[i])) continue;
+			if (that.isLinkingForm(temp[i])) continue;
 			suspects.push(temp[i]);
 		}
 		temp = document.getElementsByTagName('div');
 		for (i = 0; i < temp.length; i++){
 			if (!that.onTopLayer(temp[i])) continue;
+			if (that.isLinkingForm(temp[i])) continue;
 			suspects.push(temp[i]);
 		}
 		temp = document.getElementsByTagName('a');
 		for (i = 0; i < temp.length; i++){
 			if (!that.onTopLayer(temp[i])) continue;
+			if (that.isLinkingForm(temp[i])) continue;
 			suspects.push(temp[i]);
 		}
 		temp = document.getElementsByTagName('img');
 		for (i = 0; i < temp.length; i++){
 			if (!that.onTopLayer(temp[i])) continue;
+			if (that.isLinkingForm(temp[i])) continue;
 			suspects.push(temp[i]);
 		}
 		for (i = 0; i < suspects.length; i++){
@@ -342,6 +369,7 @@ var Registration = function(){
 		}
 		if (submitButtons.length == 0){
 			//Cannot find submit button after eliminating all buttons that are above all inputs, relax this a bit now.
+			log("Cannot find submit button when eliminating all buttons that are above text inputs, now relaxing this...");
 			for (i = 0; i < suspects.length; i++){
 				//Heuristic: eliminate those suspects whose position is not lower than all input text elements that have a close common parent with this suspect:
 				var TLtop = $(suspects[i]).offset().top;
