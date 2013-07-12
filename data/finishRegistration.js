@@ -374,7 +374,8 @@ var Registration = function(){
 			if (suspects[i].offsetHeight > 150 || suspects[i].offsetWidth > 300) continue;
 			var curScore = 0;
 			for (j = 0; j < suspects[i].attributes.length; j++)
-			{
+			{	
+				//if (suspects[i].attributes[j].name.indexOf('on') == 0) continue;		//Heuristics: event handlers doesn't count.
 				var temp = suspects[i].attributes[j].name + "=" + suspects[i].attributes[j].value;
 				curScore += that.computeSubmitButtonTextScore(temp.toLowerCase());
 			}
@@ -408,6 +409,7 @@ var Registration = function(){
 				var curScore = 0;
 				for (j = 0; j < suspects[i].attributes.length; j++)
 				{
+					//if (suspects[i].attributes[j].name.indexOf('on') == 0) continue;		//Heuristics: event handlers doesn't count.
 					var temp = suspects[i].attributes[j].name + "=" + suspects[i].attributes[j].value;
 					curScore += that.computeSubmitButtonTextScore(temp.toLowerCase());
 				}
