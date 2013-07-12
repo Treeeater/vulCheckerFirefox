@@ -307,6 +307,18 @@ var Registration = function(){
 		return false;
 	}
 	
+	this.computeSubmitButtonTextScore = function(lowerCasedInput){
+		if (typeof lowerCasedInput != "string") return 0;
+		var curScore = (lowerCasedInput.indexOf('submit')>-1?10:0);			//submit is a really strong one as an attribute.
+		curScore += (lowerCasedInput.indexOf('regist')>-1?5:0);			//include registration and register
+		curScore += (lowerCasedInput.indexOf('sign up')>-1?5:0);
+		curScore += (lowerCasedInput.indexOf('signup')>-1?5:0);
+		curScore += (lowerCasedInput.indexOf('create')>-1?3:0);			//this is less used.
+		curScore += (lowerCasedInput.indexOf('confirm')>-1?2:0);			//confirm is a bad one, because a lot of registration forms have 'confirm password' in it.
+		curScore += (lowerCasedInput.indexOf('start')>-1?2:0);				//start is a bad one.
+		return curScore;
+	}
+	
 	this.tryFindSubmitButton = function(){
 		var suspects = [];
 		var submitButtons = [];
@@ -314,32 +326,38 @@ var Registration = function(){
 		var j = 0;
 		var temp = document.getElementsByTagName('input');
 		for (i = 0; i < temp.length; i++){
+			//Heuristic: eliminate suspects that are too high in the position.
+			if ($(temp[i]).offset().top < 200) continue;
 			if (!that.onTopLayer(temp[i])) continue;
-			//Ignore input submit buttons whose form only has 2 text inputs, one of which is of password type.
+			//Heuristic: Ignore input submit buttons whose form only has 2 text inputs, one of which is of password type.
 			//This is used to battle linking accounts situation.
 			if (that.isLinkingForm(temp[i])) continue;
 			suspects.push(temp[i]);
 		}
 		temp = document.getElementsByTagName('button');
 		for (i = 0; i < temp.length; i++){
+			if ($(temp[i]).offset().top < 200) continue;
 			if (!that.onTopLayer(temp[i])) continue;
 			if (that.isLinkingForm(temp[i])) continue;
 			suspects.push(temp[i]);
 		}
 		temp = document.getElementsByTagName('div');
 		for (i = 0; i < temp.length; i++){
+			if ($(temp[i]).offset().top < 200) continue;
 			if (!that.onTopLayer(temp[i])) continue;
 			if (that.isLinkingForm(temp[i])) continue;
 			suspects.push(temp[i]);
 		}
 		temp = document.getElementsByTagName('a');
 		for (i = 0; i < temp.length; i++){
+			if ($(temp[i]).offset().top < 200) continue;
 			if (!that.onTopLayer(temp[i])) continue;
 			if (that.isLinkingForm(temp[i])) continue;
 			suspects.push(temp[i]);
 		}
 		temp = document.getElementsByTagName('img');
 		for (i = 0; i < temp.length; i++){
+			if ($(temp[i]).offset().top < 200) continue;
 			if (!that.onTopLayer(temp[i])) continue;
 			if (that.isLinkingForm(temp[i])) continue;
 			suspects.push(temp[i]);
@@ -354,15 +372,12 @@ var Registration = function(){
 			for (j = 0; j < suspects[i].attributes.length; j++)
 			{
 				var temp = suspects[i].attributes[j].name + "=" + suspects[i].attributes[j].value;
-				temp = temp.toLowerCase();
-				curScore += (temp.indexOf('submit')>-1?10:0);			//submit is a really strong one as an attribute.
-				curScore += (temp.indexOf('regist')>-1?5:0);			//include registration and register
-				curScore += (temp.indexOf('sign up')>-1?5:0);
-				curScore += (temp.indexOf('signup')>-1?5:0);
-				curScore += (temp.indexOf('create')>-1?3:0);			//this is less used.
-				curScore += (temp.indexOf('confirm')>-1?2:0);			//confirm is a bad one, because a lot of registration forms have 'confirm password' in it.
-				curScore += (temp.indexOf('start')>-1?2:0);				//start is a bad one.
+				curScore = that.computeSubmitButtonTextScore(temp.toLowerCase());
 			}
+			var directChildrenTextContent = $(suspects[i]).contents().filter(function() {
+				return this.nodeType == 3;
+			}).text().toLowerCase();
+			curScore += that.computeSubmitButtonTextScore(directChildrenTextContent);
 			if (curScore >= 1){
 				submitButtons.push({node:suspects[i],score:curScore});
 			}
@@ -385,15 +400,12 @@ var Registration = function(){
 				for (j = 0; j < suspects[i].attributes.length; j++)
 				{
 					var temp = suspects[i].attributes[j].name + "=" + suspects[i].attributes[j].value;
-					temp = temp.toLowerCase();
-					curScore += (temp.indexOf('submit')>-1?10:0);			//submit is a really strong one as an attribute.
-					curScore += (temp.indexOf('regist')>-1?5:0);			//include registration and register
-					curScore += (temp.indexOf('sign up')>-1?5:0);
-					curScore += (temp.indexOf('signup')>-1?5:0);
-					curScore += (temp.indexOf('create')>-1?3:0);			//this is less used.
-					curScore += (temp.indexOf('confirm')>-1?2:0);			//confirm is a bad one, because a lot of registration forms have 'confirm password' in it.
-					curScore += (temp.indexOf('start')>-1?2:0);				//start is a bad one.
+					curScore = that.computeSubmitButtonTextScore(temp.toLowerCase());
 				}
+				var directChildrenTextContent = $(suspects[i]).contents().filter(function() {
+					return this.nodeType == 3;
+				}).text().toLowerCase();
+				curScore += that.computeSubmitButtonTextScore(directChildrenTextContent);
 				if (curScore >= 1){
 					submitButtons.push({node:suspects[i],score:curScore});
 				}
