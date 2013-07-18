@@ -330,7 +330,7 @@ var Registration = function(){
 		for (i = 0; i < temp.length; i++){
 			//Warning: This part will be different than finishRegistration.js: in an iframe setting, requiring the submit button to be at least 200px lower is unreasonable.
 			//Heuristic: If it's input element, must be one of the three types for us to consider.
-			if (temp[i].type != "submit" && temp[i].type != "button" && temp[i].type != "radio") continue;
+			if (temp[i].type != "submit" && temp[i].type != "button" && temp[i].type != "radio" && temp[i].type != "image") continue;
 			if (!that.onTopLayer(temp[i])) continue;
 			//Heuristic: Ignore input submit buttons whose form only has 2 text inputs, one of which is of password type.
 			//This is used to battle linking accounts situation.
@@ -366,7 +366,7 @@ var Registration = function(){
 			var TLtop = $(suspects[i]).offset().top;
 			if (TLtop < that.inputBotEdge) continue;
 			//Heuristic: submit button cannot be too large:
-			if (suspects[i].offsetHeight > 150 || suspects[i].offsetWidth > 300) continue;
+			if (suspects[i].offsetHeight > 150 || suspects[i].offsetWidth > 400) continue;
 			var curScore = 0;
 			for (j = 0; j < suspects[i].attributes.length; j++)
 			{
@@ -400,7 +400,7 @@ var Registration = function(){
 				}
 				if (eliminated) continue;
 				//Heuristic: submit button cannot be too large:
-				if (suspects[i].offsetHeight > 150 || suspects[i].offsetWidth > 300) continue;
+				if (suspects[i].offsetHeight > 150 || suspects[i].offsetWidth > 400) continue;
 				var curScore = 0;
 				for (j = 0; j < suspects[i].attributes.length; j++)
 				{
