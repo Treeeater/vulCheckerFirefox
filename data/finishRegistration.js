@@ -38,6 +38,7 @@ var Registration = function(){
 		//This doesn't really work on section/canvas HTML5 element. TODO:Fix this.
 		//given an element, returns true if it's likely to be on the topmost layer, false if otherwise.
 		if (!ele) return false;
+		var document = ele.ownerDocument;
 		var inputWidth = ele.offsetWidth;
 		var inputHeight = ele.offsetHeight;
 		//heuristics: any element with a too large dimension cannot be input/submit, it must be just a underlaying div/layer.
