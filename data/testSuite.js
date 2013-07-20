@@ -26,6 +26,8 @@ self.port.on("action",function(request){
 		if (url) self.port.emit("siteToTest",url);
 	}
 	if (request.action == "navigateTo"){
+		window.onbeforeunload = null;
+		window.onunload = null;
 		document.location = request.site;
 	}
 	if (request.action == "extractContent"){
