@@ -207,7 +207,7 @@ function VulCheckerHelper() {
 		if (checkAccountInfoPresense(rootNode)) return;
 		if (document.URL.indexOf('http://www.facebook.com/') == 0 || document.URL.indexOf('https://www.facebook.com/') == 0) {
 			//These are URLs that we must not try to find login button in.
-			return;
+			if (document.URL.indexOf('http://www.facebook.com/plugins/') == -1 && document.URL.indexOf('https://www.facebook.com/plugins/') == -1) return;
 		}
 		computeAsRoot(rootNode);
 		var i = 0;
@@ -282,18 +282,21 @@ var delayedCall = function(){
 }
 if (self.port)
 {
-	setTimeout(delayedCall,2000);
-	self.port.on("checkTestingStatus",function(response){
-		debug = response.debug;
-		vulCheckerHelper.account = response.account;
-		vulCheckerHelper.searchForSignUpForFB = response.searchForSignUpForFB;
-		if (response.shouldClick) {
-			log("Legitimate iframe detected while press login button should be clicked, searching in this iframe...");
-			vulCheckerHelper.indexToClick = response.indexToClick;
-			vulCheckerHelper.loginClickAttempts = response.loginClickAttempts;
-			vulCheckerHelper.pressLoginButton();
-		}
-	});
+	if (document.URL.indexOf('http://www.facebook.com/login.php') == -1 && document.URL.indexOf('https://www.facebook.com/login.php') == -1){
+		//Doublecheck that the application didn't run into a confused state - phase 2 not updated promptly.
+		setTimeout(delayedCall,2000);
+		self.port.on("checkTestingStatus",function(response){
+			debug = response.debug;
+			vulCheckerHelper.account = response.account;
+			vulCheckerHelper.searchForSignUpForFB = response.searchForSignUpForFB;
+			if (response.shouldClick) {
+				log("Legitimate iframe detected while press login button should be clicked, searching in this iframe...");
+				vulCheckerHelper.indexToClick = response.indexToClick;
+				vulCheckerHelper.loginClickAttempts = response.loginClickAttempts;
+				vulCheckerHelper.pressLoginButton();
+			}
+		});
+	}
 }
 else
 {

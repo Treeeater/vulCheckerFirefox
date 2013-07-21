@@ -202,8 +202,10 @@ function VulCheckerHelper() {
 			return;
 		}
 		if (document.URL.indexOf('http://www.facebook.com/') == 0 || document.URL.indexOf('https://www.facebook.com/') == 0) {
-			//These are URLs that we must not try to find login button in.
-			return;
+			if (document.URL.indexOf('http://www.facebook.com/plugins/') == -1 && document.URL.indexOf('https://www.facebook.com/plugins/') == -1) {
+				//These are URLs that we must not try to find login button in.
+				return;
+			}
 		}
 		computeAsRoot(rootNode);
 		var i = 0;
@@ -293,41 +295,44 @@ var vulCheckerHelper = new VulCheckerHelper();
 
 if (self.port)
 {
-	self.port.on("userClickedPressLoginButton",function(action){
-		vulCheckerHelper.account = [];
-		vulCheckerHelper.pressLoginButton();
-	});
-	self.port.on("sendLoginButtonInformation",function(response){
-		vulCheckerHelper.account = response.account;
-		self.port.emit("sendLoginButtonInformation",vulCheckerHelper.sendLoginButtonInformation(response));
-	});
-	self.port.on("after_modification_sendLoginButtonInformation",function(response){
-		vulCheckerHelper.account = response.account;
-		self.port.emit("after_modification_sendLoginButtonInformation",vulCheckerHelper.sendLoginButtonInformation(response));
-	});
-	self.port.on("pressedLoginButton", function (response){
-		//tell background we are about to press the login button.
-		//response should contain whether background page has detected that FB has been visited.
-		vulCheckerHelper.tryFindInvisibleLoginButton = response.tryFindInvisibleLoginButton;
-		vulCheckerHelper.indexToClick = response.indexToClick;
-		vulCheckerHelper.loginClickAttempts = response.loginClickAttempts;
-		if (response.shouldClick) vulCheckerHelper.pressLoginButton();			//this condition ensures that once FB traffic is seen, we do not want to press login button again.
-	});
-	self.port.on("checkTestingStatus", function (response){
-		//check if background is in active checking.
-		vulCheckerHelper.account = response.account;
-		vulCheckerHelper.searchForSignUpForFB = response.searchForSignUpForFB;
-		if (response.shouldClick) vulCheckerHelper.automaticPressLoginButton();		//need to set a lenient timer, since if the fb traffic is not seen in this time, it's going to click the login button again, which resets the connection - this may create an infinite loop. Current setting is that if the login button is pressed more than twice, it gives up.
-	});
-	self.port.on("readyToClick", function(){
-		if (vulCheckerHelper.sortedAttrInfoMap.length > vulCheckerHelper.indexToClick) {
-			vulCheckerHelper.sortedAttrInfoMap[vulCheckerHelper.indexToClick].node.click();
-			vulCheckerHelper.clickedButtons.push(vulCheckerHelper.getXPath(vulCheckerHelper.sortedAttrInfoMap[vulCheckerHelper.indexToClick].node));		//record the clicked button, so that we don't click the same button next time if the page doesn't nav away.
-		}
-	});
-	//window.addEventListener('load',vulCheckerHelper.delayedPressLoginButton);				//must not do this. FF's gonna give u stupid hidden window error.
-	self.port.emit("clearPressLoginButtonTimer",0);
-	setTimeout(vulCheckerHelper.delayedPressLoginButton,5000);
+	if (document.URL.indexOf('http://www.facebook.com/login.php') == -1 && document.URL.indexOf('https://www.facebook.com/login.php') == -1){
+		//Doublecheck that the application didn't run into a confused state - phase 2 not updated promptly.
+		self.port.on("userClickedPressLoginButton",function(action){
+			vulCheckerHelper.account = [];
+			vulCheckerHelper.pressLoginButton();
+		});
+		self.port.on("sendLoginButtonInformation",function(response){
+			vulCheckerHelper.account = response.account;
+			self.port.emit("sendLoginButtonInformation",vulCheckerHelper.sendLoginButtonInformation(response));
+		});
+		self.port.on("after_modification_sendLoginButtonInformation",function(response){
+			vulCheckerHelper.account = response.account;
+			self.port.emit("after_modification_sendLoginButtonInformation",vulCheckerHelper.sendLoginButtonInformation(response));
+		});
+		self.port.on("pressedLoginButton", function (response){
+			//tell background we are about to press the login button.
+			//response should contain whether background page has detected that FB has been visited.
+			vulCheckerHelper.tryFindInvisibleLoginButton = response.tryFindInvisibleLoginButton;
+			vulCheckerHelper.indexToClick = response.indexToClick;
+			vulCheckerHelper.loginClickAttempts = response.loginClickAttempts;
+			if (response.shouldClick) vulCheckerHelper.pressLoginButton();			//this condition ensures that once FB traffic is seen, we do not want to press login button again.
+		});
+		self.port.on("checkTestingStatus", function (response){
+			//check if background is in active checking.
+			vulCheckerHelper.account = response.account;
+			vulCheckerHelper.searchForSignUpForFB = response.searchForSignUpForFB;
+			if (response.shouldClick) vulCheckerHelper.automaticPressLoginButton();		//need to set a lenient timer, since if the fb traffic is not seen in this time, it's going to click the login button again, which resets the connection - this may create an infinite loop. Current setting is that if the login button is pressed more than twice, it gives up.
+		});
+		self.port.on("readyToClick", function(){
+			if (vulCheckerHelper.sortedAttrInfoMap.length > vulCheckerHelper.indexToClick) {
+				vulCheckerHelper.sortedAttrInfoMap[vulCheckerHelper.indexToClick].node.click();
+				vulCheckerHelper.clickedButtons.push(vulCheckerHelper.getXPath(vulCheckerHelper.sortedAttrInfoMap[vulCheckerHelper.indexToClick].node));		//record the clicked button, so that we don't click the same button next time if the page doesn't nav away.
+			}
+		});
+		//window.addEventListener('load',vulCheckerHelper.delayedPressLoginButton);				//must not do this. FF's gonna give u stupid hidden window error.
+		self.port.emit("clearPressLoginButtonTimer",0);
+		setTimeout(vulCheckerHelper.delayedPressLoginButton,5000);
+	}
 }
 else
 {
