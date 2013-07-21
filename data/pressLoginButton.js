@@ -201,6 +201,10 @@ function VulCheckerHelper() {
 			that.userInfoFound = true;
 			return;
 		}
+		if (document.URL.indexOf('http://www.facebook.com/') == 0 || document.URL.indexOf('https://www.facebook.com/') == 0) {
+			//These are URLs that we must not try to find login button in.
+			return;
+		}
 		computeAsRoot(rootNode);
 		var i = 0;
 		var j = 0;
