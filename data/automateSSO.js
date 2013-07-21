@@ -9,9 +9,7 @@ function AutomateSSO(){
 	
 	this.checkDialogOAuth = function(){
 		if (document.URL.indexOf("https://www.facebook.com/dialog/oauth")==-1) return false;
-		//if (document.getElementById('u_0_0') == null) return false;
-		//try to click it
-		//document.getElementById('u_0_0').click();
+		if (document.getElementById('u_0_0') != null && document.getElementById('u_0_0').nodeName == "INPUT") document.getElementById('u_0_0').click();	//gamezone.com customize the SSO experience. I don't know if this is common but let us deal with this first.
 		if (document.getElementsByClassName('selected')[0] == null) return false;
 		//try to click it
 		document.getElementsByClassName('selected')[0].click();
