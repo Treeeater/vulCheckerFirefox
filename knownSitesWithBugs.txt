@@ -1,0 +1,7 @@
+"http://www.gsmarena.com": redirect to a wierd site, stall at phase 4.
+
+"mrmovietimes.com": FB login config error.
+
+"arcadaweb.com": prepopulated fields error.  They insert a '.' between ur fn and ln and then ask you that '.' is not allowed
+
+"patheos.com": SSL cert error
