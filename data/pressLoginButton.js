@@ -303,6 +303,7 @@ if (self.port)
 		});
 		self.port.on("sendLoginButtonInformation",function(response){
 			vulCheckerHelper.account = response.account;
+			vulCheckerHelper.searchForSignUpForFB = response.searchForSignUpForFB;
 			self.port.emit("sendLoginButtonInformation",vulCheckerHelper.sendLoginButtonInformation(response));
 		});
 		self.port.on("after_modification_sendLoginButtonInformation",function(response){

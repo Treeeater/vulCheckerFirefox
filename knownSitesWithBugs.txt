@@ -5,3 +5,5 @@
 "arcadaweb.com": prepopulated fields error.  They insert a '.' between ur fn and ln and then ask you that '.' is not allowed
 
 "patheos.com": SSL cert error
+
+"http://www.aarp.org": incompatible with extension (unknown error).
