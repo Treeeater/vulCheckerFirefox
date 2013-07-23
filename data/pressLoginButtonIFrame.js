@@ -132,7 +132,7 @@ function VulCheckerHelper() {
 	}
 	
 	function preFilter(curNode) {
-		if (curNode.nodeName != "A" && curNode.nodeName != "DIV" && curNode.nodeName != "SPAN" && curNode.nodeName != "IMG" && curNode.nodeName != "INPUT") return false;
+		if (curNode.nodeName != "A" && curNode.nodeName != "DIV" && curNode.nodeName != "SPAN" && curNode.nodeName != "IMG" && curNode.nodeName != "INPUT" && curNode.nodeName != "BUTTON") return false;
 		if (curNode.nodeName == "INPUT") {
 			if (curNode.type != "button" && curNode.type != "image" && curNode.type != "submit") return false;
 		}
