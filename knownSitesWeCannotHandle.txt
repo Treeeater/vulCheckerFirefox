@@ -1,0 +1,4 @@
+http://www.skype.com/: too many registration
+http://www.superpages.com/: two submission boxes after SSO, one is email, the other is real one, and the email one is under the real one. If the resolution is less than 1920x1200 this site automatically works.
+sbnation.com/: captcha, reg form to long.
+"http://www.hgtv.com": same as food.com, same template
