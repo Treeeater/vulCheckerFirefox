@@ -290,7 +290,7 @@ if (self.port)
 			vulCheckerHelper.account = response.account;
 			vulCheckerHelper.searchForSignUpForFB = response.searchForSignUpForFB;
 			if (response.shouldClick) {
-				log("Legitimate iframe detected while press login button should be clicked, searching in this iframe...");
+				//log("Legitimate iframe detected while press login button should be clicked, searching in this iframe...");
 				vulCheckerHelper.indexToClick = response.indexToClick;
 				vulCheckerHelper.loginClickAttempts = response.loginClickAttempts;
 				vulCheckerHelper.pressLoginButton();

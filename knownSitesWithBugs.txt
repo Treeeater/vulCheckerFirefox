@@ -7,3 +7,9 @@
 "patheos.com": SSL cert error
 
 "http://www.aarp.org": incompatible with extension (unknown error).
+
+"lolsports.com": fb login doesn't work.
+
+"badgeville.com": ssl error
+
+"smarter.com": homepage never finishes loading...

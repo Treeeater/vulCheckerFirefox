@@ -3,3 +3,5 @@ http://www.superpages.com/: two submission boxes after SSO, one is email, the ot
 http://www.sbnation.com/: captcha, reg form to long.
 http://www.hgtv.com: same as food.com, same template
 http://www.nfl.com: registration button too low, below the screen. It will resize in several seconds, but submit button searching is already done.
+http://www.cox.net: site 'dispatches' user to a random string on the URL, so that every visit is a different URL. Can't get pass phase 0.
+http://www.shopzilla.com: same as cox.net
