@@ -13,3 +13,11 @@
 "badgeville.com": ssl error
 
 "smarter.com": homepage never finishes loading...
+
+"ticketmaster.com": doesn't support fb login but does use fb social widget.
+
+"wix.com": doesn't support fb login but site has a button linking to pinterest.com fb login...
+
+"http://www.123greetings.com": doesn't correctly implement fb login
+
+"http://www.inquisitr.com": doesn't support fb login but does use fb social widget.

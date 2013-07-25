@@ -68,6 +68,7 @@ var Registration = function(){
 		//clear pre-populated fields that shows something like 'your name here' or 'choose a screen name'.
 		if (inputEle.name && inputEle.name!="")
 		{
+			if (inputValue.indexOf('required')!=-1) inputEle.value = "";
 			if (inputName.indexOf('email')!=-1 || inputName.indexOf('e-mail')!=-1){
 				if (inputValue.indexOf('email') != -1 || inputValue.indexOf('e-mail') != -1) inputEle.value = "";
 			}
@@ -123,15 +124,29 @@ var Registration = function(){
 			}
 		}
 		if (numericalInput){
-			var rn = randomString(inputLength, '1234567890');
-			inputEle.value = rn;
-			log("Random numbers " + rn + " inserted into top");
+			var rn = randomString(inputLength-1, '1234567890');
+			inputEle.value = "2"+rn;
+			log("Random numbers 2" + rn + " inserted into top");
 		}
 		else {
 			var rs = randomString(inputLength, 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ');
 			inputEle.value = rs;
 			log("Random alphabets " + rs + " inserted into top");
 		}
+	}
+	
+	this.fillNumber = function(inputEle){
+		var inputLength;
+		if (inputEle.maxLength <= 50 && inputEle.maxLength > 0) inputLength = inputEle.maxLength;
+		if (typeof inputLength == 'undefined' && inputEle.size > 0 && inputEle.size <= 50) inputLength = inputEle.size;
+		if (typeof inputLength == 'undefined') inputLength = 8;
+		var rn = randomString(inputLength-1, '1234567890');
+		inputEle.value = "2"+rn;
+		log("Random numbers 2" + rn + " inserted into top");
+	}
+	
+	this.unknownInputType = function(t){
+		return (t!='color' && t!='date' && t!='datetime' && t!='datetime-local' && t!='file' && t!='hidden' && t!='image' && t!='month' && t!='range' && t!='reset' && t!='search' && t!='time' && t!='url' && t!='week');
 	}
 	
 	this.fill = function(inputEle){
@@ -160,8 +175,23 @@ var Registration = function(){
 			case "button":
 				//ignore all buttons.
 				break;
+			case "tel":
+				//numbers only
+				that.fillNumber(inputEle);
+				break;
+			case "number":
+				//numbers only
+				that.fillNumber(inputEle);
+				break;
 			default:
-				log("cannot handle this input type from top: " + inputEle.type + "...");
+				if (that.unknownInputType(inputEle.type)){
+					//according to HTML standards, unknown types are treated as texts.
+					log("Unknown input type - converting type " + inputEle.type + " to text in top...");
+					that.fillText(inputEle);
+				}
+				else {
+					log("cannot handle this input type in top: " + inputEle.type + "...");
+				}
 		}
 	}
 	

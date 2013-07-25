@@ -1,7 +1,12 @@
 http://www.skype.com/: too many registration
 http://www.superpages.com/: two submission boxes after SSO, one is email, the other is real one, and the email one is under the real one. If the resolution is less than 1920x1200 this site automatically works.
-http://www.sbnation.com/: captcha, reg form to long.
+http://www.sbnation.com/: captcha, reg form too long.
 http://www.hgtv.com: same as food.com, same template
 http://www.nfl.com: registration button too low, below the screen. It will resize in several seconds, but submit button searching is already done.
 http://www.cox.net: site 'dispatches' user to a random string on the URL, so that every visit is a different URL. Can't get pass phase 0.
 http://www.shopzilla.com: same as cox.net
+http://www.alibaba.com: create account using FB is in a separate 'subtab'.
+http://www.everydayhealth.com: form too long
+http://www.kickstarter.com: oracle no good.
+http://www.foxbusiness.com: same as foxnews (prepopulated fields contains error)
+http://www.npr.org: verify email before creating account
