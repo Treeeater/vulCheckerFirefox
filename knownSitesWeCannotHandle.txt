@@ -8,5 +8,8 @@ http://www.shopzilla.com: same as cox.net
 http://www.alibaba.com: create account using FB is in a separate 'subtab'.
 http://www.everydayhealth.com: form too long
 http://www.kickstarter.com: oracle no good.
+http://www.officedepot.com: submit button inside a form which seems like a linking form.
 http://www.foxbusiness.com: same as foxnews (prepopulated fields contains error)
 http://www.npr.org: verify email before creating account
+http://www.theverge.com: captcha
+http://www.collegehumor.com: reg too long + captcha

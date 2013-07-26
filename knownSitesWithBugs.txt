@@ -21,3 +21,13 @@
 "http://www.123greetings.com": doesn't correctly implement fb login
 
 "http://www.inquisitr.com": doesn't support fb login but does use fb social widget.
+
+"http://www.fixya.com": doesn't correctly implement fb login
+
+"http://www.cbsnews.com": doesn't correctly implement fb login
+
+"http://www.eonline.com": doesn't support fb login but does use fb social widget.
+
+"http://www.typepad.com": no persistent cookie, logout immediately after refresh.
+
+"http://www.tomshardware.com/": do not use HTTPS?! serious threat! Our code doesn't inject to non HTTPS iframes.
