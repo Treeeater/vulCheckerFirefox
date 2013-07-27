@@ -184,6 +184,7 @@ function VulCheckerHelper() {
 		var fullContent = node.innerHTML.toLowerCase();
 		var i = 0;
 		for (i = 0; i < that.account.length; i++){
+			if (fullContent.indexOf(that.account[i].fbid)!=-1) return true;
 			if (fullContent.indexOf(that.account[i].firstName)!=-1) return true;
 			if (fullContent.indexOf(that.account[i].lastName)!=-1) return true;
 			if (fullContent.indexOf(that.account[i].email)!=-1) return true;
