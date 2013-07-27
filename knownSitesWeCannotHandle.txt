@@ -14,3 +14,4 @@ http://www.npr.org: verify email before creating account
 http://www.theverge.com: captcha
 http://www.collegehumor.com: reg too long + captcha
 http://www.glassdoor.com/: after user logs in through fb, before accounts are created, page displays user's FB friend with a button which has 'signin' in it. Oracle then thinks the login button is different.
+http://www.vistaprint.com/: dispatches same as cox

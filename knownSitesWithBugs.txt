@@ -31,3 +31,5 @@
 "http://www.typepad.com": no persistent cookie, logout immediately after refresh.
 
 "http://www.tomshardware.com/": do not use HTTPS?! serious threat! Our code doesn't inject to non HTTPS iframes.
+
+"http://www.fanpop.com": doesn't correctly implement fb login
