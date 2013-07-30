@@ -16,6 +16,11 @@ def kill_process(pid)
 	Process.kill(9, *to_kill)
 end
 
+if (File.exists?("vulcheckerProfile/testResults/finished.txt")) 
+	p "Job already finished?! Check your test set file."
+	exit
+end
+
 pid = spawn "cfx run -p vulCheckerProfile"
 
 currentFileCount = Dir.entries("vulcheckerProfile/testResults/").length - 2		#. and .. doesn't count
