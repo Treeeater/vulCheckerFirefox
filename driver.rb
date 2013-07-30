@@ -5,7 +5,7 @@
 require 'sys/proctable'
 include Sys
 
-SLEEPTIME = 1200		#configurable: timeout.
+SLEEPTIME = 1500		#configurable: timeout.
 
 def kill_process(pid)
 	to_kill = Array.new
@@ -27,7 +27,12 @@ while (true)
 	if (previousFileCount != currentFileCount)
 		previousFileCount = currentFileCount
 	else
-		kill_process(pid)
+		begin
+			kill_process(pid)
+		rescue Errno::ESRCH
+			#if we can't kill the process because the process already died, that's fine. We just want to restart the process.
+			p "ex"
+		end
 		sleep(10)									# wait for the child processes to close
 		pid = spawn "cfx run -p vulCheckerProfile"
 	end
