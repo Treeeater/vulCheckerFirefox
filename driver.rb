@@ -27,7 +27,13 @@ currentFileCount = Dir.entries("vulcheckerProfile/testResults/").length - 2		#. 
 previousFileCount = -1
 
 while (true)
-	if (File.exists?("vulcheckerProfile/testResults/finished.txt")) then exit end
+	if (File.exists?("vulcheckerProfile/testResults/finished.txt"))
+		begin 
+			kill_process(pid)
+		rescue Errno::ESRCH
+		end
+		exit
+	end
 	currentFileCount = Dir.entries("vulcheckerProfile/testResults/").length - 2		#. and .. doesn't count
 	if (previousFileCount != currentFileCount)
 		previousFileCount = currentFileCount
@@ -36,7 +42,6 @@ while (true)
 			kill_process(pid)
 		rescue Errno::ESRCH
 			#if we can't kill the process because the process already died, that's fine. We just want to restart the process.
-			p "ex"
 		end
 		sleep(10)									# wait for the child processes to close
 		pid = spawn "cfx run -p vulCheckerProfile"
