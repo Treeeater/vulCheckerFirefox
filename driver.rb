@@ -16,6 +16,7 @@ def kill_process(pid)
 	Process.kill(9, *to_kill)
 end
 
+if (!Dir.exists?("vulcheckerProfile/testResults")) then Dir.mkdir("vulcheckerProfile/testResults") end
 if (File.exists?("vulcheckerProfile/testResults/finished.txt")) 
 	p "Job already finished?! Check your test set file."
 	exit
