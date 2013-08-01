@@ -1,4 +1,4 @@
-var Account = function(fbid,fn,ln,email,pic,pic2,pic3,pic4,pass,token){
+var Account = function(fbid,fn,ln,email,pic,pic2,pic3,pic4,pass,token,code,sr){
 	this.fbid = fbid;
 	this.firstName = fn;
 	this.lastName = ln;
@@ -8,7 +8,9 @@ var Account = function(fbid,fn,ln,email,pic,pic2,pic3,pic4,pass,token){
 	this.picSRC3 = pic3;
 	this.picSRC4 = pic4;
 	this.passwd = pass;
-	this.access_token = token;
+	this.access_token = token;		//optional
+	//this.code = code;			//optional
+	//this.sr = sr;			//optional
 }
 
 var accounts = [];
