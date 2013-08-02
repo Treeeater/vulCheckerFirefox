@@ -8,3 +8,7 @@ Known bugs (and probably not gonna fix):
 
 1) If the website displays login button on the homepage in an iframe, ccc cannot capture its XPath and correctly clicks it two times, because pressLoginButtonIFrame.js completely works on its own, it simply asks ccc if it needs to find and click the login button, but never returns any information about the button it clicked.
 
+Vul list:
+[1] Misuse access_token to authenticate users
+[2] Although code is used, client side exchange of access_token is performed. This also exposes client secret in the traffic.
+[3] Although signed_request is used, server doesn't check the signature part.
