@@ -1,7 +1,7 @@
 var ccc = require("./ccc");
 var automatedTesting = require("./automatedTesting");
 var CONST = require("./const");
-var checkSR = require("./checkSR");
+var NM = require("./checkSR");			//NM stands for next module.
 
 const {Cc,Ci,Cr} = require("chrome");
 if (typeof CCIN == "undefined") {
@@ -23,12 +23,12 @@ var accounts;
 var inheritedPhase = 9999;
 var sawDialogOAuth = false;
 var delayRefreshTestTabTimer = 0;
-var checkLoginButtonRemovedTimer = 0;
+var notVulnerableTimer = 0;
 var delayRefreshCalled = false;
 
 var nextModule = function (){
 	observerService.removeObserver(httpRequestObserver, "http-on-examine-response");
-	checkSR.init(ccc.capturingPhase());
+	NM.init(ccc.capturingPhase());
 }
 
 var levenshteinDistance = function(a, b){
@@ -195,90 +195,10 @@ var checkAgainstFilter = function(url, capturingPhase)
 	return false;
 }
 
-function checkLoginButtonRemoved(){
-	//note: the following port.on must be declared at runtime to avoid cyclic referencing.
-	ccc.pressLoginButtonWorker().port.on("after_modification_sendLoginButtonInformation",  function(response){
-		ccc.log("Phase "+(inheritedPhase+4).toString()+": checking login button existence after modification...\n");
-		ccc.setCapturingPhase(ccc.capturingPhase() + 1);
-		ccc.log("Current login button XPath is: " + response.loginButtonXPath);
-		if (response.loginButtonXPath == ccc.loginButtonXPath() || response.loginButtonOuterHTML == ccc.loginButtonOuterHTML()) {
-			ccc.log("Modification failed! After Modification the login button is still present!");
-			ccc.log(ccc.siteToTest() + " is not vulnerable to [2], login button still present after mod.", true);
-			nextModule();
-			return;
-		}
-		ccc.log("Modification successful!, log in button different from anonymous session.");
-		checkStructuralDiff();
-		return;
-	});
-	try{
-		ccc.pressLoginButtonWorker().port.emit("after_modification_sendLoginButtonInformation", {"indexToClick": ccc.indexToClick(), "tryFindInvisibleLoginButton":ccc.tryFindInvisibleLoginButton(), "account":ccc.accountsInfo()});
-	} catch(ex){
-		ccc.log("pressloginworker hidden frame error - likely caused by host page still loading, will try again in 10 seconds.");
-		checkLoginButtonRemovedTimer = window.setTimeout(checkLoginButtonRemoved, 10000);
-	}
-}
-
-function checkStructuralDiff(){
-	ccc.testSuiteWorker().port.on("after_modification_extractedContent",function(response){
-		//ccc.saveToFile(ccc.siteToTest(), ccc.responseTextContent()[1] + "\n---------------\n" + ccc.responseTextContent()[2] + "\n---------------\n" + response);
-		//ccc.log("Phase "+(inheritedPhase+5).toString()+": Saved response content to file.");
-		ccc.log("Phase "+(inheritedPhase+5).toString()+": Checking extracted content and identifying session owner...\n");
-		modifiedResponseContent = response;
-		var lowerModifiedResponseContent = modifiedResponseContent.toLowerCase();
-		var accounts = ccc.accountsInfo();
-		var lower1 = ccc.responseTextContent()[1].toLowerCase();
-		var lower2 = ccc.responseTextContent()[2].toLowerCase();
-		if (lower1.indexOf(accounts[0].firstName)!=-1&&lower2.indexOf(accounts[1].firstName)!=-1) displayFirstName = true;
-		if (lower1.indexOf(accounts[0].lastName)!=-1&&lower2.indexOf(accounts[1].lastName)!=-1) displayLastName = true;
-		if (lower1.indexOf(accounts[0].email)!=-1&&lower2.indexOf(accounts[1].email)!=-1) displayEmail = true;
-		if (ccc.responseTextContent()[1].indexOf(accounts[0].picSRC)!=-1&&ccc.responseTextContent()[2].indexOf(accounts[1].picSRC)!=-1) displayPicSRC = true;
-		if (ccc.responseTextContent()[1].indexOf(accounts[0].picSRC2)!=-1&&ccc.responseTextContent()[2].indexOf(accounts[1].picSRC2)!=-1) displayPicSRC2 = true;
-		if (ccc.responseTextContent()[1].indexOf(accounts[0].picSRC3)!=-1&&ccc.responseTextContent()[2].indexOf(accounts[1].picSRC3)!=-1) displayPicSRC3 = true;
-		if (ccc.responseTextContent()[1].indexOf(accounts[0].picSRC4)!=-1&&ccc.responseTextContent()[2].indexOf(accounts[1].picSRC4)!=-1) displayPicSRC4 = true;
-		if (ccc.responseTextContent()[1].indexOf(accounts[0].fbid)!=-1&&ccc.responseTextContent()[2].indexOf(accounts[1].fbid)!=-1) displayFBID = true;
-		
-		ccc.log("This website displays " + (displayFirstName ? "first name, ":"" ) + (displayLastName ? "last name, ":"" ) + (displayEmail ? "email, ":"" ) + (displayPicSRC ? "picsrc, ":"" ) + (displayPicSRC2 ? "picsrc2, ":"" ) + (displayPicSRC3 ? "picsrc3, ":"" ) + (displayPicSRC4 ? "picsrc4,":"" ) + (displayFBID ? "fbid.":"" ));
-		
-		var sessionAScore = 0;
-		var sessionBScore = 0;
-		if (displayFirstName && lowerModifiedResponseContent.indexOf(accounts[0].firstName)!=-1) sessionAScore++;
-		if (displayLastName && lowerModifiedResponseContent.indexOf(accounts[0].lastName)!=-1) sessionAScore++;
-		if (displayEmail && lowerModifiedResponseContent.indexOf(accounts[0].email)!=-1) sessionAScore++;
-		if (displayPicSRC && modifiedResponseContent.indexOf(accounts[0].picSRC)!=-1) sessionAScore++;
-		if (displayPicSRC2 && modifiedResponseContent.indexOf(accounts[0].picSRC2)!=-1) sessionAScore++;
-		if (displayPicSRC3 && modifiedResponseContent.indexOf(accounts[0].picSRC3)!=-1) sessionAScore++;
-		if (displayPicSRC4 && modifiedResponseContent.indexOf(accounts[0].picSRC4)!=-1) sessionAScore++;
-		if (displayFBID && modifiedResponseContent.indexOf(accounts[0].fbid)!=-1) sessionAScore++;
-		
-		if (displayFirstName && lowerModifiedResponseContent.indexOf(accounts[1].firstName)!=-1) sessionBScore++;
-		if (displayLastName && lowerModifiedResponseContent.indexOf(accounts[1].lastName)!=-1) sessionBScore++;
-		if (displayEmail && lowerModifiedResponseContent.indexOf(accounts[1].email)!=-1) sessionBScore++;
-		if (displayPicSRC && modifiedResponseContent.indexOf(accounts[1].picSRC)!=-1) sessionBScore++;
-		if (displayPicSRC2 && modifiedResponseContent.indexOf(accounts[1].picSRC2)!=-1) sessionBScore++;
-		if (displayPicSRC3 && modifiedResponseContent.indexOf(accounts[1].picSRC3)!=-1) sessionBScore++;
-		if (displayPicSRC4 && modifiedResponseContent.indexOf(accounts[1].picSRC4)!=-1) sessionBScore++;
-		if (displayFBID && modifiedResponseContent.indexOf(accounts[1].fbid)!=-1) sessionBScore++;
-		
-		if (sessionAScore > 0 && sessionBScore == 0) {
-			ccc.log("Web application now logged in as session A, threat successful, sessionAscore is: " + sessionAScore.toString());
-			ccc.log(ccc.siteToTest() + " is vulnerable to [2]!", true);
-			nextModule();
-		}
-		else if (sessionBScore > 0 && sessionAScore == 0) {
-			ccc.log("Web application now logged in as session B, threat failed, sessionBscore is: " + sessionBScore.toString());
-			ccc.log(ccc.siteToTest() + " is not vulnerable to [2], code used but session is still Bob's.", true);
-			nextModule();
-		}
-		else {
-			ccc.log("Cannot determine login state, here are the scores: "+sessionAScore.toString()+ " " + sessionBScore.toString());
-			ccc.log(ccc.siteToTest() + " cannot be determined (score error in [2]).", true);
-			nextModule();
-		}
-	});
-	try {ccc.testSuiteWorker().port.emit("action",{"action":"after_modification_extractContent"});} catch (ex){
-		window.setTimeout('ccc.testSuiteWorker().port.emit("action",{"action":"after_modification_extractContent"})',10000);
-	}
+function notVulnerable(){
+	ccc.log("Haven't seen request that contain code+secret combination, app is not vulnerable to [2]");
+	ccc.log("Haven't seen request that contain code+secret combination, app is not vulnerable to [2]",true);
+	nextModule();
 }
 
 function processBuffer(url)
@@ -287,15 +207,15 @@ function processBuffer(url)
 	if (capturingPhase == inheritedPhase+1 && checkAgainstFilter(url, capturingPhase) && ccc.loginButtonClicked() && sawDialogOAuth)
 	{
 		sawDialogOAuth = false;
-		ccc.log("Phase "+(inheritedPhase+1).toString()+": Saw FB visit, waiting for code pattern to appear.\n");
+		ccc.log("Phase "+(inheritedPhase+1).toString()+": Saw FB visit, waiting for code/secret to appear.\n");
 		ccc.setCapturingPhase(capturingPhase + 1);
 	}
 	if (capturingPhase == inheritedPhase+3 && checkAgainstFilter(url, capturingPhase)) {
-		ccc.log("Phase "+(inheritedPhase+3).toString()+": revisited the site after code is modified, ready to compare credentials/differences.\n");
+		ccc.log("Phase "+(inheritedPhase+3).toString()+": revisited the site after code is modified, waiting for code/secret to appear.\n");
 		ccc.restoreCapturingURLs();
 		//ccc.saveToFile(ccc.siteToTest(), JSON.stringify(ccc.storageRecord()[ccc.siteToTest()]));
 		ccc.setCapturingPhase(capturingPhase + 1);
-		checkLoginButtonRemovedTimer = window.setTimeout(checkLoginButtonRemoved,10000);				//timing consistent with phase 4.
+		notVulnerableTimer = window.setTimeout(notVulnerable,10000);				//timing consistent with phase 4.
 	}
 }
 
@@ -465,24 +385,19 @@ var httpRequestObserver =
 				newListener.originalListener = aSubject.setNewListener(newListener);
 			}
 			//try modify access_token for sites which don't use SDK
-			var uri = "";
-			try {uri = gchannel.getResponseHeader('Location');}catch(ex){};
 			if ((!ccc.usedFBSDK()) && uri.indexOf('code=')!=-1 && ccc.capturingPhase() == inheritedPhase+2)
 			{
 				ccc.log("Phase "+(inheritedPhase+2).toString()+": App does not use SDK: trying to modify code.\n");
 				ccc.setCapturingPhase(ccc.capturingPhase()+1);
-				ccc.log("Original (before attack) 302 dest is:" + uri);
-				var tail = uri.substr(uri.indexOf('code='), uri.length);
-				var andIndex = (tail.indexOf('&') == -1) ? 9999999 : tail.indexOf('&');
-				var poundIndex = (tail.indexOf('#') == -1) ? 9999999 : tail.indexOf('#');
-				var cutIndex = (andIndex > poundIndex) ? poundIndex : andIndex;
-				if (cutIndex != 9999999) tail = tail.substr(cutIndex,tail.length);
-				else tail = "";
-				var redirectURI = uri.substr(0,uri.indexOf('code='))+"code="+ccc.accountsInfo()[0].code+tail;
-				gchannel.setResponseHeader('Location', redirectURI, false);
-				ccc.log(",which is changed to:" + redirectURI);
 				if (delayRefreshTestTabTimer) window.clearTimeout(delayRefreshTestTabTimer);
 				delayRefreshTestTabTimer = window.setTimeout(delayRefreshTestTab,15000);
+			}
+			if (uri.indexOf('https://graph.facebook.com/oauth/access_token')==0 && uri.indexOf('client_secret')!=-1) {
+				ccc.log(ccc.siteToTest() + " is vulnerable to [2], client secret seen.");
+				ccc.log(ccc.siteToTest() + " is vulnerable to [2], client secret seen.",true);
+				ccc.setCapturingPhase(ccc.capturingPhase() + 1);
+				nextModule();
+				return;
 			}
         }
     },
@@ -550,5 +465,5 @@ exports.processLoaded = function(url)
 
 exports.cleanup = function(){
 	window.clearTimeout(delayRefreshTestTabTimer);
-	window.clearTimeout(checkLoginButtonRemovedTimer);
+	window.clearTimeout(notVulnerableTimer);
 }
