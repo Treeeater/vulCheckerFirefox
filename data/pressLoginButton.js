@@ -249,7 +249,7 @@ function VulCheckerHelper() {
 	}
 	
 	this.automaticPressLoginButton = function(){
-		self.port.emit("pressedLoginButton",0);
+		self.port.emit("getIndexOfLoginButtonToPress",0);
 	}
 	
 	this.delayedPressLoginButton = function(){
@@ -311,7 +311,7 @@ if (self.port)
 			vulCheckerHelper.account = response.account;
 			self.port.emit("after_modification_sendLoginButtonInformation",vulCheckerHelper.sendLoginButtonInformation(response));
 		});
-		self.port.on("pressedLoginButton", function (response){
+		self.port.on("indexOfLoginButtonToPress", function (response){
 			//tell background we are about to press the login button.
 			//response should contain whether background page has detected that FB has been visited.
 			vulCheckerHelper.tryFindInvisibleLoginButton = response.tryFindInvisibleLoginButton;
