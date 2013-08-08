@@ -12,3 +12,5 @@ Vul list:
 [1] Misuse access_token to authenticate users.
 [2] Although code is used, client side exchange of access_token is performed. This also exposes client secret in the traffic. Currently we detect visit to a particular URL for this vul.
 [3] Although signed_request is used, server doesn't check the signature part.
+[4] User credentials could be leaked through referrer header when requesting a third party content
+[5] User credentials could be leaked if third party script could access HTML document.
