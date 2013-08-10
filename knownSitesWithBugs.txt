@@ -33,3 +33,5 @@
 "http://www.tomshardware.com/": do not use HTTPS?! serious threat! Our code doesn't inject to non HTTPS iframes.
 
 "http://www.fanpop.com": doesn't correctly implement fb login
+
+"http://www.patriotdepot.com": doesn't implement fb login, but links to another site which do.

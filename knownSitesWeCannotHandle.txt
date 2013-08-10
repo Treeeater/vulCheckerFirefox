@@ -15,3 +15,4 @@ http://www.theverge.com: captcha
 http://www.collegehumor.com: reg too long + captcha
 http://www.glassdoor.com/: after user logs in through fb, before accounts are created, page displays user's FB friend with a button which has 'signin' in it. Oracle then thinks the login button is different.
 http://www.vistaprint.com/: dispatches same as cox
+http://www.thetoptens.com/: needs 5 more seconds after page load for the user id to come up, otherwise good.
