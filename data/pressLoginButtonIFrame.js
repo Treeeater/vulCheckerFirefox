@@ -119,6 +119,10 @@ function VulCheckerHelper() {
 		var position = $(ele).offset();
 		var j;
 		var score = 0;
+		//The following three lines of code is commented out because we assume the login button is on the active display (initial scroll position)
+		// ele.scrollIntoView();
+		// position.top = position.top - window.pageYOffset;
+		// position.left = position.left - window.pageXOffset;
 		//Don't judge the input unfairly because of the screen/browser window size.
 		var maxHeight = (document.documentElement.clientHeight - position.top > inputHeight)? inputHeight : document.documentElement.clientHeight - position.top;
 		var maxWidth = (document.documentElement.clientWidth > inputWidth)? inputWidth : document.documentElement.clientWidth - position.left;
