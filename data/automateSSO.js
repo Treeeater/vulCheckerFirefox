@@ -56,7 +56,13 @@ function AutomateSSO(){
 var automateSSO = new AutomateSSO();
 window.moveTo(0, 0);
 window.resizeTo(screen.availWidth, screen.availHeight);
-
+//disable the following APIs for the website.
+unsafeWindow.moveTo = function(){};
+unsafeWindow.moveBy = function(){};
+unsafeWindow.resizeTo = function(){};
+unsafeWindow.resizeBy = function(){};
+unsafeWindow.alert = function(){};
+unsafeWindow.confirm = function(){};
 //trigger by the popup menu
 self.port.on("action",function(action){
 		if (action == "automateSSO"){

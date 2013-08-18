@@ -333,7 +333,18 @@ var Registration = function(){
 			curNode = curNode.parentNode;
 		}
 		if (!parentFormNode) return false;
-		if ($(parentFormNode).find("input[type='text'],input[type='email']").length == 1 && $(parentFormNode).find("input[type='password']").length == 1)
+		var textInputs = $(parentFormNode).find("input[type='text'],input[type='email']");
+		var passwordInputs = $(parentFormNode).find("input[type='password']");
+		var visibleTextInputs = 0;
+		var visiblePasswordInputs = 0;
+		var i = 0;
+		for (; i < textInputs.length; i++){
+			if (that.onTopLayer(textInputs[i])) visibleTextInputs++;
+		}
+		for (; i < passwordInputs.length; i++){
+			if (that.onTopLayer(passwordInputs[i])) visiblePasswordInputs++;
+		}
+		if (visibleTextInputs == 1 && visiblePasswordInputs == 1)
 		{
 			//console.log("Ignored submit button that's probably in a linking form.");
 			return true;
