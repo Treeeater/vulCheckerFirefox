@@ -298,6 +298,26 @@ function VulCheckerHelper() {
 
 var vulCheckerHelper = new VulCheckerHelper();
 
+//**** Below is a possible configuration ****//
+/*
+y = 0;
+function scroll(y)
+//this function scrolls quickly down the document to trigger some potential event handlers. (msn.com)
+{
+	if (y >= document.body.offsetHeight) {
+		window.scrollTo(0, document.body.offsetHeight);
+		window.scrollTo(0, 0);
+		return;
+	}
+	window.scrollTo(0,y);
+	y += screen.availHeight;
+	setTimeout(scroll.bind(window,y),10);
+}
+
+scroll(y);
+*/
+//**** Above is a possible configuration ****//
+
 if (self.port)
 {
 	if (document.URL.indexOf('http://www.facebook.com/login.php') == -1 && document.URL.indexOf('https://www.facebook.com/login.php') == -1){
