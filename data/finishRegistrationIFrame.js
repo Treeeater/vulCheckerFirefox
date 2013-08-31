@@ -338,10 +338,10 @@ var Registration = function(){
 		var visibleTextInputs = 0;
 		var visiblePasswordInputs = 0;
 		var i = 0;
-		for (; i < textInputs.length; i++){
+		for (i = 0; i < textInputs.length; i++){
 			if (that.onTopLayer(textInputs[i])) visibleTextInputs++;
 		}
-		for (; i < passwordInputs.length; i++){
+		for (i = 0; i < passwordInputs.length; i++){
 			if (that.onTopLayer(passwordInputs[i])) visiblePasswordInputs++;
 		}
 		if (visibleTextInputs == 1 && visiblePasswordInputs == 1)
