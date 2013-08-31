@@ -2,22 +2,25 @@ fileName = ARGV[0]
 
 text = File.open(fileName).read
 currentSite = ""
+allTestSites = Array.new
 failedArray = Array.new
 dnsErrorArrayTemp = Array.new
 dnsErrorArray = Array.new
 oracleErrorArray = Array.new
 supportFacebookSSO = Array.new
-stalledAtOtherPhases = Array.new
+stalledAtAboveTwoPhases = Array.new
+stalledAtOneToTwoPhases = Array.new
+stalledAtAboveTwoPhasesTemp = Array.new
+stalledAtOneToTwoPhasesTemp = Array.new
 vul1 = Array.new
 vul2 = Array.new
 vul3 = Array.new
 vul4 = Array.new
 vul5 = Array.new
-totalSites = 0
 text.each_line do |line|
 	if line.start_with? "Testing site:"
 		currentSite = line[14..-1].chomp
-		totalSites+=1
+		allTestSites.push(currentSite)
 	end
 	if line.include? "vulnerable"
 		supportFacebookSSO.push(currentSite)
@@ -49,48 +52,100 @@ text.each_line do |line|
 		next
 	end
 	if (line.include? "Test stalled at Phase ")
-		stalledAtOtherPhases.push(currentSite)
+		if ((line[-2].to_i > 2) && !stalledAtAboveTwoPhasesTemp.include?(currentSite))
+			stalledAtAboveTwoPhasesTemp.push(currentSite) 
+			next
+		end
+		if ((line[-2].to_i <= 2) && !stalledAtOneToTwoPhasesTemp.include?(currentSite))
+			stalledAtOneToTwoPhasesTemp.push(currentSite)
+			next
+		end
+	end
+	if (line.include? "Test stalled at Phase ")
+		if ((line[-2].to_i > 2) && stalledAtAboveTwoPhasesTemp.include?(currentSite))
+			stalledAtAboveTwoPhases.push(currentSite) 
+			next
+		end
+		if ((line[-2].to_i <= 2) && stalledAtOneToTwoPhasesTemp.include?(currentSite))
+			stalledAtOneToTwoPhases.push(currentSite) 
+			next
+		end
 	end
 	if line.include? "oracle failed"
 		oracleErrorArray.push(currentSite)
 	end
 end
+allTestSites.uniq!
 failedArray.uniq!
 supportFacebookSSO.uniq!
 dnsErrorArray.uniq!
 oracleErrorArray.uniq!
-stalledAtOtherPhases.uniq!
+stalledAtAboveTwoPhases.uniq!
+stalledAtOneToTwoPhases.uniq!
 vul1.uniq!
 vul2.uniq!
 vul3.uniq!
 vul4.uniq!
 vul5.uniq!
 
-stalledAtOtherPhases.each do |s|
-	if (!failedArray.include? s) then stalledAtOtherPhases.delete(s) end
+stalledAtOneToTwoPhases.each do |s|
+	if (!failedArray.include? s) then stalledAtOneToTwoPhases.delete(s) end
 end
 
-p "#{totalSites} sites tested in total."
+stalledAtAboveTwoPhases.each do |s|
+	if (!failedArray.include? s) then stalledAtAboveTwoPhases.delete(s) end
+end
+
+dnsErrorArray.each do |s|
+	if (failedArray.include? s) then failedArray.delete(s) end
+end
+
+p "#{allTestSites.length} sites tested in total."
+p "A total of #{dnsErrorArray.length} sites failed DNS"
+p "Total valid test cases: #{allTestSites.length - dnsErrorArray.length}"
+p "--------------------------------"
 p "Saw a total of " + supportFacebookSSO.length.to_s + " sites that support Facebook SSO"
 p "Saw a total of " + vul1.length.to_s + " sites that are vulnerable to [1]"
 p "Saw a total of " + vul2.length.to_s + " sites that are vulnerable to [2]"
 p "Saw a total of " + vul3.length.to_s + " sites that are vulnerable to [3]"
 p "Saw a total of " + vul4.length.to_s + " sites that are vulnerable to [4]"
 p "Saw a total of " + vul5.length.to_s + " sites that are vulnerable to [5]"
-p "A total of #{oracleErrorArray.length} sites failed oracle"
-p "A total of #{dnsErrorArray.length} sites failed DNS"
 
-dnsErrorArray.each do |s|
-	if (failedArray.include? s) then failedArray.delete(s) end
-end
+p "---------------------------------"
+p "A total of #{failedArray.length} sites failed"
+p "Of these, #{stalledAtOneToTwoPhases.length} sites stalled at 1-2 phase, and they are outputed to stalledSites.txt"
+p "Of these, #{stalledAtAboveTwoPhases.length} sites stalled at >2 phase, and they are outputed to stalledSites.txt"
+p "Of these, #{oracleErrorArray.length} sites failed due to oracle problems"
 
 oracleErrorArray.each do |s|
 	if (failedArray.include? s) then failedArray.delete(s) end
 end
 
-stalledAtOtherPhases.each do |s|
+stalledAtOneToTwoPhases.each do |s|
 	if (failedArray.include? s) then failedArray.delete(s) end
 end
+
+stalledAtAboveTwoPhases.each do |s|
+	if (failedArray.include? s) then failedArray.delete(s) end
+end
+
+outputText = "exports.testList = ["
+
+stalledAtOneToTwoPhases.each do |site|
+	outputText += "'#{site}',"
+end
+
+stalledAtAboveTwoPhases.each do |site|
+	outputText += "'#{site}',"
+end
+
+outputText = outputText[0..-2] + "];"
+
+File.open("stalledTestList.js","w+"){|f|
+	f.write(outputText)
+}
+
+
 
 outputText = "exports.testList = ["
 
@@ -102,19 +157,6 @@ outputText = outputText[0..-2] + "];"
 File.open("debugTestList.js","w+"){|f|
 	f.write(outputText)
 }
-
-outputText = "exports.testList = ["
-
-stalledAtOtherPhases.each do |site|
-	outputText += "'#{site}',"
-end
-
-outputText = outputText[0..-2] + "];"
-File.open("stalledTestList.js","w+"){|f|
-	f.write(outputText)
-}
-
-p "A total number of #{stalledAtOtherPhases.length} sites stalled at none 0 phase, and they are outputed to stalledSites.txt"
-p "A total number of #{failedArray.length} sites failed, and they are outputed to failedSites.txt"
+p "The rest #{failedArray.length} sites failed, and they are outputed to failedSites.txt"
 
 

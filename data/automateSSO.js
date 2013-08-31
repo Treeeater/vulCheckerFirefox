@@ -27,8 +27,7 @@ function AutomateSSO(){
 		document.getElementById('pass').value = (that.account == 1) ? accounts[0].passwd : accounts[1].passwd;
 		
 		if (document.getElementById('u_0_1') == null) return false;
-		//try to click it
-		document.getElementById('u_0_1').click();
+		self.port.emit("credentialsInserted","");			//everything ready, tell ccc we are ready to click.
 		return true;
 	};
 	
@@ -80,6 +79,11 @@ self.port.on("requestFBAccount", function (response){
 
 self.port.on("requestAccountInfo",function(resp){
 	self.port.emit("requestAccountInfo",accounts);
+});
+
+self.port.on("goAheadAndClick",function(){
+	//try to click it
+	document.getElementById('u_0_1').click();
 });
 
 //auto-check every time.
