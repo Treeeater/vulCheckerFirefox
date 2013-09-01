@@ -88,16 +88,16 @@ vul3.uniq!
 vul4.uniq!
 vul5.uniq!
 
+dnsErrorArray.each do |s|
+	if (failedArray.include? s) then failedArray.delete(s) end
+end
+
 stalledAtOneToTwoPhases.each do |s|
 	if (!failedArray.include? s) then stalledAtOneToTwoPhases.delete(s) end
 end
 
 stalledAtAboveTwoPhases.each do |s|
 	if (!failedArray.include? s) then stalledAtAboveTwoPhases.delete(s) end
-end
-
-dnsErrorArray.each do |s|
-	if (failedArray.include? s) then failedArray.delete(s) end
 end
 
 p "#{allTestSites.length} sites tested in total."
@@ -116,6 +116,17 @@ p "A total of #{failedArray.length} sites failed"
 p "Of these, #{stalledAtOneToTwoPhases.length} sites stalled at 1-2 phase, and they are outputed to stalledSites.txt"
 p "Of these, #{stalledAtAboveTwoPhases.length} sites stalled at >2 phase, and they are outputed to stalledSites.txt"
 p "Of these, #{oracleErrorArray.length} sites failed due to oracle problems"
+
+outputText = "exports.testList = ["
+
+failedArray.each do |site|
+	outputText += "'#{site}',"
+end
+
+outputText = outputText[0..-2] + "];"
+File.open("allFailedSites.js","w+"){|f|
+	f.write(outputText)
+}
 
 oracleErrorArray.each do |s|
 	if (failedArray.include? s) then failedArray.delete(s) end
@@ -157,6 +168,6 @@ outputText = outputText[0..-2] + "];"
 File.open("debugTestList.js","w+"){|f|
 	f.write(outputText)
 }
-p "The rest #{failedArray.length} sites failed, and they are outputed to failedSites.txt"
+p "The rest #{failedArray.length} sites failed, and they are outputed to debugTestList.js"
 
 
