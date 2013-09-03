@@ -41,11 +41,11 @@ text.each_line do |line|
 	if line.include? "fail"
 		failedArray.push(currentSite)
 	end
-	if ((line.include?("Test stalled at Phase 0") || line.include?("Test stalled at Phase 1")) && !dnsErrorArrayTemp.include?(currentSite))
+	if ((line.include?("Test stalled at Phase 0\n") || line.include?("Test stalled at Phase 1\n")) && !dnsErrorArrayTemp.include?(currentSite))
 		dnsErrorArrayTemp.push(currentSite)
 		next
 	end
-	if ((line.include?("Test stalled at Phase 0") || line.include?("Test stalled at Phase 1")) && (dnsErrorArrayTemp.include? currentSite))
+	if ((line.include?("Test stalled at Phase 0\n") || line.include?("Test stalled at Phase 1\n")) && (dnsErrorArrayTemp.include? currentSite))
 		dnsErrorArray.push(currentSite)
 		next
 	end

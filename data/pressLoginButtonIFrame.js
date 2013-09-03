@@ -240,6 +240,7 @@ function VulCheckerHelper() {
 		that.searchForLoginButton(document.body);
 		if (vulCheckerHelper.sortedAttrInfoMap.length <= vulCheckerHelper.indexToClick) return;			//no login button found.
 		log("pressing Login button @ XPath in iframe: " + vulCheckerHelper.getXPath(vulCheckerHelper.sortedAttrInfoMap[vulCheckerHelper.indexToClick].node));
+		self.port.emit('loginButtonClicked','');
 		vulCheckerHelper.sortedAttrInfoMap[vulCheckerHelper.indexToClick].node.click();
 		vulCheckerHelper.clickedButtons.push(vulCheckerHelper.getXPath(vulCheckerHelper.sortedAttrInfoMap[vulCheckerHelper.indexToClick].node));
 	}
