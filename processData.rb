@@ -9,9 +9,7 @@ dnsErrorArray = Array.new
 oracleErrorArray = Array.new
 supportFacebookSSO = Array.new
 stalledAtAboveTwoPhases = Array.new
-stalledAtOneToTwoPhases = Array.new
 stalledAtAboveTwoPhasesTemp = Array.new
-stalledAtOneToTwoPhasesTemp = Array.new
 vul1 = Array.new
 vul2 = Array.new
 vul3 = Array.new
@@ -43,31 +41,23 @@ text.each_line do |line|
 	if line.include? "fail"
 		failedArray.push(currentSite)
 	end
-	if (line.include?("Test stalled at Phase 0") && !dnsErrorArrayTemp.include?(currentSite))
+	if ((line.include?("Test stalled at Phase 0") || line.include?("Test stalled at Phase 1")) && !dnsErrorArrayTemp.include?(currentSite))
 		dnsErrorArrayTemp.push(currentSite)
 		next
 	end
-	if ((line.include? "Test stalled at Phase 0") && (dnsErrorArrayTemp.include? currentSite))
+	if ((line.include?("Test stalled at Phase 0") || line.include?("Test stalled at Phase 1")) && (dnsErrorArrayTemp.include? currentSite))
 		dnsErrorArray.push(currentSite)
 		next
 	end
 	if (line.include? "Test stalled at Phase ")
-		if ((line[-2].to_i > 2) && !stalledAtAboveTwoPhasesTemp.include?(currentSite))
+		if (!stalledAtAboveTwoPhasesTemp.include?(currentSite))
 			stalledAtAboveTwoPhasesTemp.push(currentSite) 
-			next
-		end
-		if ((line[-2].to_i <= 2) && !stalledAtOneToTwoPhasesTemp.include?(currentSite))
-			stalledAtOneToTwoPhasesTemp.push(currentSite)
 			next
 		end
 	end
 	if (line.include? "Test stalled at Phase ")
-		if ((line[-2].to_i > 2) && stalledAtAboveTwoPhasesTemp.include?(currentSite))
+		if (stalledAtAboveTwoPhasesTemp.include?(currentSite))
 			stalledAtAboveTwoPhases.push(currentSite) 
-			next
-		end
-		if ((line[-2].to_i <= 2) && stalledAtOneToTwoPhasesTemp.include?(currentSite))
-			stalledAtOneToTwoPhases.push(currentSite) 
 			next
 		end
 	end
@@ -81,7 +71,6 @@ supportFacebookSSO.uniq!
 dnsErrorArray.uniq!
 oracleErrorArray.uniq!
 stalledAtAboveTwoPhases.uniq!
-stalledAtOneToTwoPhases.uniq!
 vul1.uniq!
 vul2.uniq!
 vul3.uniq!
@@ -92,16 +81,12 @@ dnsErrorArray.each do |s|
 	if (failedArray.include? s) then failedArray.delete(s) end
 end
 
-stalledAtOneToTwoPhases.each do |s|
-	if (!failedArray.include? s) then stalledAtOneToTwoPhases.delete(s) end
-end
-
 stalledAtAboveTwoPhases.each do |s|
 	if (!failedArray.include? s) then stalledAtAboveTwoPhases.delete(s) end
 end
 
 p "#{allTestSites.length} sites tested in total."
-p "A total of #{dnsErrorArray.length} sites failed DNS"
+p "A total of #{dnsErrorArray.length} sites failed DNS/initial request"
 p "Total valid test cases: #{allTestSites.length - dnsErrorArray.length}"
 p "--------------------------------"
 p "Saw a total of " + supportFacebookSSO.length.to_s + " sites that support Facebook SSO"
@@ -113,8 +98,7 @@ p "Saw a total of " + vul5.length.to_s + " sites that are vulnerable to [5]"
 
 p "---------------------------------"
 p "A total of #{failedArray.length} sites failed"
-p "Of these, #{stalledAtOneToTwoPhases.length} sites stalled at 1-2 phase, and they are outputed to stalledSites.txt"
-p "Of these, #{stalledAtAboveTwoPhases.length} sites stalled at >2 phase, and they are outputed to stalledSites.txt"
+p "Of these, #{stalledAtAboveTwoPhases.length} sites stalled at >=2 phase, and they are outputed to stalledSites.txt"
 p "Of these, #{oracleErrorArray.length} sites failed due to oracle problems"
 
 outputText = "exports.testList = ["
@@ -132,19 +116,11 @@ oracleErrorArray.each do |s|
 	if (failedArray.include? s) then failedArray.delete(s) end
 end
 
-stalledAtOneToTwoPhases.each do |s|
-	if (failedArray.include? s) then failedArray.delete(s) end
-end
-
 stalledAtAboveTwoPhases.each do |s|
 	if (failedArray.include? s) then failedArray.delete(s) end
 end
 
 outputText = "exports.testList = ["
-
-stalledAtOneToTwoPhases.each do |site|
-	outputText += "'#{site}',"
-end
 
 stalledAtAboveTwoPhases.each do |site|
 	outputText += "'#{site}',"
@@ -155,8 +131,6 @@ outputText = outputText[0..-2] + "];"
 File.open("stalledTestList.js","w+"){|f|
 	f.write(outputText)
 }
-
-
 
 outputText = "exports.testList = ["
 
