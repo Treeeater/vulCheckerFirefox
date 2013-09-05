@@ -7,6 +7,14 @@ function AutomateSSO(){
 	this.accountA = accounts[0];
 	this.accountB = accounts[1];
 	
+	this.checkAppError = function(){
+		if (document.body && document.body.innerHTML.indexOf("We're sorry, but the application you're trying to use doesn't exist or has been disabled.")!=-1) {
+			self.port.emit('appError',"");
+			return true;
+		}
+		return false;
+	}
+	
 	this.checkDialogOAuth = function(){
 		if (document.URL.indexOf("https://www.facebook.com/dialog/oauth")==-1) return false;
 		if (document.getElementById('u_0_0') != null && document.getElementById('u_0_0').nodeName == "INPUT") document.getElementById('u_0_0').click();	//gamezone.com customize the SSO experience. I don't know if this is common but let us deal with this first.
@@ -53,8 +61,10 @@ function AutomateSSO(){
 }
 
 var automateSSO = new AutomateSSO();
-window.moveTo(0, 0);
-window.resizeTo(screen.availWidth, screen.availHeight);
+try {
+	window.moveTo(0, 0);
+	window.resizeTo(screen.availWidth, screen.availHeight);
+} catch (ex) {console.log('window resize error, this is minor and not going into the logs.');};
 //disable the following APIs for the website.
 unsafeWindow.moveTo = function(){};
 unsafeWindow.moveBy = function(){};
@@ -72,6 +82,7 @@ self.port.on("action",function(action){
 self.port.on("requestFBAccount", function (response){
 	if (!response.shouldAutomateSSO) return;
 	automateSSO.account = response.FBAccount;
+	if (automateSSO.checkAppError()) return;
 	if (automateSSO.checkEnterPassword()) return;
 	if (automateSSO.checkDialogOAuth()) return;
 	if (automateSSO.checkPermissionRequest()) return;
