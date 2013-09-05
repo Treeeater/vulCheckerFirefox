@@ -1,3 +1,8 @@
+if (ARGV.length != 2)
+	p "wrong number of arguments. needs 2"
+	exit 
+end
+
 fileName = ARGV[0]
 
 text = File.open(fileName).read
@@ -8,6 +13,7 @@ dnsErrorArrayTemp = Array.new
 dnsErrorArray = Array.new
 oracleErrorArray = Array.new
 supportFacebookSSO = Array.new
+doesNotSupportFacebookSSO = Array.new
 stalledAtAboveTwoPhases = Array.new
 stalledAtAboveTwoPhasesTemp = Array.new
 vul1 = Array.new
@@ -22,6 +28,9 @@ text.each_line do |line|
 	end
 	if line.include? "vulnerable"
 		supportFacebookSSO.push(currentSite)
+	end
+	if line.include? "Site doesn't support FB login?"
+		doesNotSupportFacebookSSO.push(currentSite)
 	end
 	if line.include? "is vulnerable to [1]"
 		vul1.push(currentSite)
@@ -68,6 +77,7 @@ end
 allTestSites.uniq!
 failedArray.uniq!
 supportFacebookSSO.uniq!
+doesNotSupportFacebookSSO.uniq!
 dnsErrorArray.uniq!
 oracleErrorArray.uniq!
 stalledAtAboveTwoPhases.uniq!
@@ -90,6 +100,8 @@ p "A total of #{dnsErrorArray.length} sites failed DNS/initial request"
 p "Total valid test cases: #{allTestSites.length - dnsErrorArray.length}"
 p "--------------------------------"
 p "Saw a total of " + supportFacebookSSO.length.to_s + " sites that support Facebook SSO"
+p "Saw a total of " + doesNotSupportFacebookSSO.length.to_s + " sites that doesn't support Facebook SSO"
+p "The rest sites stalled at phase 2 or 3, in which case we cannot determine if the site support FB SSO or not."
 p "Saw a total of " + vul1.length.to_s + " sites that are vulnerable to [1]"
 p "Saw a total of " + vul2.length.to_s + " sites that are vulnerable to [2]"
 p "Saw a total of " + vul3.length.to_s + " sites that are vulnerable to [3]"
@@ -105,6 +117,15 @@ outputText = "exports.testList = ["
 
 failedArray.each do |site|
 	outputText += "'#{site}',"
+end
+
+if (ARGV[1]=='include')
+	doesNotSupportFacebookSSO.each do |site|
+		outputText += "'#{site}',"
+	end
+	p "All failed sites output to allFailedSites.js, including sites that doesn't support FB."
+else
+	p "All failed sites output to allFailedSites.js, not including sites that doesn't support FB."
 end
 
 outputText = outputText[0..-2] + "];"
@@ -142,6 +163,6 @@ outputText = outputText[0..-2] + "];"
 File.open("debugTestList.js","w+"){|f|
 	f.write(outputText)
 }
-p "The rest #{failedArray.length} sites failed, and they are outputed to debugTestList.js"
+p "The rest #{failedArray.length} sites failed, and they are outputed to debugTestList.js."
 
 
