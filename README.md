@@ -14,3 +14,10 @@ Vul list:
 [3] Although signed_request is used, server doesn't check the signature part.
 [4] User credentials could be leaked through referrer header when requesting a third party content
 [5] User credentials could be leaked if third party script could access HTML document.
+
+
+Scripts:
+
+extractCSV.rb:  input: results.txt generated from automated testing. output: results.csv, a list of sites and their vul stats.  Missing data means it failed at some point.
+
+combineCSV.rb:  input: results1.txt, results2.txt generated from 2 runs.  output:results_new.csv, combining the results of the two.  Report if there is a disagreement on [1] [3], but does not report if there's disagreement on [2][4][5].  In [2][4][5] there might be random detecting errors as well as different third-party content served each time, therefore it should be ignored and the combined results always will be vulnerable.

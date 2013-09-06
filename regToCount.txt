@@ -1,0 +1,1 @@
+.*?is.*?vulnerable to \[\d\].*?\n.*?is.*?vulnerable to \[\d\].*?\n.*?is.*?vulnerable to \[\d\].*?\n.*?is.*?vulnerable to \[\d\].*?\n.*?is.*?vulnerable to \[\d\].*?\n
