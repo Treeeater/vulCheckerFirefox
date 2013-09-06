@@ -60,6 +60,10 @@ end
 
 errorHash.each_key{|k|
 	p k+" "+errorHash[k].to_s
+	#erase the entry to let next test resolve it.
+	if (errorHash[k] & 1 == 1) then	hash[k][0] = "" end
+	if (errorHash[k] & 2 == 2) then	hash[k][1] = ""	end
+	if (errorHash[k] & 4 == 4) then hash[k][2] = "" end
 }
 
 #output
