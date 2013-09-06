@@ -27,6 +27,7 @@ stalledTemp = Array.new
 stalled = Array.new
 currentSite = ""
 allSites = Array.new
+errorStateApp = Array.new
 text.each_line do |line|
 	if line.start_with? "Testing site:"
 		currentSite = line[14..-1].chomp
@@ -46,14 +47,19 @@ text.each_line do |line|
 			stalled.push(currentSite) 
 		end
 	end
+	if (line.include? "Site support FB but its configuration is in an error state")
+		errorStateApp.push(currentSite)
+	end
 end
 
 stalled.uniq!
 dnsErrorArray.uniq!
 allSites.uniq!
+errorStateApp.uniq!
 
 p "Total sites reported: #{allSites.length}"
 p "Total DNS resolving error reported: #{dnsErrorArray.length}"
+p "Total app in error state reported: #{errorStateApp.length}"
 
 dnsErrorArray.each{|url|
 	if (stalled.include? url)
@@ -71,6 +77,15 @@ stalled.each{|url|
 		hash[url][3] = ""
 		hash[url][4] = ""
 	end
+}
+
+errorStateApp.each{|url|
+	hash[url]=Array.new
+	hash[url][0] = 2
+	hash[url][1] = 2
+	hash[url][2] = 2
+	hash[url][3] = 2
+	hash[url][4] = 2
 }
 
 #output
