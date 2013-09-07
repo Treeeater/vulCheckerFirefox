@@ -13,6 +13,8 @@ function VulCheckerHelper() {
 	this.indexToClick = 0;
 	this.account = [];
 	this.clickedButtons = [];
+	this.iframeClickedOuterHTML = [];
+	this.iframeClickedXPATH = [];
 	this.loginClickAttempts = 1;
 	this.searchForSignUpForFB = false;
 	function createCookie(name,value,days) {
@@ -140,7 +142,12 @@ function VulCheckerHelper() {
 		if (curNode.nodeName == "INPUT") {
 			if (curNode.type != "button" && curNode.type != "image" && curNode.type != "submit") return false;
 		}
-		if (that.clickedButtons.indexOf(that.getXPath(curNode)) != -1) {
+		curNodeXPATH = that.getXPath(curNode);
+		if (that.clickedButtons.indexOf(curNodeXPATH) != -1 || that.iframeClickedXPATH.indexOf(curNodeXPATH) != -1) {
+			//avoiding clicking on the same button twice, now ignoring the duplicate button.
+			return false;
+		}
+		if (that.iframeClickedOuterHTML.indexOf(curNode.outerHTML) != -1) {
 			//avoiding clicking on the same button twice, now ignoring the duplicate button.
 			return false;
 		}
@@ -240,7 +247,7 @@ function VulCheckerHelper() {
 		that.searchForLoginButton(document.body);
 		if (vulCheckerHelper.sortedAttrInfoMap.length <= vulCheckerHelper.indexToClick) return;			//no login button found.
 		log("pressing Login button @ XPath in iframe: " + vulCheckerHelper.getXPath(vulCheckerHelper.sortedAttrInfoMap[vulCheckerHelper.indexToClick].node));
-		self.port.emit('loginButtonClicked','');
+		self.port.emit('loginButtonClicked',{"loginButtonXPath":vulCheckerHelper.getXPath(vulCheckerHelper.sortedAttrInfoMap[vulCheckerHelper.indexToClick].node), "loginButtonOuterHTML":vulCheckerHelper.sortedAttrInfoMap[vulCheckerHelper.indexToClick].node.outerHTML});
 		vulCheckerHelper.sortedAttrInfoMap[vulCheckerHelper.indexToClick].node.click();
 		vulCheckerHelper.clickedButtons.push(vulCheckerHelper.getXPath(vulCheckerHelper.sortedAttrInfoMap[vulCheckerHelper.indexToClick].node));
 	}
@@ -295,6 +302,8 @@ if (self.port)
 			debug = response.debug;
 			vulCheckerHelper.account = response.account;
 			vulCheckerHelper.searchForSignUpForFB = response.searchForSignUpForFB;
+			vulCheckerHelper.iframeClickedOuterHTML = response.iframeClickedOuterHTML;
+			vulCheckerHelper.iframeClickedXPATH = response.iframeClickedXPATH;
 			if (response.shouldClick) {
 				//log("Legitimate iframe detected while press login button should be clicked, searching in this iframe...");
 				vulCheckerHelper.indexToClick = response.indexToClick;
