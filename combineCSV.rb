@@ -35,7 +35,8 @@ text2.each_line do |line|
 	tempArray = line.split(',')
 	siteURL = tempArray[0]
 	if (hash[siteURL]==nil) then hash[siteURL] = Array.new end
-	
+	if (hash[siteURL][0].to_i >= 10) then next end				#a value greater than 10 means we have manually inspected it and determined it's one of the un-automatable scnearios, so don't worry about it.
+	#For value meaning, please refer to Readme.md
 	if ((hash[siteURL])[0] != "" && (hash[siteURL])[0] != nil && tempArray[1] != "" && tempArray[1] != nil && (hash[siteURL])[0] != tempArray[1])
 		if (tempArray[1] == "2")
 			setSiteToError(hash,siteURL)
@@ -99,6 +100,10 @@ outputText = "Site URL,token vul,secret vul,signed_request vul,referrer vul,DOM 
 completedCases = 0
 failedCasesToTestNext = Array.new
 allSitesCount = 0
+fBCorrectCount = 0
+fBErrorDetectedCount = 0
+manuallyCount = 0
+manuallyOurFaultCount = 0
 hash.each_key{|k|
 	if (hash[k][0].to_s!="" && hash[k][1].to_s!="" && hash[k][2].to_s!="" && hash[k][3].to_s!="" && hash[k][4].to_s!="") 
 		completedCases+=1 
@@ -106,10 +111,26 @@ hash.each_key{|k|
 		failedCasesToTestNext.push(k)
 	end
 	allSitesCount+=1
+	if (hash[k][0].to_i.abs==1 && hash[k][1].to_i.abs==1 && hash[k][2].to_i.abs==1 && hash[k][3].to_i.abs==1 && hash[k][4].to_i.abs==1) 
+		fBCorrectCount+=1
+	end
+	if (hash[k][0].to_i==2 && hash[k][1].to_i==2 && hash[k][2].to_i==2 && hash[k][3].to_i==2 && hash[k][4].to_i==2) 
+		fBErrorDetectedCount+=1
+	end
+	if (hash[k][0].to_i>=10 && hash[k][1].to_i>=10 && hash[k][2].to_i>=10 && hash[k][3].to_i>=10 && hash[k][4].to_i>=10) 
+		manuallyCount+=1
+	end
+	if (hash[k][0].to_i>=20 && hash[k][1].to_i>=20 && hash[k][2].to_i>=20 && hash[k][3].to_i>=20 && hash[k][4].to_i>=20) 
+		manuallyOurFaultCount+=1
+	end
 	outputText = outputText + k + ',' + hash[k][0].to_s + ',' + hash[k][1].to_s + ',' + hash[k][2].to_s + ',' + hash[k][3].to_s + ',' + hash[k][4].to_s + "\n"
 }
 p "total tests: #{allSitesCount}"
 p "total completed tests: #{completedCases}"
+p "total FB implementation correct tests (detected by our tool): #{fBCorrectCount}"
+p "total FB implementation error tests (detected by our tool): #{fBErrorDetectedCount}"
+p "total manual intervention tests: #{manuallyCount}"
+p "total cases which our tool cannot handle(our fault): #{manuallyOurFaultCount}"
 p "total failed tests: #{allSitesCount - completedCases}"
 File.open("Results_new.csv","w+"){|f|
 	f.write(outputText)

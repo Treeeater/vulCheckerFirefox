@@ -44,7 +44,7 @@ function initDetection(credentials){
 		if (!node) return;
 		if (!!(node.src) && typeof node.src == "string") {
 			var srcDomain = getDomain(node.src);
-			if (srcDomain.indexOf(document.domain)==-1 && srcDomain.indexOf('facebook.com')==-1) {
+			if (srcDomain.indexOf(document.domain)==-1 && srcDomain.indexOf('facebook.com')==-1 && srcDomain.indexOf('facebook.net')==-1) {
 				hasThirdPartyContent = true;
 				thirdPartyContentSRC = node.src;
 				return;
