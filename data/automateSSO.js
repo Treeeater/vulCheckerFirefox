@@ -12,6 +12,10 @@ function AutomateSSO(){
 			self.port.emit('appError',"");
 			return true;
 		}
+		if (document.body && document.body.innerHTML.indexOf("Given URL is not allowed by the Application configuration.")!=-1) {
+			self.port.emit('appError',"");
+			return true;
+		}
 		return false;
 	}
 	

@@ -58,11 +58,17 @@ text2.each_line do |line|
 	if (hash[siteURL][0].to_i == 2) then next end				#a value equal to 2 means our tool has automatically decided there's an implementation error, so don't worry about it. Actually, it shouldn't be here if the test results are obtained using test cases from the previous iteration.
 	if (seeIfSiteDoesNotSupportFB(hash,tempArray,siteURL)) then next end		#if any of the two has disagreement on whether the site supports FB, then handle it differently.
 	#For value meaning, please refer to Readme.md
-	if ((hash[siteURL])[0] != "" && (hash[siteURL])[0] != nil && tempArray[1] != "" && tempArray[1] != nil && (hash[siteURL])[0] != tempArray[1])
-		if (tempArray[1] == "2")
+	if ((hash[siteURL])[3] != "" && (hash[siteURL])[3] != nil && tempArray[4] != "" && tempArray[4] != nil && (hash[siteURL])[3] != tempArray[4]) 
+		#Disagreement here is fine, we probably didn't see that in one try. Mark it vulnerable
+		#p siteURL + " changed to vulnerable on disagreement for 4"
+		if (tempArray[4] == "2")
+			p "previously determined state now changed to error state on #{siteURL}."
 			setSiteToError(hash,siteURL)
 			next
 		end
+		hash[siteURL][3] = -1
+	end
+	if ((hash[siteURL])[0] != "" && (hash[siteURL])[0] != nil && tempArray[1] != "" && tempArray[1] != nil && (hash[siteURL])[0] != tempArray[1])
 		if (errorHash[siteURL] == nil) then errorHash[siteURL] = 0 end
 		errorHash[siteURL] += 1
 	end
@@ -73,11 +79,6 @@ text2.each_line do |line|
 	if ((hash[siteURL])[2] != "" && (hash[siteURL])[2] != nil && tempArray[3] != "" && tempArray[3] != nil && (hash[siteURL])[2] != tempArray[3]) 
 		if (errorHash[siteURL] == nil) then errorHash[siteURL] = 0 end
 		errorHash[siteURL] += 4
-	end
-	if ((hash[siteURL])[3] != "" && (hash[siteURL])[3] != nil && tempArray[4] != "" && tempArray[4] != nil && (hash[siteURL])[3] != tempArray[4]) 
-		#Disagreement here is fine, we probably didn't see that in one try. Mark it vulnerable
-		#p siteURL + " changed to vulnerable on disagreement for 4"
-		hash[siteURL][3] = -1
 	end
 	if ((hash[siteURL])[4] != "" && (hash[siteURL])[4] != nil && tempArray[5].chomp != "" && tempArray[5].chomp != nil && (hash[siteURL])[4] != tempArray[5].chomp) 
 		#Disagreement here is fine, we probably didn't see that in one try. Mark it vulnerable
