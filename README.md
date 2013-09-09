@@ -24,6 +24,12 @@ combineCSV.rb:  input: results1.txt, results2.txt generated from 2 runs.  result
 
 To generate AllfailedTest.js from a CSV, call combineCSV.rb with that CSV as first param and a empty file as the second param.
 
+CSV auto code:
+-1: vulnerable
+1: not vulnerable
+2: app FB configuration is detected to be in an error state.
+4: doesn't support FB, shouldn't be here in the list. If this value is considered 4 for two consecutive times, it is removed from the list.
+
 CSV manual intervention code:
 
 10: Server side error in implementing FB connect.
