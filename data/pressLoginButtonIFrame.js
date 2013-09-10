@@ -304,11 +304,23 @@ if (self.port)
 			vulCheckerHelper.searchForSignUpForFB = response.searchForSignUpForFB;
 			vulCheckerHelper.iframeClickedOuterHTML = response.iframeClickedOuterHTML;
 			vulCheckerHelper.iframeClickedXPATH = response.iframeClickedXPATH;
-			if (response.shouldClick) {
-				//log("Legitimate iframe detected while press login button should be clicked, searching in this iframe...");
-				vulCheckerHelper.indexToClick = response.indexToClick;
-				vulCheckerHelper.loginClickAttempts = response.loginClickAttempts;
-				vulCheckerHelper.pressLoginButton();
+			if (response.tryFindInvisibleLoginButton || (document.documentElement.offSetHeight != 0 && document.documentElement.offSetWidth != 0)) {	
+				//we should try an invisible iframe if ccc asks us to do so.
+				if (response.shouldClick) {
+					if (response.searchForSignUpForFB && document.URL.indexOf('https://www.facebook.com/plugins/registration')==0 && document.documentElement.offSetHeight != 0 && document.documentElement.offSetWidth != 0){
+						//make sure register plugin is visible.
+						//to handle registration plugins.
+						if (document.getElementById('fbRegistrationLogin')!=null) {
+							log("pressing Login button @ XPath in iframe: " + vulCheckerHelper.getXPath(document.getElementById('fbRegistrationLogin')));
+							self.port.emit('loginButtonClicked',{"loginButtonXPath":vulCheckerHelper.getXPath(document.getElementById('fbRegistrationLogin')), "loginButtonOuterHTML":document.getElementById('fbRegistrationLogin').outerHTML,"shouldCountClick":true});
+							document.getElementById('fbRegistrationLogin').click();
+						}
+						return;
+					}
+					vulCheckerHelper.indexToClick = response.indexToClick;
+					vulCheckerHelper.loginClickAttempts = response.loginClickAttempts;
+					vulCheckerHelper.pressLoginButton();
+				}
 			}
 		});
 	}

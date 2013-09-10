@@ -563,22 +563,28 @@ var inputFilledMessage = "Top: All fields populated. Ready to click submit butto
 
 
 if (self.port){
-	self.port.emit("getUserInfo","");
-	self.port.on("issueUserInfo",function(response){
-		registration.account = response.accountsInfo;
-		debug = response.debug;
-	});
-	self.port.on("startRegister",function(response){
-		if (response.manualClick){
-			log('manual clicked from popup.html to finish registration...');
-			registration.tryCompleteRegistration();
-		}
-		else{
-			log("Yet to see submit button clicked from iframes, starting to register from Top...");
-			registration.shouldClickSubmitButton = true;
-			setTimeout(registration.tryCompleteRegistration,2000);			//wait for extra js to load.
-		}
-	});
+	if (document.URL.indexOf("https://www.facebook.com/dialog/registration")==0 && document.getElementById('u_0_1')!=null){
+		//registration plugin.
+		document.getElementById('u_0_1').click();
+	}
+	else {
+		self.port.emit("getUserInfo","");
+		self.port.on("issueUserInfo",function(response){
+			registration.account = response.accountsInfo;
+			debug = response.debug;
+		});
+		self.port.on("startRegister",function(response){
+			if (response.manualClick){
+				log('manual clicked from popup.html to finish registration...');
+				registration.tryCompleteRegistration();
+			}
+			else{
+				log("Yet to see submit button clicked from iframes, starting to register from Top...");
+				registration.shouldClickSubmitButton = true;
+				setTimeout(registration.tryCompleteRegistration,2000);			//wait for extra js to load.
+			}
+		});
+	}
 }
 else{
 	registration.account = {firstName:"chadadarnya",lastName:"isackaldon",email:"chadadarnyaisackaldon@outlook.com"};

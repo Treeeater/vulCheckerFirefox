@@ -556,18 +556,21 @@ var delayedCall = function(){
 }
 
 if (self.port){
-	setTimeout(delayedCall,1000);
-	self.port.on("shouldRegisterIframe",function (response){
-		debug = response.debug;
-		if (response.shouldRegisterIframe) {
-			log("https iframe detected while capturing phase is 4 or 10 and the site needs registration.");
-			self.port.emit("getUserInfo","");
-		}
-	});
-	self.port.on("issueUserInfo",function(response){
-		registration.account = response;
-		registration.tryCompleteRegistration();
-	});
+	if (document.documentElement.offSetHeight != 0 && document.documentElement.offSetWidth != 0) {
+		//why bother trying an invisible iframe?
+		setTimeout(delayedCall,1000);
+		self.port.on("shouldRegisterIframe",function (response){
+			debug = response.debug;
+			if (response.shouldRegisterIframe) {
+				log("https iframe detected while capturing phase is 4 or 10 and the site needs registration.");
+				self.port.emit("getUserInfo","");
+			}
+		});
+		self.port.on("issueUserInfo",function(response){
+			registration.account = response;
+			registration.tryCompleteRegistration();
+		});
+	}
 }
 else{
 	registration.account = {firstName:"chadadarnya",lastName:"isackaldon",email:"chadadarnyaisackaldon@outlook.com"};
