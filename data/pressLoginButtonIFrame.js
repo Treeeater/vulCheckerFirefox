@@ -307,7 +307,7 @@ if (self.port)
 			if (response.tryFindInvisibleLoginButton || (document.documentElement.offSetHeight != 0 && document.documentElement.offSetWidth != 0)) {	
 				//we should try an invisible iframe if ccc asks us to do so.
 				if (response.shouldClick) {
-					if (response.searchForSignUpForFB && document.URL.indexOf('https://www.facebook.com/plugins/registration')==0 && document.documentElement.offSetHeight != 0 && document.documentElement.offSetWidth != 0){
+					if (response.searchForSignUpForFB && (document.URL.indexOf('http://www.facebook.com/plugins/registration')==0 || document.URL.indexOf('https://www.facebook.com/plugins/registration')==0) && document.documentElement.offSetHeight != 0 && document.documentElement.offSetWidth != 0){
 						//make sure register plugin is visible.
 						//to handle registration plugins.
 						if (document.getElementById('fbRegistrationLogin')!=null) {
@@ -315,6 +315,20 @@ if (self.port)
 							self.port.emit('loginButtonClicked',{"loginButtonXPath":vulCheckerHelper.getXPath(document.getElementById('fbRegistrationLogin')), "loginButtonOuterHTML":document.getElementById('fbRegistrationLogin').outerHTML,"shouldCountClick":true});
 							document.getElementById('fbRegistrationLogin').click();
 						}
+						return;
+					}
+					if ((document.URL.indexOf('http://www.facebook.com/plugins/login_button.php')==0 || document.URL.indexOf('https://www.facebook.com/plugins/login_button.php')==0) && document.documentElement.offSetHeight != 0 && document.documentElement.offSetWidth != 0){
+						if (document.getElementsByClassName('pluginFaviconButtonText fwb').length>0)
+						{
+							log("pressing Login button @ XPath in iframe: " + vulCheckerHelper.getXPath(document.getElementsByClassName('pluginFaviconButtonText fwb')[0]));
+							self.port.emit('loginButtonClicked',{"loginButtonXPath":vulCheckerHelper.getXPath(document.getElementsByClassName('pluginFaviconButtonText fwb')[0]), "loginButtonOuterHTML":document.getElementsByClassName('pluginFaviconButtonText fwb')[0].outerHTML,"shouldCountClick":true});
+							document.getElementsByClassName('pluginFaviconButtonText fwb')[0].click();
+							return;
+						}
+					}
+					if (document.URL.indexOf('http://www.facebook.com/plugins/')==0 || document.URL.indexOf('https://www.facebook.com/plugins/')==0)
+					{
+						//this gotta be like, comment, follow, facepile, or anything else that's unrelated to the site's functionality, ignore.
 						return;
 					}
 					vulCheckerHelper.indexToClick = response.indexToClick;
