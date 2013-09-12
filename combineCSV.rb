@@ -7,8 +7,9 @@ def setSiteToError(hash,siteURL)
 end
 
 def seeIfSiteDoesNotSupportFB(hash,tempArray,siteURL)
-	if ((hash[siteURL][0].to_i == 4 && tempArray[1].to_i != 4) || (hash[siteURL][0].to_i != 4 && tempArray[1].to_i == 4))
-		#if previously considered doesn't agree with this run, then assigns this run's result to the new value.
+	if ((hash[siteURL][4] == "4" && tempArray[5].chomp != "4") || (hash[siteURL][4] == "" && tempArray[5].chomp == "4"))
+		#if previously considers there's no FB support but now we consider there is, then assigns this run's result to the new value.
+		#if previously test stalled, then assigns this run's result to the new value.
 		(hash[siteURL])[0] = tempArray[1]
 		(hash[siteURL])[1] = tempArray[2]
 		(hash[siteURL])[2] = tempArray[3]
@@ -16,11 +17,13 @@ def seeIfSiteDoesNotSupportFB(hash,tempArray,siteURL)
 		(hash[siteURL])[4] = tempArray[5].chomp
 		return true
 	end
-	if (hash[siteURL][0].to_i == 4 && tempArray[1].to_i == 4)
+	if (hash[siteURL][4] == "4" && tempArray[5].chomp == "4")
 		#two runs show the same result, we remove this siteURL from database
 		hash.delete(siteURL)
+		p "removed #{siteURL} because no FB login"
 		return true
 	end
+	if (tempArray[5].chomp == "4") then return true end				#we don't want the rest of the caller function to deal with this situation.
 	return false
 end
 
@@ -113,7 +116,7 @@ manuallyCount = 0
 manuallyOurFaultCount = 0
 hash.each_key{|k|
 	if (hash[k][0].to_s!="" && hash[k][1].to_s!="" && hash[k][2].to_s!="" && hash[k][3].to_s!="" && hash[k][4].to_s!="") 
-		if (hash[k][0].to_s != "4")
+		if (hash[k][4].to_s != "4")
 			completedCases+=1 
 		else
 			doesNotSupportFBCases.push(k)
@@ -124,16 +127,17 @@ hash.each_key{|k|
 	allSitesCount+=1
 	if (hash[k][0].to_i.abs==1 && hash[k][1].to_i.abs==1 && hash[k][2].to_i.abs==1 && hash[k][3].to_i.abs==1 && hash[k][4].to_i.abs==1) 
 		fBCorrectCount+=1
-	end
-	if (hash[k][0].to_i==2 && hash[k][1].to_i==2 && hash[k][2].to_i==2 && hash[k][3].to_i==2 && hash[k][4].to_i==2) 
+	elsif (hash[k][0].to_i==2 && hash[k][1].to_i==2 && hash[k][2].to_i==2 && hash[k][3].to_i==2 && hash[k][4].to_i==2) 
 		fBErrorDetectedCount+=1
-	end
-	if (hash[k][0].to_i>=10 && hash[k][1].to_i>=10 && hash[k][2].to_i>=10 && hash[k][3].to_i>=10 && hash[k][4].to_i>=10) 
+	elsif (hash[k][0].to_i>=10 && hash[k][1].to_i>=10 && hash[k][2].to_i>=10 && hash[k][3].to_i>=10 && hash[k][4].to_i>=10) 
 		manuallyCount+=1
+		if (hash[k][0].to_i>=20 && hash[k][1].to_i>=20 && hash[k][2].to_i>=20 && hash[k][3].to_i>=20 && hash[k][4].to_i>=20) 
+			manuallyOurFaultCount+=1
+		end
+	elsif (hash[k][0].to_s!="" && hash[k][1].to_s!="" && hash[k][2].to_s!="" && hash[k][3].to_s!="" && hash[k][4].to_s!="" && hash[k][4].to_s != "4")
+		p k + " is in an error state in new results.csv"
 	end
-	if (hash[k][0].to_i>=20 && hash[k][1].to_i>=20 && hash[k][2].to_i>=20 && hash[k][3].to_i>=20 && hash[k][4].to_i>=20) 
-		manuallyOurFaultCount+=1
-	end
+	
 	outputText = outputText + k + ',' + hash[k][0].to_s + ',' + hash[k][1].to_s + ',' + hash[k][2].to_s + ',' + hash[k][3].to_s + ',' + hash[k][4].to_s + "\n"
 }
 p "total tests: #{allSitesCount}"
