@@ -3,6 +3,7 @@ A vul checker application.
 Note:
 Firefox needs to have popup blocking turned off (go to options to diable that)
 and also caching turned off (got to about:config and type network.http.use-cache to disable it).
+Also turn off auto crash report submit by going to about:config and type toolkit.startup.max_resumed_crashes.
 
 Known bugs (and probably not gonna fix):
 
