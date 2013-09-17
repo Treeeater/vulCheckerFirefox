@@ -7,7 +7,7 @@ def setSiteToError(hash,siteURL)
 end
 
 def seeIfSiteDoesNotSupportFB(hash,tempArray,siteURL)
-	if ((hash[siteURL][4] == "4" && tempArray[5].chomp != "4") || (hash[siteURL][4] == "" && tempArray[5].chomp == "4"))
+	if (hash[siteURL][4] == "4" && tempArray[5].chomp != "4")
 		#if previously considers there's no FB support but now we consider there is, then assigns this run's result to the new value.
 		#if previously test stalled, then assigns this run's result to the new value.
 		(hash[siteURL])[0] = tempArray[1]
@@ -15,6 +15,17 @@ def seeIfSiteDoesNotSupportFB(hash,tempArray,siteURL)
 		(hash[siteURL])[2] = tempArray[3]
 		(hash[siteURL])[3] = tempArray[4]
 		(hash[siteURL])[4] = tempArray[5].chomp
+		return true
+	end
+	if (hash[siteURL][4] != "4" && tempArray[5].chomp == "4")
+		#if previously considers there's no FB support but now we consider there is, then assigns this run's result to the new value.
+		#if previously test stalled, then assigns this run's result to the new value.
+		p "#{siteURL} detected to have no FB in the new run."
+		#(hash[siteURL])[0] = tempArray[1]
+		#(hash[siteURL])[1] = tempArray[2]
+		#(hash[siteURL])[2] = tempArray[3]
+		#(hash[siteURL])[3] = tempArray[4]
+		#(hash[siteURL])[4] = tempArray[5].chomp
 		return true
 	end
 	if (hash[siteURL][4] == "4" && tempArray[5].chomp == "4")
@@ -142,7 +153,7 @@ hash.each_key{|k|
 }
 p "total tests: #{allSitesCount}"
 p "total completed tests that have Facebook login: #{completedCases}"
-p "total tests that does not have Facebook login: #{doesNotSupportFBCases.length}"
+p "total tests that does not have Facebook login (temporarily, just this run, needs to confirm in the next.): #{doesNotSupportFBCases.length}"
 p "total FB implementation correct tests (detected by our tool): #{fBCorrectCount}"
 p "total FB implementation error tests (detected by our tool): #{fBErrorDetectedCount}"
 p "total manual intervention tests: #{manuallyCount}"

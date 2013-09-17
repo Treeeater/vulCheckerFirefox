@@ -186,6 +186,7 @@ function VulCheckerHelper() {
 
 	function checkAccountInfoPresense(node){
 		var fullContent = node.innerHTML.toLowerCase();
+		fullContent = fullContent + document.cookie.toLowerCase();
 		var i = 0;
 		for (i = 0; i < that.account.length; i++){
 			if (fullContent.indexOf(that.account[i].fbid)!=-1) return true;
