@@ -52,6 +52,7 @@ end
 pids = Array.new
 currentFileCount = Array.new
 previousFileCount = Array.new
+finishedPids = Array.new
 i = 0
 
 while (i < totalSessions)
@@ -64,23 +65,23 @@ end
 
 while (true)
 	i = 0
-	finishedProcess = 0
 	while (i < totalSessions)
 		if (File.exists?("vulCheckerProfile#{i}/testResults/finished.txt"))
 			begin
 				kill_process(pids[i])
+				finishedPids.push(i)
 				sleep(3)
-				finishedProcess+=1
 			rescue Errno::ESRCH
 			end
 		end
-		if (finishedProcess == totalSessions)
+		finishedPids.uniq!
+		if (finishedPids.length == totalSessions)
 			exit
 		end
 		currentFileCount[i] = Dir.entries("vulCheckerProfile#{i}/testResults/").length - 2		#. and .. doesn't count
 		if (previousFileCount[i] != currentFileCount[i])
 			previousFileCount[i] = currentFileCount[i]
-		else
+		elsif !finishedPids.include?(i)
 			begin
 				kill_process(pids[i])
 			rescue Errno::ESRCH
