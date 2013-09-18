@@ -11,8 +11,14 @@ is_windows = (RbConfig::CONFIG['host_os'] =~ /mswin|mingw|cygwin/)
 SLEEPTIME = 1500		#configurable: timeout.
 
 
-failedSiteFileName = "./lib/testList.js"
-numberOfSlices = ARGV[0].to_i
+#sanity check
+if (ARGV.length != 2)
+	p "wrong number of arguments. needs 2, 1st: testlist file name, 2nd: # of concurrent sessions"
+	exit 
+end
+
+failedSiteFileName = ARGV[0]
+numberOfSlices = ARGV[1].to_i
 
 temp = IO.readlines(failedSiteFileName)
 rawSites = temp[0]
@@ -25,6 +31,8 @@ allSites = rawSites.split("','")
 groupSize = allSites.length/numberOfSlices
 
 stringToWrite = "exports.testList = [['" + allSites[0]
+i = 0
+j = 0
 
 for i in 0..numberOfSlices-1
 	for j in 1..groupSize - 1
@@ -44,20 +52,13 @@ File.open("./lib/dividedTestList.js",'w'){|f|
 	f.write(stringToWrite)
 }
 
-
-#sanity check
-if (ARGV.length != 1)
-	p "wrong number of arguments. needs 1"
-	exit 
-end
-
 if (!Dir.exists?("vulCheckerProfile0"))
 	p "No bootstrapping profile, create one and re-run this script"
 	p "Make sure the caching, popup blocker and crash reports are all turned off."
 	exit
 end
 
-totalSessions = ARGV[0].to_i
+totalSessions = ARGV[1].to_i
 
 def kill_process(pid)
 	to_kill = Array.new
