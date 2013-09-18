@@ -16,7 +16,7 @@ function extractContent(){
 	$("img[src]").each(function(i){
 		if ($(this).attr && $(this).attr('src')!="") str+=($(this).attr('src')+" ");
 	})*/
-	var str = document.documentElement.innerHTML;
+	var str = document.documentElement.innerHTML.toLowerCase() + document.cookie.toLowerCase();
 	return str;
 }
 
