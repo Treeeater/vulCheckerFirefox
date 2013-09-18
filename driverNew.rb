@@ -10,6 +10,41 @@ is_windows = (RbConfig::CONFIG['host_os'] =~ /mswin|mingw|cygwin/)
 
 SLEEPTIME = 1500		#configurable: timeout.
 
+
+failedSiteFileName = "./lib/testList.js"
+numberOfSlices = ARGV[0].to_i
+
+temp = IO.readlines(failedSiteFileName)
+rawSites = temp[0]
+
+rawSites = rawSites[21..-4]
+
+allSites = rawSites.split("','")
+#p allSites
+
+groupSize = allSites.length/numberOfSlices
+
+stringToWrite = "exports.testList = [['" + allSites[0]
+
+for i in 0..numberOfSlices-1
+	for j in 1..groupSize - 1
+		stringToWrite = stringToWrite + "','" + allSites[i*groupSize+j]
+	end
+	if (i != numberOfSlices - 1)
+		stringToWrite = stringToWrite + "'],['" + allSites[i*groupSize+j+1]
+	else
+		while (allSites[i*groupSize+j+1]!=nil)
+			stringToWrite = stringToWrite + "','" + allSites[i*groupSize+j+1]
+			j+=1
+		end
+	end
+end
+stringToWrite += "']];" 
+File.open("./lib/dividedTestList.js",'w'){|f|
+	f.write(stringToWrite)
+}
+
+
 #sanity check
 if (ARGV.length != 1)
 	p "wrong number of arguments. needs 1"
