@@ -5,6 +5,8 @@
 require 'sys/proctable'
 require 'fileutils'
 include Sys
+require 'rbconfig'
+is_windows = (RbConfig::CONFIG['host_os'] =~ /mswin|mingw|cygwin/)
 
 SLEEPTIME = 1500		#configurable: timeout.
 
@@ -34,9 +36,11 @@ end
 i = 0
 while (i < totalSessions)
 	if (File.exists?("vulCheckerProfile#{i}/testResults/finished.txt"))
+		i+=1
 		next
 	end
 	if (!Dir.exists?("vulCheckerProfile#{i}"))
+		FileUtils.mkdir_p("vulCheckerProfile#{i}")
 		FileUtils.cp_r(Dir["vulCheckerProfile0/."],"vulCheckerProfile#{i}")
 	end
 	if (!Dir.exists?("vulCheckerProfile#{i}/testResults"))
@@ -51,7 +55,7 @@ previousFileCount = Array.new
 i = 0
 
 while (i < totalSessions)
-	pids[i] = spawn("cfx run -p vulCheckerProfile#{i}")
+	if (is_windows) then pids[i] = spawn("cfx run -p vulCheckerProfile#{i}") else pids[i] = spawn("cfx run -p vulCheckerProfile#{i} -b ~/firefox/firefox") end
 	currentFileCount[i] = Dir.entries("vulCheckerProfile#{i}/testResults/").length - 2		#. and .. doesn't count
 	previousFileCount[i] = -1
 	i+=1
