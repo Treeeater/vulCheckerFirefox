@@ -32,6 +32,6 @@ for i in 0..numberOfSlices-1
 	end
 end
 stringToWrite += "']];" 
-File.open("testSite.js",'w'){|f|
+File.open("testList.js",'w'){|f|
 	f.write(stringToWrite)
 }
