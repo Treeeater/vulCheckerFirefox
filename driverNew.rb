@@ -23,7 +23,7 @@ numberOfSlices = ARGV[1].to_i
 temp = IO.readlines(failedSiteFileName)
 rawSites = temp[0]
 
-rawSites = rawSites[21..-4]
+rawSites = rawSites.chomp[21..-4]
 
 allSites = rawSites.split("','")
 #p allSites

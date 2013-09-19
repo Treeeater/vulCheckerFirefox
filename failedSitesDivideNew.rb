@@ -9,7 +9,7 @@ numberOfSlices = ARGV[1].to_i
 temp = IO.readlines(ARGV[0])
 rawSites = temp[0]
 
-rawSites = rawSites[21..-4]
+rawSites = rawSites.chomp[21..-4]
 
 allSites = rawSites.split("','")
 p allSites
@@ -17,7 +17,8 @@ p allSites
 groupSize = allSites.length/numberOfSlices
 
 stringToWrite = "exports.testList = [['" + allSites[0]
-
+i = 0
+j = 0
 for i in 0..numberOfSlices-1
 	for j in 1..groupSize - 1
 		stringToWrite = stringToWrite + "','" + allSites[i*groupSize+j]
