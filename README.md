@@ -29,6 +29,7 @@ CSV auto code:
 -1: vulnerable
 1: not vulnerable
 2: app FB configuration is detected to be in an error state.
+3: oracle failed
 4: doesn't support FB, shouldn't be here in the list. If this value is considered 4 for two consecutive times, it is removed from the list.
 
 CSV manual intervention code:

@@ -134,12 +134,11 @@ http://www.officedepot.com,23,23,23,23,23
 http://www.lyricsmode.com,1,1,1,1,1
 http://www.christianpost.com,1,1,1,1,1
 http://www.theverge.com,1,1,1,1,1
-http://www.wetpaint.com,,1,,1,1
 http://www.tagged.com,1,1,1,1,1
 http://www.myrecipes.com,1,1,1,1,1
 http://www.stylebistro.com,-1,1,-1,1,1
 http://www.cafepress.com,-1,1,-1,1,1
-http://www.zulily.com,,1,,1,1
+http://www.zulily.com,3,1,3,1,1
 http://www.apartmenttherapy.com,1,1,1,1,1
 http://www.realtor.com,,1,,1,1
 http://www.thekitchn.com,1,1,1,1,1
@@ -155,7 +154,7 @@ http://www.citysearch.com,1,1,1,1,1
 http://www.ranker.com,1,1,1,1,1
 http://www.mlive.com,1,1,1,1,1
 http://www.biography.com,1,1,1,1,1
-http://www.boston.com,,1,,1,1
+http://www.boston.com,3,1,3,1,1
 http://www.tv.com,-1,1,-1,1,1
 http://www.ovguide.com,1,1,1,1,1
 http://www.zynga.com,,1,,1,1
@@ -224,7 +223,7 @@ http://www.allmusic.com,1,1,1,1,1
 http://www.homeaway.com,-1,1,-1,1,1
 http://www.bravotv.com,1,1,1,1,1
 http://www.newser.com,,1,,1,1
-http://www.howaboutwe.com,,1,,1,1
+http://www.howaboutwe.com,3,1,3,1,1
 http://www.independentlivingnews.com,1,1,1,1,1
 http://www.expotv.com,1,1,-1,1,1
 http://www.education.com,1,1,1,1,1
@@ -252,7 +251,7 @@ http://www.change.org,1,1,1,1,1
 http://www.bufferapp.com,1,1,1,1,1
 http://www.jossandmain.com,-1,1,-1,1,1
 http://www.radaris.com,1,1,1,1,1
-http://www.thegrio.com,,1,,1,1
+http://www.thegrio.com,3,1,3,1,1
 http://www.nbclosangeles.com,1,1,1,1,1
 http://www.tiqiq.com,-1,1,-1,1,1
 http://www.popularscreensavers.com,-1,1,-1,1,1
@@ -272,7 +271,7 @@ http://www.ted.com,1,1,1,1,1
 http://www.ymail.com,1,1,1,1,1
 http://www.dermstore.com,1,1,1,1,1
 http://www.coupons.net,-1,1,-1,1,1
-http://www.seniorfriendfinder.com,,1,,1,1
+http://www.seniorfriendfinder.com,3,1,3,1,1
 http://www.academia.edu,,1,,1,1
 http://www.foxsports.com,1,1,1,1,1
 http://www.sellebrity.com,,1,,1,1
@@ -310,14 +309,14 @@ http://www.garmin.com,1,1,1,1,1
 http://www.meijer.com,,1,,1,1
 http://www.guitarcenter.com,1,1,1,1,1
 http://www.cheaptickets.com,1,1,1,1,1
-http://www.telldc.com,,1,,1,1
+http://www.telldc.com,3,1,3,1,1
 http://www.dealspl.us,,1,,1,1
 http://www.bizjournals.com,1,1,1,1,1
 http://www.majorleaguegaming.com,1,1,1,1,1
 http://www.caranddriver.com,1,1,1,1,1
 http://www.scientificamerican.com,1,1,1,1,1
 http://www.gourmetrecipe.com,,1,,1,1
-http://www.myfitnesspal.com,,1,,1,1
+http://www.myfitnesspal.com,3,1,3,1,1
 http://www.jokeroo.com,,1,,1,1
 http://www.cancer.org,1,1,1,1,1
 http://www.orlandosentinel.com,1,1,1,1,1
@@ -341,7 +340,7 @@ http://www.pennlive.com,1,1,1,1,1
 http://www.enotes.com,1,1,1,1,1
 http://www.steadyhealth.com,1,1,1,1,1
 http://www.getitfree.us,1,1,1,1,1
-http://www.businessconsumeralliance.org,,1,,1,-1
+http://www.businessconsumeralliance.org,3,1,3,1,-1
 http://www.ebayclassifieds.com,1,1,-1,1,1
 http://www.dailyfinance.com,1,1,1,1,1
 http://www.liquor.com,-1,1,-1,1,1
@@ -367,9 +366,9 @@ http://www.tickets.com,,1,,-1,-1
 http://www.flickriver.com,1,1,1,1,1
 http://www.depositfiles.com,1,1,1,1,1
 http://www.southparkstudios.com,,1,,1,1
-http://www.rafflecopter.com,,1,,1,1
+http://www.rafflecopter.com,3,1,3,1,1
 http://www.9gag.com,1,1,1,1,1
-http://www.dealchicken.com,,1,,-1,-1
+http://www.dealchicken.com,3,1,3,-1,-1
 http://www.nbcdfw.com,1,1,1,1,1
 http://www.teleflora.com,1,1,-1,-1,-1
 http://www.eviesays.com,1,1,1,1,1
@@ -377,7 +376,7 @@ http://www.viator.com,1,1,1,1,1
 http://www.wikidot.com,1,1,1,1,1
 http://www.pjmedia.com,-1,1,-1,1,1
 http://www.lockerz.com,1,1,1,1,1
-http://www.theknot.com,,1,,1,1
+http://www.theknot.com,3,1,3,1,1
 http://www.ea.com,,1,,1,-1
 http://www.wajam.com,1,1,1,1,1
 http://www.diabetes.org,1,1,1,-1,-1
@@ -431,7 +430,7 @@ http://www.articlesbase.com,1,1,1,1,1
 http://www.trailer.ly,1,1,1,-1,1
 http://www.wyndhamrewards.com,1,1,1,1,1
 http://www.fontspace.com,1,1,1,1,1
-http://www.veoh.com,,1,,1,1
+http://www.veoh.com,3,1,3,1,1
 http://www.oneall.com,1,1,1,1,1
 http://www.moddb.com,1,1,1,1,1
 http://www.mypoints.com,1,1,1,1,1
@@ -447,7 +446,7 @@ http://www.walkscore.com,1,1,1,1,1
 http://www.neoseeker.com,-1,1,1,1,1
 http://www.cdbaby.com,1,1,1,1,1
 http://www.nbcmiami.com,1,1,1,1,1
-http://www.insiderpages.com,,1,,1,1
+http://www.insiderpages.com,3,1,3,1,1
 http://www.azfamily.com,1,1,1,-1,1
 http://www.nikonusa.com,1,1,1,1,1
 http://www.courant.com,1,1,1,1,1
@@ -457,7 +456,7 @@ http://www.ancientfaces.com,-1,1,-1,1,1
 http://www.trysensa.com,1,1,1,1,1
 http://www.ae.com,-1,1,-1,1,1
 http://www.accessatlanta.com,1,1,1,1,1
-http://www.iwin.com,,1,,1,1
+http://www.iwin.com,3,1,3,1,1
 http://www.digitalpoint.com,,1,,-1,-1
 http://www.minyanville.com,-1,1,-1,1,1
 http://www.artfire.com,,1,,1,1
@@ -498,14 +497,14 @@ http://www.addictinggames.com,,1,,1,1
 http://www.cesarsway.com,1,1,1,1,1
 http://www.gofundme.com,,1,,1,1
 http://www.allfreecrochet.com,-1,1,-1,1,1
-http://www.trustlink.org,,1,,1,-1
+http://www.trustlink.org,3,1,3,1,-1
 http://www.ebates.com,1,1,1,1,1
-http://www.justia.com,,1,,1,1
+http://www.justia.com,3,1,3,1,1
 http://www.agoda.com,,1,,1,1
 http://www.topicologist.com,1,1,1,1,1
 http://www.complaintsboard.com,1,1,1,1,1
 http://www.neatorama.com,1,1,1,1,1
-http://www.fieldandstream.com,,1,,1,1
+http://www.fieldandstream.com,3,1,3,1,1
 http://www.wholefoodsmarket.com,1,1,1,1,1
 http://www.haaretz.com,-1,1,-1,1,1
 http://www.everytrail.com,1,1,1,1,1
@@ -523,10 +522,10 @@ http://www.knoxnews.com,,1,,1,1
 http://www.crosscards.com,1,1,1,1,1
 http://www.trails.com,1,1,1,1,1
 http://www.tennessean.com,,1,,1,1
-http://www.coolsavings.com,,1,,1,1
+http://www.coolsavings.com,3,1,3,1,1
 http://www.hi5.com,1,1,1,1,1
 http://www.redrobin.com,1,1,1,1,1
-http://www.crunchbase.com,,1,,1,1
+http://www.crunchbase.com,10,10,10,10,10
 http://www.mynewplace.com,-1,1,-1,1,1
 http://www.topspeed.com,1,1,1,1,1
 http://www.menupix.com,,1,,1,1
@@ -638,7 +637,7 @@ http://www.cookingchanneltv.com,1,1,1,1,1
 http://www.freeonlinegames.com,,1,,1,1
 http://www.getsatisfaction.com,,1,,1,1
 http://www.huffingtonpost.ca,1,1,1,1,1
-http://www.hoursmap.com,,1,,1,1
+http://www.hoursmap.com,10,10,10,10,10
 http://www.la-z-boy.com,,1,,1,1
 http://www.expedia.fr,1,1,-1,1,1
 http://www.avvo.com,1,1,1,1,1
@@ -713,7 +712,7 @@ http://www.naplesnews.com,,1,,1,1
 http://www.rebelmouse.com,1,1,1,1,1
 http://www.allfreeknitting.com,-1,1,-1,1,1
 http://www.justcloud.com,1,1,1,1,1
-http://www.shift.com,,1,,1,1
+http://www.shift.com,3,1,3,1,1
 http://www.nextdaypets.com,,1,,-1,1
 http://www.weather.ca,,1,,1,1
 http://www.foxsoccer.com,1,1,1,1,1
@@ -759,7 +758,7 @@ http://www.quora.com,1,1,1,1,1
 http://www.1800baskets.com,1,1,-1,1,1
 http://www.aeriagames.com,,1,,1,1
 http://www.whattoexpect.com,1,1,1,1,1
-http://www.tablespoon.com,,1,,1,1
+http://www.tablespoon.com,3,1,3,1,1
 http://www.milesplit.com,,1,,-1,1
 http://www.callofduty.com,,1,,1,1
 http://www.fanbridge.com,,1,,1,1
@@ -781,7 +780,7 @@ http://www.homesandland.com,,1,,1,1
 http://www.bigoven.com,,1,,1,1
 http://www.ycheckrates.com,1,1,1,1,1
 http://www.lacrossetribune.com,1,1,1,-1,-1
-http://www.plantersplace.com,,1,,1,1
+http://www.plantersplace.com,10,10,10,10,10
 http://www.vulture.com,1,1,1,1,1
 http://www.flyertalk.com,1,1,1,1,1
 http://www.missoulian.com,,1,,-1,-1
@@ -796,7 +795,7 @@ http://www.hopster.com,1,1,1,-1,-1
 http://www.airbnb.com,1,1,1,1,1
 http://www.cutoutandkeep.net,1,1,1,-1,1
 http://www.baublebox.com,1,1,1,1,-1
-http://www.trademarkia.com,,1,,1,1
+http://www.trademarkia.com,3,1,3,1,1
 http://www.cookeatshare.com,1,1,1,1,1
 http://www.dallascowboys.com,1,1,1,1,1
 http://www.tunegenie.com,1,1,-1,1,1
@@ -806,7 +805,7 @@ http://www.razoo.com,1,1,1,1,1
 http://www.jollywallet.com,,1,,1,1
 http://www.grocerycouponnetwork.com,1,1,1,1,1
 http://www.fordparts.com,1,1,1,-1,-1
-http://www.newhomesource.com,,1,,1,1
+http://www.newhomesource.com,3,1,3,1,1
 http://www.lookbook.nu,1,1,1,1,-1
 http://www.metro.co.uk,1,1,1,1,1
 http://www.ammoland.com,,1,,1,1
@@ -826,7 +825,7 @@ http://www.rapidcityjournal.com,1,1,1,-1,-1
 http://www.idealist.org,1,1,1,1,1
 http://www.chess.com,,1,,1,1
 http://www.nbcnews.com,1,1,1,1,1
-http://www.horseracingnation.com,1,1,,1,1
+http://www.horseracingnation.com,1,1,1,1,1
 http://www.pantagraph.com,1,1,1,-1,-1
 http://www.mymodernmet.com,,1,,1,1
 http://www.stelladot.com,,1,,1,1
@@ -991,7 +990,7 @@ http://www.ubi.com,,1,,1,-1
 http://www.ipoll.com,1,1,1,1,1
 http://www.svpply.com,1,1,1,1,1
 http://www.hickoryrecord.com,,1,,-1,-1
-http://www.californiaavocado.com,,1,,1,1
+http://www.californiaavocado.com,10,10,10,10,10
 http://www.k12jobspot.com,1,1,1,1,1
 http://www.sho.com,1,1,1,1,1
 http://www.skyrock.com,1,1,1,1,1
@@ -1020,8 +1019,8 @@ http://www.themetapicture.com,1,1,1,1,1
 http://www.loveagain.com,,1,,1,1
 http://www.espnfc.com,1,1,-1,1,1
 http://www.8coupons.com,1,1,1,1,1
-http://www.crash.net,,1,1,1,1
-http://www.eshakti.com,,1,,1,1
+http://www.crash.net,3,1,1,1,1
+http://www.eshakti.com,3,1,3,1,1
 http://www.mcnhub.com,1,1,1,1,1
 http://www.sharemyplaylists.com,1,1,1,-1,-1
 http://www.souplantation.com,,1,,1,1
@@ -1030,7 +1029,7 @@ http://www.nature.org,1,1,1,1,1
 http://www.flipsnack.com,1,1,1,1,1
 http://www.uniqlo.com,1,1,1,1,1
 http://www.shiftgig.com,1,1,1,1,1
-http://www.prankdial.com,,1,,1,1
+http://www.prankdial.com,3,1,3,1,1
 http://www.classifieds1000.com,1,1,1,1,1
 http://www.hometalk.com,1,1,-1,1,1
 http://www.date.com,1,1,-1,1,1
@@ -1079,7 +1078,7 @@ http://www.caspio.net,,,,,
 http://www.spotcrime.com,2,2,2,2,2
 http://www.candystand.com,,1,,1,1
 http://www.teaparty.org,2,2,2,2,2
-http://www.youmint.com,4,4,4,4,4
+http://www.youmint.com,,,,,
 http://www.atr.org,2,2,2,2,2
 http://www.sapo.pt,,1,,1,1
 http://www.history.navy.mil,,,,,

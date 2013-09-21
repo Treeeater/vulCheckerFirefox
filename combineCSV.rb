@@ -123,6 +123,7 @@ failedCasesToTestNext = Array.new
 allSitesCount = 0
 fBCorrectCount = 0
 fBErrorDetectedCount = 0
+fBOracleFailedCount = 0
 manuallyCount = 0
 manuallyOurFaultCount = 0
 hash.each_key{|k|
@@ -140,6 +141,8 @@ hash.each_key{|k|
 		fBCorrectCount+=1
 	elsif (hash[k][0].to_i==2 && hash[k][1].to_i==2 && hash[k][2].to_i==2 && hash[k][3].to_i==2 && hash[k][4].to_i==2) 
 		fBErrorDetectedCount+=1
+	elsif (hash[k][0].to_i==3 || hash[k][2].to_i==3) 
+		fBOracleFailedCount+=1
 	elsif (hash[k][0].to_i>=10 && hash[k][1].to_i>=10 && hash[k][2].to_i>=10 && hash[k][3].to_i>=10 && hash[k][4].to_i>=10) 
 		manuallyCount+=1
 		if (hash[k][0].to_i>=20 && hash[k][1].to_i>=20 && hash[k][2].to_i>=20 && hash[k][3].to_i>=20 && hash[k][4].to_i>=20) 
@@ -154,11 +157,12 @@ hash.each_key{|k|
 p "total tests: #{allSitesCount}"
 p "total completed tests that have Facebook login: #{completedCases}"
 p "total tests that does not have Facebook login (temporarily, just this run, needs to confirm in the next.): #{doesNotSupportFBCases.length}"
+p "total failed tests (excluding completed and known failed): #{allSitesCount - completedCases - doesNotSupportFBCases.length}"
+p "------------------------"
 p "total FB implementation correct tests (detected by our tool): #{fBCorrectCount}"
 p "total FB implementation error tests (detected by our tool): #{fBErrorDetectedCount}"
-p "total manual intervention tests: #{manuallyCount}"
-p "total cases which our tool cannot handle(our fault): #{manuallyOurFaultCount}"
-p "total failed tests (excluding completed and doesn't have FB login): #{allSitesCount - completedCases - doesNotSupportFBCases.length}"
+p "total FB oracle failed tests (detected by our tool): #{fBOracleFailedCount}"
+p "total manual inspection cases/our fault cases(other than oracle failures): #{manuallyCount}/#{manuallyOurFaultCount}"
 File.open("Results_new.csv","w+"){|f|
 	f.write(outputText)
 }

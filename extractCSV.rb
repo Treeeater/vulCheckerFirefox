@@ -29,6 +29,7 @@ currentSite = ""
 allSites = Array.new
 errorStateApp = Array.new
 doesNotSupportFB = Array.new
+oracleFailedArray = Array.new
 text.each_line do |line|
 	if line.start_with? "Testing site:"
 		currentSite = line[14..-1].chomp
@@ -48,6 +49,9 @@ text.each_line do |line|
 			stalled.push(currentSite) 
 		end
 	end
+	if (line.include? "oracle failed")
+		oracleFailedArray.push(currentSite)
+	end
 	if (line.include? "Site support FB but its configuration is in an error state")
 		errorStateApp.push(currentSite)
 	end
@@ -61,11 +65,13 @@ dnsErrorArray.uniq!
 allSites.uniq!
 errorStateApp.uniq!
 doesNotSupportFB.uniq!
+oracleFailedArray.uniq!
 
 p "Total sites reported: #{allSites.length}"
 p "Total DNS resolving error reported: #{dnsErrorArray.length}"
 p "Total app in error state reported: #{errorStateApp.length}"
 p "Total app that doesn't support FB: #{doesNotSupportFB.length}"
+p "Total app that reported with an oracle failure: #{oracleFailedArray.length}"
 
 dnsErrorArray.each{|url|
 	if (stalled.include? url)
@@ -92,6 +98,16 @@ errorStateApp.each{|url|
 	hash[url][2] = 2
 	hash[url][3] = 2
 	hash[url][4] = 2
+}
+
+oracleFailedArray.each{|url|
+	#Only fill in the blanks.
+	if (!hash.has_key? url) then hash[url] = Array.new end
+	if (hash[url][0] == "" || hash[url][0] == nil) then hash[url][0] = 3 end
+	if (hash[url][1] == "" || hash[url][1] == nil) then hash[url][1] = 3 end
+	if (hash[url][2] == "" || hash[url][2] == nil) then hash[url][2] = 3 end
+	if (hash[url][3] == "" || hash[url][3] == nil) then hash[url][3] = 3 end
+	if (hash[url][4] == "" || hash[url][4] == nil) then hash[url][4] = 3 end
 }
 
 doesNotSupportFB.each{|url|
