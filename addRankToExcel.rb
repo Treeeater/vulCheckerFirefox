@@ -1,5 +1,5 @@
 if (ARGV.length != 2)
-	p "wrong number of arguments. needs 2, first: quantcast list. second: result.csv"
+	p "wrong number of arguments. needs 2, first: quantcast list (original quantcast.txt w/o hidden profile). second: result.csv"
 	exit 
 end
 
@@ -16,11 +16,15 @@ rankedArrayToWrite = Hash.new
 percentileArray = Array.new
 vul13PercentileArray = Array.new
 vul45PercentileArray = Array.new
+errorDetectedArray = Array.new
+errorArray = Array.new
 resultFile.each_line{|l|
 	temp = l.chomp.split(',')
 	site = temp[0]
 	vul13 = (temp[1] == '-1' || temp[3] == '-1')
 	vul45 = (temp[4] == '-1' || temp[5] == '-1')
+	errorDetected = temp[1] == '2'
+	error = ((temp[1] == '10') || errorDetected)
 	index = rankArray.index(site[11..-1])
 	if (index == nil) 
 		p l
@@ -33,42 +37,72 @@ resultFile.each_line{|l|
 		if vul45
 			if (vul45PercentileArray[index*100/totalSites] == nil) then vul45PercentileArray[index*100/totalSites] = 1 else vul45PercentileArray[index*100/totalSites] += 1 end
 		end
+		if errorDetected
+			if (errorDetectedArray[index*100/totalSites] == nil) then errorDetectedArray[index*100/totalSites] = 1 else errorDetectedArray[index*100/totalSites] += 1 end
+		end
+		if error
+			if (errorArray[index*100/totalSites] == nil) then errorArray[index*100/totalSites] = 1 else errorArray[index*100/totalSites] += 1 end
+		end
 	end
 }
 
-percentileFileContent = ""
+percentileFileContent = "# of sites supporting FB SSO,"
 rankedFileContent = ""
 
 percentileArray.each_index{|i|
 	if !percentileArray[i] then percentileArray[i] = 0 end
 	percentileFileContent += (percentileArray[i].to_s + ",")
 }
-percentileFileContent += "\n"
+
+percentileFileContent += "\n% of sites supporting FB SSO,"
+
+percentileArray.each_index{|i|
+	if !percentileArray[i] then percentileArray[i] = 0 end
+	percentileFileContent += ((percentileArray[i]/100.0).to_s + ",")
+}
+
+percentileFileContent += "\n# of sites vulnerable to simulated attacks,"
 
 vul13PercentileArray.each_index{|i|
 	if !vul13PercentileArray[i] then vul13PercentileArray[i] = 0 end
 	percentileFileContent += (vul13PercentileArray[i].to_s + ",")
 }
 
-percentileFileContent += "\n"
+percentileFileContent += "\n# of sites leaking credentials,"
 
 vul45PercentileArray.each_index{|i|
 	if !vul45PercentileArray[i] then vul45PercentileArray[i] = 0 end
 	percentileFileContent += (vul45PercentileArray[i].to_s + ",")
 }
 
-percentileFileContent += "\n"
+percentileFileContent += "\n% of sites vulnerable to simulated attacks,"
 
 vul13PercentileArray.each_index{|i|
 	if (percentileArray[i] == 0) then percentileFileContent += "0," end
 	percentileFileContent += ((vul13PercentileArray[i]/percentileArray[i].to_f).to_s + ",")
 }
 
-percentileFileContent += "\n"
+percentileFileContent += "\n% of sites leaking credentials,"
 
 vul45PercentileArray.each_index{|i|
 	if (percentileArray[i] == 0) then percentileFileContent += "0," end
 	percentileFileContent += ((vul45PercentileArray[i]/percentileArray[i].to_f).to_s + ",")
+}
+
+percentileFileContent += "\n% of sites detected to have an erroneous implementation,"
+
+errorDetectedArray.each_index{|i|
+	if !errorDetectedArray[i] then errorDetectedArray[i] = 0 end
+	if (percentileArray[i] == 0) then percentileFileContent += "0," end
+	percentileFileContent += ((errorDetectedArray[i]/percentileArray[i].to_f).to_s + ",")
+}
+
+percentileFileContent += "\n% of sites having an erroneous implementation,"
+
+errorArray.each_index{|i|
+	if !errorArray[i] then errorArray[i] = 0 end
+	if (percentileArray[i] == 0) then percentileFileContent += "0," end
+	percentileFileContent += ((errorArray[i]/percentileArray[i].to_f).to_s + ",")
 }
 
 rankedArrayToWrite.sort.map do |key,value|
