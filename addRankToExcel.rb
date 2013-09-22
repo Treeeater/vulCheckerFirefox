@@ -5,6 +5,7 @@ end
 
 rankFile = File.open(ARGV[0],'r')
 resultFile = File.open(ARGV[1],'r')
+Granularity = 100
 
 rankArray = Array.new
 totalSites = 0
@@ -16,6 +17,7 @@ rankedArrayToWrite = Hash.new
 percentileArray = Array.new
 vul13PercentileArray = Array.new
 vul45PercentileArray = Array.new
+vulPercentileArray = Array.new
 errorDetectedArray = Array.new
 errorArray = Array.new
 resultFile.each_line{|l|
@@ -30,18 +32,21 @@ resultFile.each_line{|l|
 		p l
 	else
 		rankedArrayToWrite[index] = l
-		if (percentileArray[index*100/totalSites] == nil) then percentileArray[index*100/totalSites] = 1 else percentileArray[index*100/totalSites] += 1 end
+		if (percentileArray[index*Granularity/totalSites] == nil) then percentileArray[index*Granularity/totalSites] = 1 else percentileArray[index*Granularity/totalSites] += 1 end
 		if vul13
-			if (vul13PercentileArray[index*100/totalSites] == nil) then vul13PercentileArray[index*100/totalSites] = 1 else vul13PercentileArray[index*100/totalSites] += 1 end
+			if (vul13PercentileArray[index*Granularity/totalSites] == nil) then vul13PercentileArray[index*Granularity/totalSites] = 1 else vul13PercentileArray[index*Granularity/totalSites] += 1 end
 		end
 		if vul45
-			if (vul45PercentileArray[index*100/totalSites] == nil) then vul45PercentileArray[index*100/totalSites] = 1 else vul45PercentileArray[index*100/totalSites] += 1 end
+			if (vul45PercentileArray[index*Granularity/totalSites] == nil) then vul45PercentileArray[index*Granularity/totalSites] = 1 else vul45PercentileArray[index*Granularity/totalSites] += 1 end
+		end
+		if vul45 || vul13
+			if (vulPercentileArray[index*Granularity/totalSites] == nil) then vulPercentileArray[index*Granularity/totalSites] = 1 else vulPercentileArray[index*Granularity/totalSites] += 1 end
 		end
 		if errorDetected
-			if (errorDetectedArray[index*100/totalSites] == nil) then errorDetectedArray[index*100/totalSites] = 1 else errorDetectedArray[index*100/totalSites] += 1 end
+			if (errorDetectedArray[index*Granularity/totalSites] == nil) then errorDetectedArray[index*Granularity/totalSites] = 1 else errorDetectedArray[index*Granularity/totalSites] += 1 end
 		end
 		if error
-			if (errorArray[index*100/totalSites] == nil) then errorArray[index*100/totalSites] = 1 else errorArray[index*100/totalSites] += 1 end
+			if (errorArray[index*Granularity/totalSites] == nil) then errorArray[index*Granularity/totalSites] = 1 else errorArray[index*Granularity/totalSites] += 1 end
 		end
 	end
 }
@@ -58,7 +63,7 @@ percentileFileContent += "\n% of sites supporting FB SSO,"
 
 percentileArray.each_index{|i|
 	if !percentileArray[i] then percentileArray[i] = 0 end
-	percentileFileContent += ((percentileArray[i]/100.0).to_s + ",")
+	percentileFileContent += ((percentileArray[i]*Granularity.to_f/totalSites).to_s + ",")
 }
 
 percentileFileContent += "\n# of sites vulnerable to simulated attacks,"
@@ -75,6 +80,13 @@ vul45PercentileArray.each_index{|i|
 	percentileFileContent += (vul45PercentileArray[i].to_s + ",")
 }
 
+percentileFileContent += "\n# of sites are vulnerable in general,"
+
+vulPercentileArray.each_index{|i|
+	if !vulPercentileArray[i] then vulPercentileArray[i] = 0 end
+	percentileFileContent += (vulPercentileArray[i].to_s + ",")
+}
+
 percentileFileContent += "\n% of sites vulnerable to simulated attacks,"
 
 vul13PercentileArray.each_index{|i|
@@ -87,6 +99,13 @@ percentileFileContent += "\n% of sites leaking credentials,"
 vul45PercentileArray.each_index{|i|
 	if (percentileArray[i] == 0) then percentileFileContent += "0," end
 	percentileFileContent += ((vul45PercentileArray[i]/percentileArray[i].to_f).to_s + ",")
+}
+
+percentileFileContent += "\n% of sites are vulnerable in general,"
+
+vulPercentileArray.each_index{|i|
+	if (percentileArray[i] == 0) then percentileFileContent += "0," end
+	percentileFileContent += ((vulPercentileArray[i]/percentileArray[i].to_f).to_s + ",")
 }
 
 percentileFileContent += "\n% of sites detected to have an erroneous implementation,"
