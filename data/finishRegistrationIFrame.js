@@ -84,6 +84,7 @@ var Registration = function(){
 			if (inputName.indexOf('year') !=-1 && (inputEle.value == "YYYY" || inputValue.indexOf('year') != -1)) inputEle.value = "";
 			if (inputName.indexOf('month') !=-1 && (inputEle.value == "MM" || inputValue.indexOf('month') != -1)) inputEle.value = "";
 			if (inputName.indexOf('day') !=-1 && (inputEle.value == "DD" || inputValue.indexOf('day') != -1)) inputEle.value = "";
+			if (inputEle.value.indexOf("DD") != -1 && inputEle.value.indexOf("YY") != -1 && inputEle.value.indexOf("MM") != -1) inputEle.value = "10/10/1980";
 		}
 		if (inputEle.value != "") return;			//auto-filled by the application, presumbly by SSO process.  We don't do anything here.
 		if (inputEle.name && inputEle.name!="")
