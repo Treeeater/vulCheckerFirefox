@@ -1,5 +1,5 @@
-if (ARGV.length != 2)
-	p "wrong number of arguments. needs 2, first: quantcast list (original quantcast.txt w/o hidden profile). second: result.csv"
+if (ARGV.length < 2 || ARGV.length > 4)
+	p "wrong number of arguments. needs 2 or 3, first: quantcast list (original quantcast.txt w/o hidden profile). second: result.csv. Third(optional): folder name where all detailed results are stored, this is used for collecting stats about widget and SDK usage."
 	exit 
 end
 
@@ -20,7 +20,18 @@ vul45PercentileArray = Array.new
 vulPercentileArray = Array.new
 errorDetectedArray = Array.new
 errorArray = Array.new
+sDKUseArray = Array.new
+widgetArray = Array.new
+sDKVul13 = 0
+sDKVul45 = 0
+widgetVul13 = 0
+widgetVul45 = 0
+totalVul13 = 0
+totalVul45 = 0
+totalSDK = 0
+totalWidget = 0
 resultFile.each_line{|l|
+	if (l[0..7] == 'Site URL') then next end		#skip form header
 	temp = l.chomp.split(',')
 	site = temp[0]
 	vul13 = (temp[1] == '-1' || temp[3] == '-1')
@@ -29,31 +40,77 @@ resultFile.each_line{|l|
 	error = ((temp[1] == '10') || errorDetected)
 	index = rankArray.index(site[11..-1])
 	if (index == nil) 
-		p l
+		p l + " doesn't have ranking information??"
 	else
-		rankedArrayToWrite[index] = l
-		if (percentileArray[index*Granularity/totalSites] == nil) then percentileArray[index*Granularity/totalSites] = 1 else percentileArray[index*Granularity/totalSites] += 1 end
+		bucket = index*Granularity/totalSites
+		if (percentileArray[bucket] == nil) then percentileArray[bucket] = 1 else percentileArray[bucket] += 1 end
 		if vul13
-			if (vul13PercentileArray[index*Granularity/totalSites] == nil) then vul13PercentileArray[index*Granularity/totalSites] = 1 else vul13PercentileArray[index*Granularity/totalSites] += 1 end
+			totalVul13 += 1
+			if (vul13PercentileArray[bucket] == nil) then vul13PercentileArray[bucket] = 1 else vul13PercentileArray[bucket] += 1 end
 		end
 		if vul45
-			if (vul45PercentileArray[index*Granularity/totalSites] == nil) then vul45PercentileArray[index*Granularity/totalSites] = 1 else vul45PercentileArray[index*Granularity/totalSites] += 1 end
+			totalVul45 += 1
+			if (vul45PercentileArray[bucket] == nil) then vul45PercentileArray[bucket] = 1 else vul45PercentileArray[bucket] += 1 end
 		end
 		if vul45 || vul13
-			if (vulPercentileArray[index*Granularity/totalSites] == nil) then vulPercentileArray[index*Granularity/totalSites] = 1 else vulPercentileArray[index*Granularity/totalSites] += 1 end
+			if (vulPercentileArray[bucket] == nil) then vulPercentileArray[bucket] = 1 else vulPercentileArray[bucket] += 1 end
 		end
 		if errorDetected
-			if (errorDetectedArray[index*Granularity/totalSites] == nil) then errorDetectedArray[index*Granularity/totalSites] = 1 else errorDetectedArray[index*Granularity/totalSites] += 1 end
+			if (errorDetectedArray[bucket] == nil) then errorDetectedArray[bucket] = 1 else errorDetectedArray[bucket] += 1 end
 		end
 		if error
-			if (errorArray[index*Granularity/totalSites] == nil) then errorArray[index*Granularity/totalSites] = 1 else errorArray[index*Granularity/totalSites] += 1 end
+			if (errorArray[bucket] == nil) then errorArray[bucket] = 1 else errorArray[bucket] += 1 end
 		end
+		if (ARGV[2])
+			fileName = ARGV[2]+"/"+site.gsub(/[^a-zA-Z0-9]*/,"")[0..31]+".txt"
+			l.chomp!
+			if (!File.exists?(fileName))
+				p site + " doesn't have a detailed corresponding file?"
+				l += ",0,0,0\n"
+			else
+				detailedContent = File.read(fileName)
+				if (detailedContent.include? "This site uses FB SDK")
+					if (sDKUseArray[bucket] == nil) then sDKUseArray[bucket] = 1 else sDKUseArray[bucket] += 1 end
+					if (vul13) then sDKVul13+=1 end
+					if (vul45) then sDKVul45+=1 end
+					totalSDK+=1
+					l += ",1"
+				else
+					l += ",0"
+				end
+				if (detailedContent.include? "Site uses social plugin button.php")
+					if (widgetArray[bucket] == nil) then widgetArray[bucket] = 1 else widgetArray[bucket] += 1 end
+					if (vul13) then widgetVul13+=1 end
+					if (vul45) then widgetVul45+=1 end
+					totalWidget+=1
+					l += ",1\n"
+				else
+					l += ",0\n"
+				end
+			end
+		end
+		rankedArrayToWrite[index] = l
 	end
 }
 
-percentileFileContent = "# of sites supporting FB SSO,"
-rankedFileContent = ""
+# Screen output
 
+p "Total sites: #{rankedArrayToWrite.length}"
+p "% of sites vul to 13: #{totalVul13/rankedArrayToWrite.length.to_f}"
+p "% of sites vul to 45: #{totalVul45/rankedArrayToWrite.length.to_f}"
+p "Total sites using SDK: #{totalSDK}"
+p "Total sites using widget: #{totalWidget}"
+p "% of sites vul to 13 using SDK: #{sDKVul13/totalSDK.to_f}"
+p "% of sites vul to 45 using SDK: #{sDKVul45/totalSDK.to_f}"
+p "% of sites vul to 13 using widget: #{widgetVul13/totalWidget.to_f}"
+p "% of sites vul to 45 using widget: #{widgetVul45/totalWidget.to_f}"
+
+#
+
+
+percentileFileContent = "# of sites supporting FB SSO,"
+rankedFileContent = "Rank,Site URL,token vul,secret vul,signed_request vul,referrer vul,DOM vul\n"
+if (ARGV[2]) then rankedFileContent = "Rank,Site URL,token vul,secret vul,signed_request vul,referrer vul,DOM vul, SDK used, social plugin used\n" end
 percentileArray.each_index{|i|
 	if !percentileArray[i] then percentileArray[i] = 0 end
 	percentileFileContent += (percentileArray[i].to_s + ",")
@@ -106,6 +163,22 @@ percentileFileContent += "\n% of sites are vulnerable in general,"
 vulPercentileArray.each_index{|i|
 	if (percentileArray[i] == 0) then percentileFileContent += "0," end
 	percentileFileContent += ((vulPercentileArray[i]/percentileArray[i].to_f).to_s + ",")
+}
+
+percentileFileContent += "\n% of sites use Facebook SDK,"
+
+sDKUseArray.each_index{|i|
+	if !sDKUseArray[i] then sDKUseArray[i] = 0 end
+	if (percentileArray[i] == 0) then percentileFileContent += "0," end
+	percentileFileContent += ((sDKUseArray[i]/percentileArray[i].to_f).to_s + ",")
+}
+
+percentileFileContent += "\n% of sites use Facebook social widget,"
+
+widgetArray.each_index{|i|
+	if !widgetArray[i] then widgetArray[i] = 0 end
+	if (percentileArray[i] == 0) then percentileFileContent += "0," end
+	percentileFileContent += ((widgetArray[i]/percentileArray[i].to_f).to_s + ",")
 }
 
 percentileFileContent += "\n% of sites detected to have an erroneous implementation,"
