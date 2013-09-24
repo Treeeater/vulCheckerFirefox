@@ -42,7 +42,7 @@ var Registration = function(){
 		var inputWidth = ele.offsetWidth;
 		var inputHeight = ele.offsetHeight;
 		//heuristics: any element with a too large dimension cannot be input/submit, it must be just a underlaying div/layer.
-		if (inputWidth >= screen.availWidth/4 || inputHeight >= screen.availHeight/4) return false;
+		if (inputWidth >= screen.availWidth/3 || inputHeight >= screen.availHeight/4) return false;
 		if (inputWidth <= 0 || inputHeight <= 0) return false;			//Elements that are on top layer must be visible.
 		var position = $(ele).offset();
 		var j;
@@ -359,8 +359,10 @@ var Registration = function(){
 		var curScore = (lowerCasedInput.indexOf('submit')>-1?10:0);			//submit is a really strong one as an attribute.
 		curScore += (lowerCasedInput.indexOf('regist')>-1?5:0);			//include registration and register
 		curScore += (lowerCasedInput.indexOf('sign up')>-1?5:0);
+		curScore += (lowerCasedInput.indexOf('sign-up')>-1?5:0);
 		curScore += (lowerCasedInput.indexOf('signup')>-1?5:0);
 		curScore += (lowerCasedInput.indexOf('create')>-1?3:0);			//this is less used.
+		curScore += (lowerCasedInput.indexOf('finish')>-1?3:0);			//this is less used.
 		curScore += (lowerCasedInput.indexOf('confirm')>-1?2:0);			//confirm is a bad one, because a lot of registration forms have 'confirm password' in it.
 		curScore += (lowerCasedInput.indexOf('continue')>-1?2:0);			
 		curScore += (lowerCasedInput.indexOf('start')>-1?2:0);				//start is a bad one.
@@ -417,7 +419,7 @@ var Registration = function(){
 			var TLtop = $(suspects[i]).offset().top;
 			if (TLtop < that.inputBotEdge) continue;
 			//Heuristic: submit button cannot be too large:
-			if (suspects[i].offsetHeight > 150 || suspects[i].offsetWidth > 400) continue;
+			if (suspects[i].offsetHeight > 150 || suspects[i].offsetWidth > 800) continue;
 			var curScore = 0;
 			for (j = 0; j < suspects[i].attributes.length; j++)
 			{	
@@ -451,7 +453,7 @@ var Registration = function(){
 				}
 				if (eliminated) continue;
 				//Heuristic: submit button cannot be too large:
-				if (suspects[i].offsetHeight > 150 || suspects[i].offsetWidth > 400) continue;
+				if (suspects[i].offsetHeight > 150 || suspects[i].offsetWidth > 800) continue;
 				var curScore = 0;
 				for (j = 0; j < suspects[i].attributes.length; j++)
 				{

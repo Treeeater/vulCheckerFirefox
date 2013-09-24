@@ -143,9 +143,9 @@ hash.each_key{|k|
 		fBErrorDetectedCount+=1
 	elsif (hash[k][0].to_i==3 || hash[k][2].to_i==3) 
 		fBOracleFailedCount+=1
-	elsif (hash[k][0].to_i>=10 && hash[k][1].to_i>=10 && hash[k][2].to_i>=10 && hash[k][3].to_i>=10 && hash[k][4].to_i>=10) 
+	elsif (hash[k][0].to_i>=10 || hash[k][1].to_i>=10 || hash[k][2].to_i>=10 || hash[k][3].to_i>=10 || hash[k][4].to_i>=10) 
 		manuallyCount+=1
-		if (hash[k][0].to_i>=20 && hash[k][1].to_i>=20 && hash[k][2].to_i>=20 && hash[k][3].to_i>=20 && hash[k][4].to_i>=20) 
+		if (hash[k][0].to_i>=20 || hash[k][1].to_i>=20 || hash[k][2].to_i>=20 || hash[k][3].to_i>=20 || hash[k][4].to_i>=20) 
 			manuallyOurFaultCount+=1
 		end
 	elsif (hash[k][0].to_s!="" && hash[k][1].to_s!="" && hash[k][2].to_s!="" && hash[k][3].to_s!="" && hash[k][4].to_s!="" && hash[k][4].to_s != "4")
