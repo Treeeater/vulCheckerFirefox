@@ -46,3 +46,4 @@ CSV manual intervention code:
 21: Timeout
 22: Input cannot handle
 23: Cannot find submit button
+24: Other rare reasons
