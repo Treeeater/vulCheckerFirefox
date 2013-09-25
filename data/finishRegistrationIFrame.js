@@ -559,8 +559,9 @@ var delayedCall = function(){
 }
 
 if (self.port){
-	if (document.documentElement.offSetHeight != 0 && document.documentElement.offSetWidth != 0) {
+	if (document.documentElement.offSetHeight != 0 && document.documentElement.offSetWidth != 0 && document.URL.indexOf('plugins/likebox.php')==-1) {
 		//why bother trying an invisible iframe?
+		//Ignore plugin likeboxes.
 		setTimeout(delayedCall,1000);
 		self.port.on("shouldRegisterIframe",function (response){
 			debug = response.debug;

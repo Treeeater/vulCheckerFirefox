@@ -65,15 +65,15 @@ function initDetection(credentials){
 	var html = document.documentElement.innerHTML;
 	
 	if (hasThirdPartyContent){
-		if (typeof credentials.access_token == "string" && url.indexOf('access_token=')!=-1 && url.indexOf(credentials.access_token)!=-1) {
+		if (typeof credentials.access_token == "string" && url.indexOf(credentials.access_token)!=-1) {
 			self.port.emit('access_token_seen',{"where":"URL","thirdPartyURL":thirdPartyContentSRC});
 		}
 
-		if (typeof credentials.code == "string" && url.indexOf('code=')!=-1 && url.indexOf(credentials.code)!=-1) {
+		if (typeof credentials.code == "string" && url.indexOf(credentials.code)!=-1) {
 			self.port.emit('code_seen',{"where":"URL","thirdPartyURL":thirdPartyContentSRC});
 		}
 
-		if (typeof credentials.signed_request == "string" && url.indexOf('signed_request=')!=-1 && url.indexOf(credentials.signed_request)!=-1) {
+		if (typeof credentials.signed_request == "string" && url.indexOf(credentials.signed_request)!=-1) {
 			self.port.emit('signed_request_seen',{"where":"URL","thirdPartyURL":thirdPartyContentSRC});
 		}
 	}

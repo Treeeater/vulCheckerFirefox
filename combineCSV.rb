@@ -119,6 +119,7 @@ errorHash.each_key{|k|
 outputText = "Site URL,token vul,secret vul,signed_request vul,referrer vul,DOM vul\n"
 completedCases = 0
 doesNotSupportFBCases = Array.new
+manuallyDoesNotSupportFBCases = Array.new
 failedCasesToTestNext = Array.new
 allSitesCount = 0
 fBCorrectCount = 0
@@ -128,10 +129,12 @@ manuallyCount = 0
 manuallyOurFaultCount = 0
 hash.each_key{|k|
 	if (hash[k][0].to_s!="" && hash[k][1].to_s!="" && hash[k][2].to_s!="" && hash[k][3].to_s!="" && hash[k][4].to_s!="") 
-		if (hash[k][4].to_s != "4")
-			completedCases+=1 
-		else
+		if (hash[k][4].to_s == "4")
 			doesNotSupportFBCases.push(k)
+		elsif (hash[k][4].to_s == "14")
+			manuallyDoesNotSupportFBCases.push(k)
+		else
+			completedCases+=1
 		end
 	else
 		failedCasesToTestNext.push(k)
@@ -154,15 +157,18 @@ hash.each_key{|k|
 	
 	outputText = outputText + k + ',' + hash[k][0].to_s + ',' + hash[k][1].to_s + ',' + hash[k][2].to_s + ',' + hash[k][3].to_s + ',' + hash[k][4].to_s + "\n"
 }
-p "total tests: #{allSitesCount}"
-p "total completed tests that have Facebook login: #{completedCases}"
+p "total cases: #{allSitesCount}"
 p "total tests that does not have Facebook login (temporarily, just this run, needs to confirm in the next.): #{doesNotSupportFBCases.length}"
-p "total failed tests (excluding completed and known failed): #{allSitesCount - completedCases - doesNotSupportFBCases.length}"
+p "total tests that does not have Facebook login (manually confirmed): #{manuallyDoesNotSupportFBCases.length}"
+p "total cases that support Facebook: #{allSitesCount - doesNotSupportFBCases.length - manuallyDoesNotSupportFBCases.length}"
+p "------------------------"
+p "total completed tests: #{completedCases}"
+p "total failed tests (excluding completed and known failed): #{allSitesCount - completedCases - doesNotSupportFBCases.length - manuallyDoesNotSupportFBCases.length}"
 p "------------------------"
 p "total FB implementation correct tests (detected by our tool): #{fBCorrectCount}"
 p "total FB implementation error tests (detected by our tool): #{fBErrorDetectedCount}"
 p "total FB oracle failed tests (detected by our tool): #{fBOracleFailedCount}"
-p "total manual inspection cases/our fault cases(other than oracle failures): #{manuallyCount}/#{manuallyOurFaultCount}"
+p "total manual inspection cases/our fault cases(other than oracle failures): #{manuallyCount - manuallyDoesNotSupportFBCases.length}/#{manuallyOurFaultCount}"
 File.open("Results_new.csv","w+"){|f|
 	f.write(outputText)
 }
