@@ -84,7 +84,7 @@ var Registration = function(){
 			if (inputName.indexOf('year') !=-1 && (inputEle.value == "YYYY" || inputValue.indexOf('year') != -1)) inputEle.value = "";
 			if (inputName.indexOf('month') !=-1 && (inputEle.value == "MM" || inputValue.indexOf('month') != -1)) inputEle.value = "";
 			if (inputName.indexOf('day') !=-1 && (inputEle.value == "DD" || inputValue.indexOf('day') != -1)) inputEle.value = "";
-			if (inputEle.value.indexOf("DD") != -1 && inputEle.value.indexOf("YY") != -1 && inputEle.value.indexOf("MM") != -1) inputEle.value = "10/10/1980";
+			if ((inputEle.value.indexOf("DD") != -1 && inputEle.value.indexOf("YY") != -1 && inputEle.value.indexOf("MM") != -1) || (inputEle.placeholder.indexOf("DD") != -1 && inputEle.placeholder.indexOf("YY") != -1 && inputEle.placeholder.indexOf("MM") != -1)) inputEle.value = "10/10/1980";
 		}
 		if (inputEle.value != "") return;			//auto-filled by the application, presumbly by SSO process.  We don't do anything here.
 		if (inputEle.name && inputEle.name!="")
@@ -94,7 +94,7 @@ var Registration = function(){
 				return;
 			}
 			if (inputName.indexOf('pass')!=-1){
-				inputEle.value = "msr123456";
+				inputEle.value = "Zlixoh2a";
 				return;
 			}
 			if (inputName.indexOf('zip') !=-1 || inputName.indexOf('postal')!=-1){
@@ -103,6 +103,10 @@ var Registration = function(){
 			}
 			if (inputName.indexOf('year') !=-1){
 				inputEle.value = "1980";
+				return;
+			}
+			if (inputName.indexOf('cell') !=-1 || inputName.indexOf('phone') !=-1 || inputName.indexOf('mobile') !=-1){
+				inputEle.value = "202" + randomString(7, '1234567890');
 				return;
 			}
 			if (inputName.indexOf('name')!=-1 && inputName.indexOf('last')!=-1){
@@ -164,7 +168,7 @@ var Registration = function(){
 				that.fillText(inputEle);
 				break;
 			case "password":
-				inputEle.value = "msr123456";
+				inputEle.value = "Zlixoh2a";
 				break;
 			case "email":
 				inputEle.value = that.account.email;
