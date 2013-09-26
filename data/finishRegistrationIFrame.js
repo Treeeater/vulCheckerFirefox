@@ -14,6 +14,7 @@ var Registration = function(){
 	this.allTopTextInputs = [];		//stores all text inputs that are on top layer.
 	this.allTopTextInputBottomEdges = [];		//stores bottom edges of all inputs.
 	this.inputBotEdge = 0;			//stores the bottommost edge of all inputs
+	this.disableRestrictionOnLinking = false;		//relax restriction on linking.
 	var uniqueRadioButtons = [];
 	var filledRadioButtonNames = [];
 	var randomString = function(length, chars) {
@@ -327,6 +328,7 @@ var Registration = function(){
 	}
 	
 	this.isLinkingForm = function(submitButton){
+		if (that.disableRestrictionOnLinking) return false;
 		var curNode = submitButton;
 		var parentFormNode = null;
 		while (curNode != null && typeof curNode != "undefined")
@@ -473,6 +475,14 @@ var Registration = function(){
 					submitButtons.push({node:suspects[i],score:curScore});
 				}
 			}
+		}
+		//relax linking form restriction:
+		if (submitButtons.length == 0 && !that.disableRestrictionOnLinking){
+			that.disableRestrictionOnLinking = true;
+			log('Cannot find submit button when eliminating linking-like forms, now relaxing this...')
+			that.tryFindSubmitButton();
+			that.disableRestrictionOnLinking = false;
+			return;
 		}
 		for (i = 0; i < submitButtons.length; i++)
 		{
