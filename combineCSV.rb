@@ -127,11 +127,22 @@ fBErrorDetectedCount = 0
 fBOracleFailedCount = 0
 manuallyCount = 0
 manuallyOurFaultCount = 0
+manuallyError = 0
+captcha = 0
+linking = 0
+verifyEmail = 0
+prepopulate = 0
+ssl = 0
+oracle = 0
+timeout = 0
+input = 0
+submit = 0
+other = 0
 hash.each_key{|k|
 	if (hash[k][0].to_s!="" && hash[k][1].to_s!="" && hash[k][2].to_s!="" && hash[k][3].to_s!="" && hash[k][4].to_s!="") 
-		if (hash[k][4].to_s == "4")
+		if (hash[k][0].to_s == "4")
 			doesNotSupportFBCases.push(k)
-		elsif (hash[k][4].to_s == "14")
+		elsif (hash[k][0].to_s == "14")
 			manuallyDoesNotSupportFBCases.push(k)
 		else
 			completedCases+=1
@@ -146,9 +157,20 @@ hash.each_key{|k|
 		fBErrorDetectedCount+=1
 	elsif (hash[k][0].to_i==3 || hash[k][2].to_i==3) 
 		fBOracleFailedCount+=1
-	elsif (hash[k][0].to_i>=10 || hash[k][1].to_i>=10 || hash[k][2].to_i>=10 || hash[k][3].to_i>=10 || hash[k][4].to_i>=10) 
+	elsif (hash[k][0].to_i>=10) 
+		if (hash[k][0].to_i==10) then manuallyError += 1 end
+		if (hash[k][0].to_i==11) then captcha += 1 end
+		if (hash[k][0].to_i==12) then linking += 1 end
+		if (hash[k][0].to_i==13) then verifyEmail += 1 end
+		if (hash[k][0].to_i==15) then prepopulate += 1 end
+		if (hash[k][0].to_i==16) then ssl += 1 end
 		manuallyCount+=1
-		if (hash[k][0].to_i>=20 || hash[k][1].to_i>=20 || hash[k][2].to_i>=20 || hash[k][3].to_i>=20 || hash[k][4].to_i>=20) 
+		if (hash[k][0].to_i>=20)
+			if (hash[k][0].to_i==20) then oracle += 1 end
+			if (hash[k][0].to_i==21) then timeout += 1 end
+			if (hash[k][0].to_i==22) then input += 1 end
+			if (hash[k][0].to_i==23) then submit += 1 end
+			if (hash[k][0].to_i==24) then other += 1 end
 			manuallyOurFaultCount+=1
 		end
 	elsif (hash[k][0].to_s!="" && hash[k][1].to_s!="" && hash[k][2].to_s!="" && hash[k][3].to_s!="" && hash[k][4].to_s!="" && hash[k][4].to_s != "4")
@@ -157,6 +179,7 @@ hash.each_key{|k|
 	
 	outputText = outputText + k + ',' + hash[k][0].to_s + ',' + hash[k][1].to_s + ',' + hash[k][2].to_s + ',' + hash[k][3].to_s + ',' + hash[k][4].to_s + "\n"
 }
+p manuallyCount
 p "total cases: #{allSitesCount}"
 p "total tests that does not have Facebook login (temporarily, just this run, needs to confirm in the next.): #{doesNotSupportFBCases.length}"
 p "total tests that does not have Facebook login (manually confirmed): #{manuallyDoesNotSupportFBCases.length}"
@@ -164,11 +187,26 @@ p "total cases that support Facebook: #{allSitesCount - doesNotSupportFBCases.le
 p "------------------------"
 p "total completed tests: #{completedCases}"
 p "total failed tests (excluding completed and known failed): #{allSitesCount - completedCases - doesNotSupportFBCases.length - manuallyDoesNotSupportFBCases.length}"
-p "------------------------"
-p "total FB implementation correct tests (detected by our tool): #{fBCorrectCount}"
 p "total FB implementation error tests (detected by our tool): #{fBErrorDetectedCount}"
+p "total error cases by manual analysis: #{manuallyError}."
+p "------------------------"
+p "total FB implementation correct tests: #{allSitesCount - doesNotSupportFBCases.length - manuallyDoesNotSupportFBCases.length - fBErrorDetectedCount - manuallyError}"
+p "total FB implementation correct tests (detected by our tool): #{fBCorrectCount}"
 p "total FB oracle failed tests (detected by our tool): #{fBOracleFailedCount}"
-p "total manual inspection cases/our fault cases(other than oracle failures): #{manuallyCount - manuallyDoesNotSupportFBCases.length}/#{manuallyOurFaultCount}"
+p "------------------------"
+p "total 11-16 cases: #{captcha + linking + verifyEmail + prepopulate + ssl}"
+p "total captcha required cases: #{captcha}"
+p "total linking cases: #{linking}"
+p "total verifying email cases: #{verifyEmail}"
+p "total pre-populated fields error cases: #{prepopulate}"
+p "total SSL iframe cases: #{ssl}"
+p "------------------------"
+p "total other manual inspection cases: #{oracle + timeout + input + submit + other}"
+p "total oracle cases: #{oracle}"
+p "total timeout cases: #{timeout}"
+p "total input cases: #{input}"
+p "total submit cases: #{submit}"
+p "total other cases: #{other}"
 File.open("Results_new.csv","w+"){|f|
 	f.write(outputText)
 }

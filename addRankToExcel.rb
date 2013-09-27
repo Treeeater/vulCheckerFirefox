@@ -28,6 +28,7 @@ widgetVul13 = 0
 widgetVul45 = 0
 totalVul13 = 0
 totalVul45 = 0
+totalVul = 0
 totalSDK = 0
 totalWidget = 0
 resultFile.each_line{|l|
@@ -53,6 +54,7 @@ resultFile.each_line{|l|
 			if (vul45PercentileArray[bucket] == nil) then vul45PercentileArray[bucket] = 1 else vul45PercentileArray[bucket] += 1 end
 		end
 		if vul45 || vul13
+			totalVul += 1
 			if (vulPercentileArray[bucket] == nil) then vulPercentileArray[bucket] = 1 else vulPercentileArray[bucket] += 1 end
 		end
 		if errorDetected
@@ -96,8 +98,12 @@ resultFile.each_line{|l|
 # Screen output
 
 p "Total sites: #{rankedArrayToWrite.length}"
+p "# of sites vul to 13: #{totalVul13}"
 p "% of sites vul to 13: #{totalVul13/rankedArrayToWrite.length.to_f}"
+p "# of sites vul to 45: #{totalVul45}"
 p "% of sites vul to 45: #{totalVul45/rankedArrayToWrite.length.to_f}"
+p "# of sites vul: #{totalVul}"
+p "% of sites vul: #{totalVul/rankedArrayToWrite.length.to_f}"
 p "Total sites using SDK: #{totalSDK}"
 p "Total sites using widget: #{totalWidget}"
 p "% of sites vul to 13 using SDK: #{sDKVul13/totalSDK.to_f}"

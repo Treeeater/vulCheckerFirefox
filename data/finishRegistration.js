@@ -394,6 +394,7 @@ var Registration = function(){
 		}
 		temp = document.getElementsByTagName('button');
 		for (i = 0; i < temp.length; i++){
+			if (temp[i].innerHTML.indexOf('accessible_elem')!=-1 && temp[i].innerHTML.indexOf('pluginButtonIcon')!=-1) continue;		//eliminate like buttons.
 			if ($(temp[i]).offset().top < 100) continue;
 			if (!that.onTopLayer(temp[i])) continue;
 			if (that.isLinkingForm(temp[i])) continue;
