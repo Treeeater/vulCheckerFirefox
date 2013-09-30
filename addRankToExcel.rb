@@ -153,21 +153,30 @@ vulPercentileArray.each_index{|i|
 percentileFileContent += "\n% of sites vulnerable to simulated attacks,"
 
 vul13PercentileArray.each_index{|i|
-	if (percentileArray[i] == 0) then percentileFileContent += "0," end
+	if (percentileArray[i] == 0) 
+		percentileFileContent += "0,"
+		next
+	end
 	percentileFileContent += ((vul13PercentileArray[i]/percentileArray[i].to_f).to_s + ",")
 }
 
 percentileFileContent += "\n% of sites leaking credentials,"
 
 vul45PercentileArray.each_index{|i|
-	if (percentileArray[i] == 0) then percentileFileContent += "0," end
+	if (percentileArray[i] == 0)
+		percentileFileContent += "0,"
+		next
+	end
 	percentileFileContent += ((vul45PercentileArray[i]/percentileArray[i].to_f).to_s + ",")
 }
 
 percentileFileContent += "\n% of sites are vulnerable in general,"
 
 vulPercentileArray.each_index{|i|
-	if (percentileArray[i] == 0) then percentileFileContent += "0," end
+	if (percentileArray[i] == 0)
+		percentileFileContent += "0,"
+		next
+	end
 	percentileFileContent += ((vulPercentileArray[i]/percentileArray[i].to_f).to_s + ",")
 }
 
@@ -175,7 +184,10 @@ percentileFileContent += "\n% of sites use Facebook SDK,"
 
 sDKUseArray.each_index{|i|
 	if !sDKUseArray[i] then sDKUseArray[i] = 0 end
-	if (percentileArray[i] == 0) then percentileFileContent += "0," end
+	if (percentileArray[i] == 0)
+		percentileFileContent += "0,"
+		next
+	end
 	percentileFileContent += ((sDKUseArray[i]/percentileArray[i].to_f).to_s + ",")
 }
 
@@ -183,7 +195,10 @@ percentileFileContent += "\n% of sites use Facebook social widget,"
 
 widgetArray.each_index{|i|
 	if !widgetArray[i] then widgetArray[i] = 0 end
-	if (percentileArray[i] == 0) then percentileFileContent += "0," end
+	if (percentileArray[i] == 0) 
+		percentileFileContent += "0,"
+		next
+	end
 	percentileFileContent += ((widgetArray[i]/percentileArray[i].to_f).to_s + ",")
 }
 
@@ -191,7 +206,10 @@ percentileFileContent += "\n% of sites detected to have an erroneous implementat
 
 errorDetectedArray.each_index{|i|
 	if !errorDetectedArray[i] then errorDetectedArray[i] = 0 end
-	if (percentileArray[i] == 0) then percentileFileContent += "0," end
+	if (percentileArray[i] == 0) 
+		percentileFileContent += "0," 
+		next
+	end
 	percentileFileContent += ((errorDetectedArray[i]/percentileArray[i].to_f).to_s + ",")
 }
 
@@ -199,7 +217,10 @@ percentileFileContent += "\n% of sites having an erroneous implementation,"
 
 errorArray.each_index{|i|
 	if !errorArray[i] then errorArray[i] = 0 end
-	if (percentileArray[i] == 0) then percentileFileContent += "0," end
+	if (percentileArray[i] == 0) 
+		percentileFileContent += "0," 
+		next
+	end
 	percentileFileContent += ((errorArray[i]/percentileArray[i].to_f).to_s + ",")
 }
 
