@@ -1,0 +1,188 @@
+#ruby driver of the AVC
+#Prior to using, 1) gem install sys-proctable
+#2) go to about:config of FF using the profile and type toolkit.startup.max_resumed_crashes in the search box. Set this value to -1/999999(very large number)
+
+require 'sys/proctable'
+require 'fileutils'
+require 'mysql2'
+include Sys
+require 'rbconfig'
+require 'mail'
+is_windows = (RbConfig::CONFIG['host_os'] =~ /mswin|mingw|cygwin/)
+
+SLEEPTIME = 1500		#configurable: timeout.
+
+def kill_process(pid)
+	to_kill = Array.new
+	to_kill.push(pid)
+	ProcTable.ps do |proc|
+		to_kill << proc.pid if to_kill.include?(proc.ppid)
+	end
+	Process.kill(9, *to_kill)
+end
+
+def sendMail(recipient, title, message)
+	begin
+		Mail.deliver do
+		   from    'ssoscan@gmail.com'
+		   to      recipient
+		   subject title
+		   body    message
+		end
+	rescue
+	end
+end
+
+if (!Dir.exists?("vulCheckerProfile0"))
+	p "No bootstrapping profile, create one and re-run this script"
+	p "Make sure the caching, popup blocker and crash reports are all turned off."
+	exit
+end
+
+options = { :address              => "smtp.gmail.com",
+            :port                 => 587,
+            :domain               => 'gmail.com',
+            :user_name            => 'ssoscan@gmail.com',
+            :password             => 'securitygroup',
+            :authentication       => 'plain',
+            :enable_starttls_auto => true  }
+			
+Mail.defaults do
+  delivery_method :smtp, options
+end
+
+totalSessions = 3
+
+i = 0
+
+while (i < totalSessions)
+	if (!File.exists?("./lib/webServiceFile#{i}"))
+		File.open("./lib/webServiceFile#{i}.js","w+"){|f|}		#just touch all of them.
+	end
+	if (Dir.exists?("vulCheckerProfile#{i}/testResults"))
+		FileUtils.rm_rf("vulCheckerProfile#{i}/testResults")
+	end
+	FileUtils.mkdir_p("vulCheckerProfile#{i}/testResults")
+	if (!Dir.exists?("vulCheckerProfile#{i}"))
+		FileUtils.mkdir_p("vulCheckerProfile#{i}")
+		FileUtils.cp_r(Dir["vulCheckerProfile0/."],"vulCheckerProfile#{i}")
+	end
+	i+=1
+end
+
+pid_session = Array.new
+randomhash_session = Array.new
+time_session = Array.new
+email_session = Array.new
+URL_session = Array.new
+remainingSessions = Array.new
+for i in 0..totalSessions-1
+	remainingSessions.push(i)
+end
+finishedpid_session = Array.new
+client = Mysql2::Client.new(:host => "localhost", :username => "root", :password => "ssoscan", :database => "jobs")
+i = 0
+
+#check if we lost track of any jobs when we restart the service
+client.query("UPDATE `jobs` SET `started`=0, `startTime`='' WHERE `started`='1' AND done != '1'")
+
+while (true)
+	#reclaim completed jobs first.
+	for i in 0..totalSessions-1
+		if (remainingSessions.include? i) then next end			#we only reclaim running (and finished) sessions.
+		if (File.exists?("vulCheckerProfile#{i}/testResults/finished.txt"))
+			begin
+				kill_process(pid_session[i])
+				sleep(5)
+			rescue Errno::ESRCH
+			end
+			if (!File.exists?("vulCheckerProfile#{i}/testResults/results.txt"))
+				client.query("UPDATE jobs SET done=1, finishTime='#{Time.new}', errorcode=64 WHERE randomhash='#{randomhash_session[i]}'")
+			else
+				text = File.open("vulCheckerProfile#{i}/testResults/results.txt").read
+				tempArray = [0,0,0,0,0]
+				errorcode = 0
+				text.each_line do |line|
+					if line.chomp == "Site support FB but its configuration is in an error state."
+						errorcode |= 1
+					end
+					if line.match(/(.*?)failed because oracle failed though we are able to login.\n/)
+						errorcode |= 2
+					end
+					if line.chomp == "Site doesn't support FB login?"
+						errorcode |= 4
+					end
+					if line.chomp == "Test failed a second time due to timeout, skipping this..."
+						errorcode |= 8
+					end
+					if line.chomp == "Cannot register this site when searching for signup button... Give up." || line.chomp == "Signup button search doesn't help, test still fails." || line.match(/.*used to work for.*\n/)
+						errorcode |= 16
+					end
+					if line.match(/(.*?)\sis\snot\svulnerable\sto\s\[(\d)\].*?\n/)
+						tempArray[$2.to_i-1] = 1
+					end
+					if line.match(/(.*?)\sis\svulnerable\sto\s\[(\d)\].*?\n/)
+						tempArray[$2.to_i-1] = -1
+					end
+				end
+				queryString = "UPDATE `jobs` SET `done`=1, finishTime='#{Time.new}', `errorcode`=#{errorcode}"
+				if (tempArray[0] != 0) then queryString += " , `vul1`=#{tempArray[0]}" end
+				if (tempArray[1] != 0) then queryString += " , `vul2`=#{tempArray[1]}" end
+				if (tempArray[2] != 0) then queryString += " , `vul3`=#{tempArray[2]}" end
+				if (tempArray[3] != 0) then queryString += " , `vul4`=#{tempArray[3]}" end
+				if (tempArray[4] != 0) then queryString += " , `vul5`=#{tempArray[4]}" end
+				queryString += " WHERE randomhash='#{randomhash_session[i]}'"
+				client.query(queryString)
+			end
+			FileUtils.rm_rf("vulCheckerProfile#{i}/testResults")			#clear results dir
+			remainingSessions.push(i)
+			msgBody = "Dear developer,\n\tThe requested scan on #{URL_session[i]} has completed.  Please visit <a href='http://www.ssoscan.org/result.py?testID=#{randomhash_session[i]}'>here</a> to view the results.\n\tIf you have any questions regarding this, do not reply to this email, instead, contact SSOScan's developers: Yuchen Zhou (yuchen@virginia.edu).\n\tThanks,\n--SSOScan @ University of Virginia"
+			sendMail(email_session[i], "Test results for " + URL_session[i] + " is ready", msgBody)
+			p "Session #{i} finished."
+		end
+	end
+	#check if any jobs exceeded timeout
+	for i in 0..totalSessions-1
+		if (remainingSessions.include? i) then next end			#we only check running sessions.
+		if (Time.new - time_session[i] > 1500)					#25 min is maximum
+			begin
+				kill_process(pid_session[i])
+				sleep(5)
+			rescue Errno::ESRCH
+			end
+			client.query("UPDATE jobs SET done=1, errorcode=7, finishTime='#{Time.new}' WHERE randomhash='#{randomhash_session[i]}'")
+			FileUtils.rm_rf("vulCheckerProfile#{i}/testResults")			#clear results dir
+			remainingSessions.push(i)
+			msgBody = "Dear developer,\n\tThe requested scan on #{URL_session[i]} has timed out.  Please visit <a href='http://www.ssoscan.org/result.py?testID=#{randomhash_session[i]}'>here</a> to view the results.\n\tIf you have any questions regarding this, do not reply to this email, instead, contact SSOScan's developers: Yuchen Zhou (yuchen@virginia.edu).\n\tThanks,\n--SSOScan @ University of Virginia"
+			sendMail(email_session[i], "Test results for " + URL_session[i] + " is ready", msgBody)
+			p "Session #{i} timed out."
+		end
+	end
+	results = client.query("SELECT * FROM jobs WHERE started != 1")
+	#then reassign jobs to remainingSessions.
+	if (results.count > 0 && remainingSessions.length > 0)
+		results.each{|r|
+			if (remainingSessions.length <= 0) then break end
+			sessionNumber = remainingSessions.shift
+			#write site to test info to that file first.
+			stringToWrite = "exports.testList = ['"
+			stringToWrite += r["URL"]
+			stringToWrite += "'];"
+
+			File.open("./lib/webServiceFile#{sessionNumber}.js",'w+'){|f|
+				f.write(stringToWrite)
+			}
+			
+			#then spawn the child process
+			if (is_windows) then pid_session[sessionNumber] = spawn("cfx run -p vulCheckerProfile#{sessionNumber}") else pid_session[sessionNumber] = spawn("cfx run -p vulCheckerProfile#{sessionNumber} -b ~/firefox/firefox") end
+			randomhash_session[sessionNumber] = r["randomhash"]
+			time_session[sessionNumber] = Time.new
+			email_session[sessionNumber] = r["email"]
+			URL_session[sessionNumber] = r["URL"]
+			client.query("UPDATE `jobs` SET `started`=1, `startTime`='#{time_session[sessionNumber]}' WHERE `randomhash`='#{client.escape(r["randomhash"])}'")
+			p "Dispatched session #{sessionNumber} to handle #{r["URL"]}"
+			sleep(5)		#wait for the process to spawn completely
+		}
+	end
+	sleep(10)			#check db once 10 secs.
+end

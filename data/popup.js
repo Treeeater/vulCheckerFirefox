@@ -37,5 +37,3 @@ document.getElementById('finishRegistration').addEventListener('click',finishReg
 document.getElementById('deleteCookies').addEventListener('click',deleteCookies_wrapper);
 document.getElementById('testSuite').addEventListener('click',testSuiteStart_wrapper);
 document.getElementById('reload').addEventListener('click',reload_extension);
-
-console.log("popup.js loaded");
