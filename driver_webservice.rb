@@ -137,7 +137,9 @@ while (true)
 			FileUtils.rm_rf("vulCheckerProfile#{i}/testResults")			#clear results dir
 			remainingSessions.push(i)
 			msgBody = "Dear developer,\n\tThe requested scan on #{URL_session[i]} has completed.  Please visit <a href='http://www.ssoscan.org/result.py?testID=#{randomhash_session[i]}'>here</a> to view the results.\n\tIf you have any questions regarding this, do not reply to this email, instead, contact SSOScan's developers: Yuchen Zhou (yuchen@virginia.edu).\n\tThanks,\n--SSOScan @ University of Virginia"
-			sendMail(email_session[i], "Test results for " + URL_session[i] + " is ready", msgBody)
+			if email_session[i]!=""
+				sendMail(email_session[i], "Test results for " + URL_session[i] + " is ready", msgBody)
+			end
 			p "Session #{i} finished."
 		end
 	end
@@ -156,6 +158,22 @@ while (true)
 			msgBody = "Dear developer,\n\tThe requested scan on #{URL_session[i]} has timed out.  Please visit <a href='http://www.ssoscan.org/result.py?testID=#{randomhash_session[i]}'>here</a> to view the results.\n\tIf you have any questions regarding this, do not reply to this email, instead, contact SSOScan's developers: Yuchen Zhou (yuchen@virginia.edu).\n\tThanks,\n--SSOScan @ University of Virginia"
 			sendMail(email_session[i], "Test results for " + URL_session[i] + " is ready", msgBody)
 			p "Session #{i} timed out."
+		end
+	end
+	#check if any jobs are resubmitted by the user
+	for i in 0..totalSessions-1
+		if (remainingSessions.include? i) then next end			#we only check running sessions.
+		url = URL_session[i]
+		results = client.query("SELECT * FROM jobs WHERE URL='"+client.escape(url)+"' AND started=0")
+		if results.count > 0
+			#just terminate this job
+			begin
+				kill_process(pid_session[i])
+				sleep(5)
+			rescue Errno::ESRCH
+			end
+			FileUtils.rm_rf("vulCheckerProfile#{i}/testResults")			#clear results dir
+			remainingSessions.push(i)
 		end
 	end
 	results = client.query("SELECT * FROM jobs WHERE started != 1")
