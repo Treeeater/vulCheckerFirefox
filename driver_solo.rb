@@ -70,6 +70,14 @@ def kill_process(pid)
 end
 
 i = 0
+WebSessions = 3
+while (i < WebSessions)
+	if (!File.exists?("lib/webServiceFile#{i}.js"))
+		FileUtils.touch("lib/webServiceFile#{i}.js")
+	end
+	i+=1
+end
+i = 0
 while (i < totalSessions)
 	if (File.exists?("vulCheckerProfile#{i}/testResults/finished.txt"))
 		i+=1
