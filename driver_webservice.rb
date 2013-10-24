@@ -97,9 +97,19 @@ while (true)
 			rescue Errno::ESRCH
 			end
 			if (!File.exists?("vulCheckerProfile#{i}/testResults/results.txt"))
-				client.query("UPDATE jobs SET done=1, finishTime='#{Time.new}', errorcode=64 WHERE randomhash='#{randomhash_session[i]}'")
+				#shouldn't happen at any time, panic.
+				client.query("UPDATE jobs SET done=1, finishTime='#{Time.new}', errorcode=32 WHERE randomhash='#{randomhash_session[i]}'")
 			else
-				text = File.open("vulCheckerProfile#{i}/testResults/results.txt").read
+				results = client.query("SELECT * FROM jobs WHERE randomhash='#{randomhash_session[i]}'")
+				retries = 999
+				if (results.count > 0)
+					results.each{|r|
+						retries = r["retries"].to_i
+					}
+				end
+				resultsFH = File.open("vulCheckerProfile#{i}/testResults/results.txt")
+				text = resultsFH.read
+				resultsFH.close
 				tempArray = [0,0,0,0,0]
 				errorcode = 0
 				text.each_line do |line|
@@ -125,21 +135,30 @@ while (true)
 						tempArray[$2.to_i-1] = -1
 					end
 				end
-				queryString = "UPDATE `jobs` SET `done`=1, finishTime='#{Time.new}', `errorcode`=#{errorcode}"
-				if (tempArray[0] != 0) then queryString += " , `vul1`=#{tempArray[0]}" end
-				if (tempArray[1] != 0) then queryString += " , `vul2`=#{tempArray[1]}" end
-				if (tempArray[2] != 0) then queryString += " , `vul3`=#{tempArray[2]}" end
-				if (tempArray[3] != 0) then queryString += " , `vul4`=#{tempArray[3]}" end
-				if (tempArray[4] != 0) then queryString += " , `vul5`=#{tempArray[4]}" end
-				queryString += " WHERE randomhash='#{randomhash_session[i]}'"
-				client.query(queryString)
+				if (errorcode > 1 && retries < 2)
+					#restart it and wait for scheduler to pick it up again.
+					queryString = "UPDATE `jobs` SET `started`=0 WHERE randomhash='#{randomhash_session[i]}'"
+					client.query(queryString)
+				else
+					queryString = "UPDATE `jobs` SET `done`=1, `finishTime`='#{Time.new}', `errorcode`=#{errorcode}"
+					if (tempArray[0] != 0) then queryString += " , `vul1`=#{tempArray[0]}" end
+					if (tempArray[1] != 0) then queryString += " , `vul2`=#{tempArray[1]}" end
+					if (tempArray[2] != 0) then queryString += " , `vul3`=#{tempArray[2]}" end
+					if (tempArray[3] != 0) then queryString += " , `vul4`=#{tempArray[3]}" end
+					if (tempArray[4] != 0) then queryString += " , `vul5`=#{tempArray[4]}" end
+					queryString += " WHERE randomhash='#{randomhash_session[i]}'"
+					client.query(queryString)
+					msgBody = "Dear developer,\n\tThe requested scan on #{URL_session[i]} has completed.  Please visit <a href='http://www.ssoscan.org/result.py?testID=#{randomhash_session[i]}'>here</a> to view the results.\n\tIf you have any questions regarding this, do not reply to this email, instead, contact SSOScan's developers: Yuchen Zhou (yuchen@virginia.edu).\n\tThanks,\n--SSOScan @ University of Virginia"
+					if email_session[i]!=""
+						sendMail(email_session[i], "Test results for " + URL_session[i] + " is ready", msgBody)
+					end
+					if ((errorcode | 2 == 2) || (errorcode | 8 == 8) || (errorcode | 16 == 16))
+						sendMail("pinkforpeace@gmail.com", "#{URL_session[i]} has problem EC##{errorcode}", "EC##{errorcode}")
+					end
+				end
 			end
 			FileUtils.rm_rf("vulCheckerProfile#{i}/testResults")			#clear results dir
 			remainingSessions.push(i)
-			msgBody = "Dear developer,\n\tThe requested scan on #{URL_session[i]} has completed.  Please visit <a href='http://www.ssoscan.org/result.py?testID=#{randomhash_session[i]}'>here</a> to view the results.\n\tIf you have any questions regarding this, do not reply to this email, instead, contact SSOScan's developers: Yuchen Zhou (yuchen@virginia.edu).\n\tThanks,\n--SSOScan @ University of Virginia"
-			if email_session[i]!=""
-				sendMail(email_session[i], "Test results for " + URL_session[i] + " is ready", msgBody)
-			end
 			p "Session #{i} finished."
 		end
 	end
@@ -152,15 +171,27 @@ while (true)
 				sleep(5)
 			rescue Errno::ESRCH
 			end
-			client.query("UPDATE jobs SET done=1, errorcode=7, finishTime='#{Time.new}' WHERE randomhash='#{randomhash_session[i]}'")
-			FileUtils.rm_rf("vulCheckerProfile#{i}/testResults")			#clear results dir
-			remainingSessions.push(i)
-			msgBody = "Dear developer,\n\tThe requested scan on #{URL_session[i]} has timed out.  Please visit <a href='http://www.ssoscan.org/result.py?testID=#{randomhash_session[i]}'>here</a> to view the results.\n\tIf you have any questions regarding this, do not reply to this email, instead, contact SSOScan's developers: Yuchen Zhou (yuchen@virginia.edu).\n\tThanks,\n--SSOScan @ University of Virginia"
-			sendMail(email_session[i], "Test results for " + URL_session[i] + " is ready", msgBody)
-			p "Session #{i} timed out."
+			results = client.query("SELECT * FROM jobs WHERE randomhash='#{randomhash_session[i]}'")
+			retries = 999
+			if (results.count > 0)
+				results.each{|r|
+					retries = r["retries"].to_i
+				}
+			end
+			if (retries > 2)
+				client.query("UPDATE jobs SET done=1, errorcode=64, finishTime='#{Time.new}' WHERE randomhash='#{randomhash_session[i]}'")
+				FileUtils.rm_rf("vulCheckerProfile#{i}/testResults")			#clear results dir
+				remainingSessions.push(i)
+				msgBody = "Dear developer,\n\tThe requested scan on #{URL_session[i]} has timed out.  Please visit <a href='http://www.ssoscan.org/result.py?testID=#{randomhash_session[i]}'>here</a> to view detailed results.\n\tIf you have any questions regarding this, do not reply to this email, instead, contact SSOScan's developers: Yuchen Zhou (yuchen@virginia.edu).\n\tThanks,\n--SSOScan @ University of Virginia"
+				sendMail(email_session[i], "Test results for " + URL_session[i] + " is ready", msgBody)
+				p "Session #{i} timed out."
+			else
+				queryString = "UPDATE `jobs` SET `started`=0 WHERE randomhash='#{randomhash_session[i]}'"
+				client.query(queryString)
+			end
 		end
 	end
-	#check if any jobs are resubmitted by the user
+	#check if any jobs are resubmitted by the user or about to be retried.
 	for i in 0..totalSessions-1
 		if (remainingSessions.include? i) then next end			#we only check running sessions.
 		url = URL_session[i]
@@ -176,7 +207,7 @@ while (true)
 			remainingSessions.push(i)
 		end
 	end
-	results = client.query("SELECT * FROM jobs WHERE started != 1")
+	results = client.query("SELECT * FROM jobs WHERE started != 1 AND retries < 2")
 	#then reassign jobs to remainingSessions.
 	if (results.count > 0 && remainingSessions.length > 0)
 		results.each{|r|
@@ -186,6 +217,8 @@ while (true)
 			stringToWrite = "exports.testList = ['"
 			stringToWrite += r["URL"]
 			stringToWrite += "'];"
+			retries = r["retries"].to_i
+			FileUtils.rm_rf("vulCheckerProfile#{remainingSessions}/testResults")			#clear results dir
 
 			File.open("./lib/webServiceFile#{sessionNumber}.js",'w+'){|f|
 				f.write(stringToWrite)
@@ -197,7 +230,7 @@ while (true)
 			time_session[sessionNumber] = Time.new
 			email_session[sessionNumber] = r["email"]
 			URL_session[sessionNumber] = r["URL"]
-			client.query("UPDATE `jobs` SET `started`=1, `startTime`='#{time_session[sessionNumber]}' WHERE `randomhash`='#{client.escape(r["randomhash"])}'")
+			client.query("UPDATE `jobs` SET `started`=1, `retries`=#{retries+1}, `startTime`='#{time_session[sessionNumber]}' WHERE `randomhash`='#{client.escape(r["randomhash"])}'")
 			p "Dispatched session #{sessionNumber} to handle #{r["URL"]}"
 			sleep(5)		#wait for the process to spawn completely
 		}
