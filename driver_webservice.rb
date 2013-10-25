@@ -148,7 +148,7 @@ while (true)
 					if (tempArray[4] != 0) then queryString += " , `vul5`=#{tempArray[4]}" end
 					queryString += " WHERE randomhash='#{randomhash_session[i]}'"
 					client.query(queryString)
-					msgBody = "Dear developer,\n\tThe requested scan on #{URL_session[i]} has completed.  Please visit <a href='http://www.ssoscan.org/result.py?testID=#{randomhash_session[i]}'>here</a> to view the results.\n\tIf you have any questions regarding this, do not reply to this email, instead, contact SSOScan's developers: Yuchen Zhou (yuchen@virginia.edu).\n\tThanks,\n--SSOScan @ University of Virginia"
+					msgBody = "Dear developer,\n\tThe requested scan on #{URL_session[i]} has completed.  Please visit <a href=\"http://www.ssoscan.org/result.py?testID=#{randomhash_session[i]}\">here</a> to view the results.\n\tIf you have any questions regarding this, do not reply to this email, instead, contact SSOScan's developers: Yuchen Zhou (yuchen@virginia.edu).\n\tThanks,\n--SSOScan @ University of Virginia"
 					if email_session[i]!=""
 						sendMail(email_session[i], "Test results for " + URL_session[i] + " is ready", msgBody)
 					end
@@ -182,7 +182,7 @@ while (true)
 				client.query("UPDATE jobs SET done=1, errorcode=64, finishTime='#{Time.new}' WHERE randomhash='#{randomhash_session[i]}'")
 				FileUtils.rm_rf("vulCheckerProfile#{i}/testResults")			#clear results dir
 				remainingSessions.push(i)
-				msgBody = "Dear developer,\n\tThe requested scan on #{URL_session[i]} has timed out.  Please visit <a href='http://www.ssoscan.org/result.py?testID=#{randomhash_session[i]}'>here</a> to view detailed results.\n\tIf you have any questions regarding this, do not reply to this email, instead, contact SSOScan's developers: Yuchen Zhou (yuchen@virginia.edu).\n\tThanks,\n--SSOScan @ University of Virginia"
+				msgBody = "Dear developer,\n\tThe requested scan on #{URL_session[i]} has timed out.  Please visit <a href=\"http://www.ssoscan.org/result.py?testID=#{randomhash_session[i]}\">here</a> to view detailed results.\n\tIf you have any questions regarding this, do not reply to this email, instead, contact SSOScan's developers: Yuchen Zhou (yuchen@virginia.edu).\n\tThanks,\n--SSOScan @ University of Virginia"
 				sendMail(email_session[i], "Test results for " + URL_session[i] + " is ready", msgBody)
 				p "Session #{i} timed out."
 			else
