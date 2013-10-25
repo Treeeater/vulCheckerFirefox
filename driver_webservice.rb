@@ -152,7 +152,7 @@ while (true)
 					if email_session[i]!=""
 						sendMail(email_session[i], "Test results for " + URL_session[i] + " is ready", msgBody)
 					end
-					if ((errorcode | 2 == 2) || (errorcode | 8 == 8) || (errorcode | 16 == 16))
+					if ((errorcode & 2 == 2) || (errorcode & 8 == 8) || (errorcode & 16 == 16))
 						sendMail("pinkforpeace@gmail.com", "#{URL_session[i]} has problem EC##{errorcode}", "EC##{errorcode}")
 					end
 				end
