@@ -95,7 +95,7 @@ function VulCheckerHelper() {
 		return this;
 	}
 	
-	var isChildElement = function(parent, child){
+	this.isChildElement = function(parent, child){
 		if (child == null) return false;
 		if (parent == child) return true;
 		if (parent == null || typeof parent == "undefined") return false;
@@ -103,12 +103,12 @@ function VulCheckerHelper() {
 		var i = 0;
 		for (i = 0; i < parent.children.length; i++)
 		{
-			if (isChildElement(parent.children[i],child)) return true;
+			if (that.isChildElement(parent.children[i],child)) return true;
 		}
 		return false;
 	}
 	
-	var onTopLayer = function(ele){
+	this.onTopLayer = function(ele){
 		//This doesn't really work on section/canvas HTML5 element. TODO:Fix this.
 		//given an element, returns true if it's likely to be on the topmost layer, false if otherwise.
 		if (!ele) return false;
@@ -131,7 +131,7 @@ function VulCheckerHelper() {
 		//Instead of deciding it on one try, deciding it on 10 tries.  This tackles some weird problems.
 		for (j = 0; j < 10; j++)
 		{
-			score = isChildElement(ele,document.elementFromPoint(position.left+1+j*maxWidth/10, position.top+1+j*maxHeight/10)) ? score + 1 : score;
+			score = that.isChildElement(ele,document.elementFromPoint(position.left+1+j*maxWidth/10, position.top+1+j*maxHeight/10)) ? score + 1 : score;
 		}
 		if (score >= 5) return true;
 		else return false;
@@ -151,7 +151,7 @@ function VulCheckerHelper() {
 			//avoiding clicking on the same button twice, now ignoring the duplicate button.
 			return false;
 		}
-		return (that.tryFindInvisibleLoginButton || onTopLayer(curNode));
+		return (that.tryFindInvisibleLoginButton || that.onTopLayer(curNode));
 	}
 	
 	function computeAsRoot(curNode)
@@ -179,7 +179,7 @@ function VulCheckerHelper() {
 			if (that.hasLogin) curScore += 4;												//this is used to offset a lot of 'follow us on facebook' buttons.
 			if (that.hasFB && that.hasLogin) curScore += 4;									//extra score if both terms are found.
 			if (that.hasLikeOrShare && !that.hasLogin) curScore = -1;						//ignore like or share button without login.
-			if (curNode.offsetHeight > 150 || curNode.offsetWidth > 400) curScore = -1;		//ignore login buttons that are too large, they may just be overlays.
+			if ((curNode.offsetHeight > 150 || curNode.offsetWidth > 400) && curNode.nodeName != "BUTTON" && curNode.nodeName != "A" ) curScore = -1;		//ignore non-A and non-Button type login buttons that are too large, they may just be overlays.
 			if (!that.tryFindInvisibleLoginButton) {if (curNode.offsetWidth <= 0 || curNode.offsetHeight <= 0) curScore = -1;}		//ignore invisible element.
 			var temp = new AttrInfoClass(curNode, curScore);
 			that.AttrInfoMap[that.count] = temp;
