@@ -68,9 +68,10 @@ var Registration = function(){
 		var inputName = "";
 		var inputValue = "";
 		if (inputEle.name && inputEle.name != "") inputName = inputEle.name.toLowerCase();
+		if (inputEle.id && inputEle.id != "") inputName += inputEle.id.toLowerCase();
 		if (inputEle.value && inputEle.value != "") inputValue = inputEle.value.toLowerCase();
 		//clear pre-populated fields that shows something like 'your name here' or 'choose a screen name'.
-		if (inputEle.name && inputEle.name!="")
+		if (inputName != "")
 		{
 			if (inputValue.indexOf('required')!=-1) inputEle.value = "";
 			if (inputName.indexOf('email')!=-1 || inputName.indexOf('e-mail')!=-1){
@@ -88,7 +89,7 @@ var Registration = function(){
 			if ((inputEle.value.indexOf("DD") != -1 && inputEle.value.indexOf("YY") != -1 && inputEle.value.indexOf("MM") != -1) || (inputEle.placeholder.indexOf("DD") != -1 && inputEle.placeholder.indexOf("YY") != -1 && inputEle.placeholder.indexOf("MM") != -1)) inputEle.value = "10/10/1980";
 		}
 		if (inputEle.value != "") return;			//auto-filled by the application, presumbly by SSO process.  We don't do anything here.
-		if (inputEle.name && inputEle.name!="")
+		if (inputName != "")
 		{
 			if (inputName.indexOf('email')!=-1 || inputName.indexOf('e-mail')!=-1){
 				inputEle.value = that.account.email;

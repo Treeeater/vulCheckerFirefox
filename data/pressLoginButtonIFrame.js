@@ -336,6 +336,24 @@ if (self.port)
 					vulCheckerHelper.loginClickAttempts = response.loginClickAttempts;
 					vulCheckerHelper.pressLoginButton();
 				}
+				else {
+					//the situation asks us not to click anything. We just report whatever login button we detected, for oracle to determine if the login button is gone.
+					if (response.searchForSignUpForFB && (document.URL.indexOf('http://www.facebook.com/plugins/registration')==0 || document.URL.indexOf('https://www.facebook.com/plugins/registration')==0) && document.documentElement.offSetHeight != 0 && document.documentElement.offSetWidth != 0){
+						//make sure register plugin is visible.
+						//to handle registration plugins.
+						if (document.getElementById('fbRegistrationLogin')!=null) {
+							self.port.emit('reportLoginButtonFromIframe',{"loginButtonXPath":vulCheckerHelper.getXPath(document.getElementById('fbRegistrationLogin')), "loginButtonOuterHTML":document.getElementById('fbRegistrationLogin').outerHTML,"shouldCountClick":true});
+						}
+						return;
+					}
+					if ((document.URL.indexOf('http://www.facebook.com/plugins/login_button.php')==0 || document.URL.indexOf('https://www.facebook.com/plugins/login_button.php')==0) && document.documentElement.offSetHeight != 0 && document.documentElement.offSetWidth != 0){
+						if (document.getElementsByClassName('pluginFaviconButtonText fwb').length>0)
+						{
+							self.port.emit('reportLoginButtonFromIframe',{"loginButtonXPath":vulCheckerHelper.getXPath(document.getElementsByClassName('pluginFaviconButtonText fwb')[0]), "loginButtonOuterHTML":document.getElementsByClassName('pluginFaviconButtonText fwb')[0].outerHTML,"shouldCountClick":true});
+							return;
+						}
+					}
+				}
 			}
 		});
 	}
