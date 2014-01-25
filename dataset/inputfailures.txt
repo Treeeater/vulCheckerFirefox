@@ -1,0 +1,26 @@
+http://www.wunderground.com				checkbox to confirm upgrade to premium account
+http://www.zynga.com					dropdown menu implemented using span
+http://www.ebaumsworld.com				checkbox implemented by span
+http://www.buzznet.com					date of birth input name doesn't match string
+http://www.reverbnation.com				options implemented using li
+http://www.sharecare.com				checkbox overlayed by another span, and is by definition an invisible element.
+http://www.meijer.com					default zip code gives error msg: no stores nearby
+http://www.myfitnesspal.com				body weight and height
+http://www.thefreelibrary.com			14,14,14,14,14
+http://www.meez.com						need to choose an avatar to play (img)
+http://www.kaboodle.com					special event handler that requires manual typing to make username 'available'
+http://www.behance.net					dropdown menu implemented using span
+http://www.researchgate.net				email input name doesn't match string
+http://www.theaustralian.com.au			zip code input name doesn't match string
+http://www.techhive.com					select element has an event handler that nav the page to another domain
+
+http://www.arcadeweb.com
+http://www.jokeroo.com
+http://www.lonelyplanet.com
+http://www.chess.com
+http://www.fxnetworks.com
+
+
+total:
+
+-1 FB support
