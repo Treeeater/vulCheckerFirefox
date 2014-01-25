@@ -1,0 +1,58 @@
+This file includes all records in top 10,000 that's marked 3 or 20.
+
+http://www.zulily.com				1,1,1,1,1
+http://www.boston.com				click 'member center'
+http://www.howaboutwe.com			click 'get started' 	(bad design)
+http://www.thegrio.com				10,10,10,10,10
+http://www.seniorfriendfinder.com	23,23,23,23,23	(submit button is a span, with other disruptions)
+http://www.telldc.com				no information drawn from FB (impossible to determine)
+http://www.myfitnesspal.com			22,22,22,22,22		(input body weight, height)
+http://www.businessconsumeralliance.org	24,24,24,24,24	(insecure https form submission halt SSOScan)
+http://www.rafflecopter.com			14,14,14,14,14
+http://www.dealchicken.com			23,23,23,23,23  (submit button is 'yes, please let me in')
+http://www.theknot.com				23,23,23,23,23	(submit button is 'join free' and link)
+http://www.veoh.com					-1,1,-1,1,1
+http://www.insiderpages.com			1,1,1,1,1
+http://www.iwin.com					1,1,1,1,1
+http://www.trustlink.org			1,1,1,1,1
+http://www.justia.com				click 'my account'
+http://www.fieldandstream.com		10,10,10,10,10
+http://www.coolsavings.com			click 'my account'
+http://www.shift.com				redirect to another login page if reg is not finished. (original login button gone, but reg not finished)
+http://www.tablespoon.com			1,1,1,1,1
+http://www.trademarkia.com			click 'my account'
+http://www.newhomesource.com		click 'my favorite'
+http://www.crash.net				click 'my crash' and then click 'edit profile'
+http://www.eshakti.com				no information drawn from FB
+http://www.prankdial.com			click 'my account'
+http://www.typepad.com				must use redirected url to see account related info (after login, visiting homepage still shows login).
+http://www.kickstarter.com			'my profile'
+http://www.cbc.ca					'my account'
+http://www.familybuilder.com		must use redirected url to see account related info (after login, visiting homepage still shows login).
+http://www.atgstores.com			'your account' -> 'account information'
+http://www.gobookee.net				14,14,14,14,14
+http://www.getsatisfaction.com		must use redirected url to see account related info (after login, visiting homepage still shows login).
+http://www.teamsnap.com				12,12,12,12,12
+http://www.points.com				must use redirected url to see account related info (after login, visiting homepage still shows login).
+http://www.funpic.de				must use redirected url to see account related info (after login, visiting homepage still shows login).
+http://www.matadornetwork.com		'your account'
+http://www.freedomworks.org			'my profile'
+http://www.ford-trucks.com			'forum'
+http://www.jollywallet.com			must use redirected url to see account related info (after login, visiting homepage still shows login).
+http://www.poetryfoundation.org		'my favorite' -> 'manage account'
+http://www.soundboard.com			must use redirected url to see account related info (after login, visiting homepage still shows login).
+http://www.wirewax.com				must use redirected url to see account related info (after login, visiting homepage still shows login).
+http://www.reviewjournal.com		14,14,14,14,14
+http://www.dailydot.com				'edit profile'
+http://www.bassresource.com			'forum'
+
+Total:
+
+-3 FB support
++2 manual inspected fail implementation.
++1 subscribe
++3 manual cannot find submit button
++1 manual cannot handle input
++6 good cases
++1 others
+-17 oracle cases

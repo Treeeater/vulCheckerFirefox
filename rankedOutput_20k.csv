@@ -138,7 +138,7 @@ Rank,Site URL,token vul,secret vul,signed_request vul,referrer vul,DOM vul, SDK 
 355,http://www.myrecipes.com,1,1,1,1,1,0,0
 364,http://www.stylebistro.com,-1,1,-1,1,1,1,0
 365,http://www.cafepress.com,-1,1,-1,1,1,1,0
-367,http://www.zulily.com,3,1,3,1,1,1,0
+367,http://www.zulily.com,1,1,1,1,1,1,0
 368,http://www.apartmenttherapy.com,1,1,1,1,1,0,0
 370,http://www.realtor.com,10,10,10,10,10,1,0
 371,http://www.thekitchn.com,1,1,1,1,1,0,0
@@ -254,7 +254,7 @@ Rank,Site URL,token vul,secret vul,signed_request vul,referrer vul,DOM vul, SDK 
 875,http://www.bufferapp.com,1,1,1,1,1,0,0
 884,http://www.jossandmain.com,-1,1,-1,1,1,1,0
 888,http://www.radaris.com,1,1,1,1,1,0,0
-892,http://www.thegrio.com,3,1,3,1,1,0,1
+892,http://www.thegrio.com,10,10,10,10,10
 898,http://www.nbclosangeles.com,1,1,1,1,1,0,0
 900,http://www.tiqiq.com,-1,1,-1,1,1,1,0
 902,http://www.popularscreensavers.com,-1,1,-1,1,1,0,1
@@ -275,7 +275,7 @@ Rank,Site URL,token vul,secret vul,signed_request vul,referrer vul,DOM vul, SDK 
 980,http://www.ymail.com,1,1,1,1,1,0,0
 982,http://www.dermstore.com,1,1,1,1,1,1,0
 996,http://www.coupons.net,-1,1,-1,1,1,1,0
-1001,http://www.seniorfriendfinder.com,3,1,3,1,1,0,1
+1001,http://www.seniorfriendfinder.com,23,1,23,1,1,0,1
 1003,http://www.academia.edu,13,1,13,1,1,1,0
 1004,http://www.foxsports.com,1,1,1,1,1,0,0
 1011,http://www.sellebrity.com,14,14,14,14,14,0,0
@@ -322,7 +322,7 @@ Rank,Site URL,token vul,secret vul,signed_request vul,referrer vul,DOM vul, SDK 
 1253,http://www.caranddriver.com,1,1,1,1,1,0,0
 1258,http://www.scientificamerican.com,1,1,1,1,1,0,0
 1280,http://www.gourmetrecipe.com,11,1,11,1,1,0,0
-1302,http://www.myfitnesspal.com,3,1,3,1,1,1,0
+1302,http://www.myfitnesspal.com,22,1,22,1,1,1,0
 1304,http://www.jokeroo.com,15,1,15,1,1,1,0
 1308,http://www.cancer.org,1,1,1,1,1,1,0
 1315,http://www.orlandosentinel.com,1,1,1,1,1,0,0
@@ -348,7 +348,7 @@ Rank,Site URL,token vul,secret vul,signed_request vul,referrer vul,DOM vul, SDK 
 1429,http://www.steadyhealth.com,1,1,1,1,1,0,0
 1430,http://www.memegenerator.net,-1,1,-1,1,1,1,0
 1439,http://www.getitfree.us,1,1,1,1,1,0,0
-1441,http://www.businessconsumeralliance.org,3,1,3,1,-1,0,1
+1441,http://www.businessconsumeralliance.org,24,1,24,1,-1,0,1
 1442,http://www.ebayclassifieds.com,1,1,-1,1,1,1,0
 1443,http://www.dailyfinance.com,1,1,1,1,1,0,0
 1446,http://www.liquor.com,-1,1,-1,1,1,1,0
@@ -374,9 +374,9 @@ Rank,Site URL,token vul,secret vul,signed_request vul,referrer vul,DOM vul, SDK 
 1585,http://www.flickriver.com,1,1,1,1,1,0,0
 1590,http://www.depositfiles.com,1,1,1,1,1,0,0
 1594,http://www.southparkstudios.com,10,10,10,10,10,0,1
-1605,http://www.rafflecopter.com,3,1,3,1,1,1,0
+1605,http://www.rafflecopter.com,14,14,14,14,14,1,0
 1616,http://www.9gag.com,1,1,1,1,1,0,0
-1625,http://www.dealchicken.com,3,1,3,-1,-1,1,0
+1625,http://www.dealchicken.com,23,1,23,-1,-1,1,0
 1627,http://www.nbcdfw.com,1,1,1,1,1,0,0
 1630,http://www.teleflora.com,1,1,-1,-1,-1,1,0
 1633,http://www.eviesays.com,1,1,1,1,1,0,0
@@ -384,7 +384,7 @@ Rank,Site URL,token vul,secret vul,signed_request vul,referrer vul,DOM vul, SDK 
 1649,http://www.wikidot.com,1,1,1,1,1,1,0
 1656,http://www.pjmedia.com,-1,1,-1,1,1,1,0
 1659,http://www.lockerz.com,1,1,1,1,1,1,0
-1661,http://www.theknot.com,3,1,3,1,1,1,0
+1661,http://www.theknot.com,23,1,23,1,1,1,0
 1664,http://www.ea.com,14,14,14,14,14,1,0
 1673,http://www.wajam.com,1,1,1,1,1,1,0
 1677,http://www.diabetes.org,1,1,1,-1,-1,0,0
@@ -442,7 +442,7 @@ Rank,Site URL,token vul,secret vul,signed_request vul,referrer vul,DOM vul, SDK 
 2049,http://www.trailer.ly,1,1,1,-1,1,0,0
 2065,http://www.wyndhamrewards.com,1,1,1,1,1,0,0
 2073,http://www.fontspace.com,1,1,1,1,1,0,0
-2093,http://www.veoh.com,3,1,3,1,1,1,0
+2093,http://www.veoh.com,-1,1,-1,1,1,1,0
 2097,http://www.oneall.com,1,1,1,1,1,0,0
 2117,http://www.moddb.com,1,1,1,1,1,0,0
 2124,http://www.mypoints.com,1,1,1,1,1,0,0
@@ -458,7 +458,7 @@ Rank,Site URL,token vul,secret vul,signed_request vul,referrer vul,DOM vul, SDK 
 2189,http://www.neoseeker.com,-1,1,1,1,1,0,0
 2195,http://www.cdbaby.com,1,1,1,1,1,0,0
 2196,http://www.nbcmiami.com,1,1,1,1,1,0,0
-2197,http://www.insiderpages.com,3,1,3,1,1,0,1
+2197,http://www.insiderpages.com,1,1,1,1,1,0,1
 2199,http://www.azfamily.com,1,1,1,-1,1,0,0
 2201,http://www.nikonusa.com,1,1,1,1,1,0,0
 2210,http://www.courant.com,1,1,1,1,1,0,0
@@ -469,7 +469,7 @@ Rank,Site URL,token vul,secret vul,signed_request vul,referrer vul,DOM vul, SDK 
 2254,http://www.ae.com,-1,1,-1,1,1,1,0
 2255,http://www.queerty.com,2,2,2,2,2,0,1
 2261,http://www.accessatlanta.com,1,1,1,1,1,0,0
-2279,http://www.iwin.com,3,1,3,1,1,1,0
+2279,http://www.iwin.com,1,1,1,1,1,1,0
 2294,http://www.digitalpoint.com,24,1,24,-1,-1,0,0
 2298,http://www.minyanville.com,-1,1,-1,1,1,0,1
 2299,http://www.artfire.com,10,10,10,10,10,0,0
@@ -511,14 +511,14 @@ Rank,Site URL,token vul,secret vul,signed_request vul,referrer vul,DOM vul, SDK 
 2533,http://www.cesarsway.com,1,1,1,1,1,0,0
 2534,http://www.gofundme.com,10,10,10,10,10,1,0
 2535,http://www.allfreecrochet.com,-1,1,-1,1,1,1,0
-2543,http://www.trustlink.org,3,1,3,1,-1,0,1
+2543,http://www.trustlink.org,1,1,1,1,-1,0,1
 2554,http://www.ebates.com,1,1,1,1,1,1,0
 2555,http://www.justia.com,3,1,3,1,1,0,1
 2563,http://www.agoda.com,12,1,12,1,1,0,0
 2574,http://www.topicologist.com,1,1,1,1,1,0,0
 2591,http://www.complaintsboard.com,1,1,1,1,1,0,0
 2602,http://www.neatorama.com,1,1,1,1,1,0,0
-2612,http://www.fieldandstream.com,3,1,3,1,1,0,1
+2612,http://www.fieldandstream.com,10,10,10,10,10,0,1
 2617,http://www.democratsenators.org,10,10,10,10,10,0,0
 2632,http://www.wholefoodsmarket.com,1,1,1,1,1,0,0
 2633,http://www.haaretz.com,-1,1,-1,1,1,1,0
@@ -568,7 +568,7 @@ Rank,Site URL,token vul,secret vul,signed_request vul,referrer vul,DOM vul, SDK 
 3083,http://www.ktvu.com,1,1,1,1,1,0,0
 3088,http://www.photo.net,1,1,1,-1,-1,0,0
 3089,http://www.sonyrewards.com,11,1,11,1,-1,0,0
-3099,http://www.gobookee.net,20,1,20,1,1,1,0
+3099,http://www.gobookee.net,14,14,14,14,14,1,0
 3100,http://www.vk.com,1,1,1,1,1,0,0
 3107,http://www.theberry.com,1,1,1,1,1,0,0
 3109,http://www.journalstar.com,2,2,2,2,2,0,0
@@ -713,7 +713,7 @@ Rank,Site URL,token vul,secret vul,signed_request vul,referrer vul,DOM vul, SDK 
 4427,http://www.cricketcountry.com,1,1,1,1,1,0,1
 4430,http://www.delawareonline.com,12,1,12,1,1,1,0
 4473,http://www.davidsbridal.com,1,1,1,1,1,0,0
-4478,http://www.teamsnap.com,20,1,20,1,1,0,1
+4478,http://www.teamsnap.com,12,1,12,1,1,0,1
 4481,http://www.mypalmbeachpost.com,1,1,1,1,1,0,0
 4483,http://www.roomstays.com,1,1,1,1,1,0,0
 4485,http://www.spotcrime.com,2,2,2,2,2,0,1
@@ -778,7 +778,7 @@ Rank,Site URL,token vul,secret vul,signed_request vul,referrer vul,DOM vul, SDK 
 5021,http://www.1800baskets.com,1,1,-1,1,1,1,0
 5026,http://www.aeriagames.com,1,1,1,1,1,1,0
 5028,http://www.whattoexpect.com,1,1,1,1,1,0,0
-5038,http://www.tablespoon.com,3,1,3,1,1,0,1
+5038,http://www.tablespoon.com,1,1,1,1,1,0,1
 5058,http://www.milesplit.com,23,1,23,-1,1,0,0
 5065,http://www.callofduty.com,10,10,10,10,10,0,0
 5066,http://www.fanbridge.com,12,1,12,1,1,0,0
@@ -930,7 +930,7 @@ Rank,Site URL,token vul,secret vul,signed_request vul,referrer vul,DOM vul, SDK 
 6886,http://www.pressofatlanticcity.com,11,11,11,11,11,0,0
 6898,http://www.motleyfool.com,10,10,10,10,10,1,0
 6901,http://www.yellowpages.ca,1,1,1,1,1,0,0
-6913,http://www.reviewjournal.com,20,1,20,1,1,0,0
+6913,http://www.reviewjournal.com,14,14,14,14,14,0,0
 6948,http://www.marvel.com,1,1,1,1,1,0,0
 6950,http://www.tcpalm.com,12,1,12,1,1,0,0
 6951,http://www.room77.com,-1,1,-1,1,1,1,0
