@@ -1,0 +1,33 @@
+http://www.officedepot.com				2nd ranked candidate	
+http://www.tunein.com					span
+http://www.seniorfriendfinder.com		span
+http://www.avclub.com					onTopLayer doesn't work (invisible)
+http://www.dealspl.us					confused by another subscribe button at the bottom of the page	(not below one of the input)
+http://www.offerpop.com					span
+http://www.bloglovin.com				1,1,1,-1,-1
+http://www.dealchicken.com				'i am new here', no indicator
+http://www.theknot.com					4th ranked candidate
+http://www.vevo.com						others (submit button click doesn't trigger JS handler? password requirement not met, although it's already met)
+http://www.fitbit.com					others (sign up with Facebook shall be helpful but never found.)
+http://www.armorgames.com				'i don't have an armorgames account'
+http://www.theweathernetwork.com		invisible submit button (form in an iframe that's too small)
+http://www.pet360.com					'go play'
+http://www.weather.ca					same website as http://www.theweathernetwork.com
+http://www.calorie-count.com			'i accept'
+http://www.good.is						linking form-like, but actually not linking form
+http://www.milesplit.com				12,1,12,-1,1
+http://www.lef.org						14,14,14,14,14
+http://www.homesandland.com				invisible submit button
+http://www.bigoven.com					'choose basic plan'
+http://www.virtuallythere.com			span
+http://www.loginradius.com				22,22,22,22,22		(dropdown menu using span)
+http://www.gdgt.com						span
+
+total:
+
+-4 submit button failures
+-2 FB support
++1 solved
++1 linking
++1 cannot handle input
+-1 vulnerable case

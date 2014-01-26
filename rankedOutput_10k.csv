@@ -337,7 +337,7 @@ Rank,Site URL,token vul,secret vul,signed_request vul,referrer vul,DOM vul
 1363,http://www.syracuse.com,1,1,1,1,1
 1370,http://www.americanlanternalerts.com,1,1,1,1,1
 1371,http://www.wsbtv.com,1,1,1,1,1
-1373,http://www.bloglovin.com,23,1,23,-1,-1
+1373,http://www.bloglovin.com,1,1,1,-1,-1
 1378,http://www.americanidol.com,1,1,1,1,1
 1382,http://www.diynetwork.com,-1,1,-1,1,1
 1391,http://www.kraftrecipes.com,12,1,12,1,1
@@ -734,7 +734,6 @@ Rank,Site URL,token vul,secret vul,signed_request vul,referrer vul,DOM vul
 4589,http://www.justcloud.com,1,1,1,1,1
 4594,http://www.shift.com,3,1,3,1,1
 4600,http://www.nextdaypets.com,12,1,12,-1,1
-4613,http://www.weather.ca,23,1,23,1,1
 4628,http://www.foxsoccer.com,1,1,1,1,1
 4633,http://www.barchart.com,1,1,1,1,1
 4654,http://www.fuelly.com,12,1,12,1,1
@@ -779,7 +778,7 @@ Rank,Site URL,token vul,secret vul,signed_request vul,referrer vul,DOM vul
 5026,http://www.aeriagames.com,1,1,1,1,1
 5028,http://www.whattoexpect.com,1,1,1,1,1
 5038,http://www.tablespoon.com,1,1,1,1,1
-5058,http://www.milesplit.com,23,1,23,-1,1
+5058,http://www.milesplit.com,12,1,12,-1,1
 5065,http://www.callofduty.com,10,10,10,10,10
 5066,http://www.fanbridge.com,12,1,12,1,1
 5072,http://www.theboot.com,14,14,14,14,14
@@ -790,7 +789,7 @@ Rank,Site URL,token vul,secret vul,signed_request vul,referrer vul,DOM vul
 5116,http://www.energycitizens.org,16,1,16,1,1
 5132,http://www.webmasterplan.com,12,1,12,-1,1
 5155,http://www.witn.com,14,14,14,14,14
-5167,http://www.lef.org,23,1,23,-1,-1
+5167,http://www.lef.org,14,14,14,14,14
 5168,http://www.tapiture.com,-1,1,-1,1,1
 5173,http://www.computing.net,11,1,11,-1,-1
 5191,http://www.atr.org,2,2,2,2,2
@@ -892,7 +891,7 @@ Rank,Site URL,token vul,secret vul,signed_request vul,referrer vul,DOM vul
 6360,http://www.wktv.com,2,2,2,2,2
 6361,http://www.trustpilot.com,-1,1,-1,1,1
 6391,http://www.mom365.com,10,10,10,10,10
-6408,http://www.loginradius.com,23,1,23,1,1
+6408,http://www.loginradius.com,22,1,22,1,1
 6423,http://www.psu.com,1,1,-1,1,1
 6450,http://www.bing.net,1,1,1,1,1
 6471,http://www.everything.org.uk,24,1,24,1,1
