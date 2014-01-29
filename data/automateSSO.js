@@ -66,8 +66,10 @@ function AutomateSSO(){
 
 var automateSSO = new AutomateSSO();
 try {
-	window.moveTo(0, 0);
-	window.resizeTo(screen.availWidth, screen.availHeight);
+	if (document.URL.indexOf('https://www.facebook.com')!=0){
+		window.moveTo(0, 0);
+		window.resizeTo(screen.availWidth, screen.availHeight);
+	}
 } catch (ex) {console.log('window resize error, this is minor and not going into the logs.');};
 //disable the following APIs for the website.
 unsafeWindow.moveTo = function(){};

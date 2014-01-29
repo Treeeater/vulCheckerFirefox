@@ -1,13 +1,18 @@
 function VulCheckerHelper() {
 
 	var that = this;
+	//options
 	this.tryFindInvisibleLoginButton = false;
+	this.searchForSignUpForFB = false;
 	this.indexToClick = 0;
+	this.relaxedStringMatch = false;
+	
 	this.account = [];
 	this.clickedButtons = [];
 	this.userInfoFound = false;
 	this.loginClickAttempts = 1;
-	this.searchForSignUpForFB = false;
+	this.results = {};					//used to store candidate information.
+	
 	function createCookie(name,value,days) {
 		if (days) {
 			var date = new Date();
@@ -53,10 +58,14 @@ function VulCheckerHelper() {
 			output += (inputStr.match(/sign-in/gi)!=null) ? 1 : 0;
 			output += (inputStr.match(/sign_in/gi)!=null) ? 1 : 0;
 			output += (inputStr.match(/connect/gi)!=null) ? 1 : 0;
-			
+			if (that.relaxedStringMatch) {
+				output += (inputStr.match(/account/gi)!=null) ? 1 : 0;
+				output += (inputStr.match(/forum/gi)!=null) ? 1 : 0;
+			}
 			that.hasLogin = that.hasLogin || (inputStr.match(/login/gi)!=null || inputStr.match(/log\sin/gi)!=null || inputStr.match(/sign\sin/gi)!=null || inputStr.match(/signin/gi)!=null || inputStr.match(/sign-in/gi)!=null || inputStr.match(/sign_in/gi)!=null || (inputStr.match(/connect/gi)!=null && inputStr.match(/connect[a-zA-Z]/gi)==null));
 			//connect is a more common word, we need to at least restrict its existence, for example, we want to rule out "Connecticut" and "connection".
 			//More heuristics TODO: give more weight to inputStr if it contains the exact strings: 'login with Facebook', 'connect with Facebook', 'sign in with facebook', etc.
+			that.hasLogin = that.hasLogin || (that.relaxedStringMatch && (inputStr.match(/account/gi)!=null || inputStr.match(/forum/gi)!=null));
 		}
 		else {
 			//search for sign up with facebook, etc.
@@ -83,6 +92,8 @@ function VulCheckerHelper() {
 	function AttrInfoClass(thisNode, thisScore) {
 		this.node = thisNode;
 		this.score = thisScore;
+		this.strategy = -1;
+		this.worker = null;
 		return this;
 	}
 	
@@ -98,6 +109,24 @@ function VulCheckerHelper() {
 		}
 		return false;
 	}
+	
+	this.tryAnotherStrategy = function(){
+		if (!that.tryFindInvisibleLoginButton && !that.relaxedStringMatch){
+			that.tryFindInvisibleLoginButton = true;
+			return true;
+		}
+		if (that.tryFindInvisibleLoginButton && !that.relaxedStringMatch){
+			that.tryFindInvisibleLoginButton = false;
+			that.relaxedStringMatch = true;
+			return true;
+		}
+		if (!that.tryFindInvisibleLoginButton && that.relaxedStringMatch){
+			that.tryFindInvisibleLoginButton = true;
+			that.relaxedStringMatch = true;
+			return true;
+		}
+		return false;			//no other strategies available
+	};
 	
 	this.onTopLayer = function(ele){
 		//This doesn't really work on section/canvas HTML5 element. TODO:Fix this.
@@ -247,21 +276,74 @@ function VulCheckerHelper() {
 		return {"loginButtonXPath":vulCheckerHelper.getXPath(vulCheckerHelper.sortedAttrInfoMap[response.indexToClick].node), "loginButtonOuterHTML":vulCheckerHelper.sortedAttrInfoMap[response.indexToClick].node.outerHTML};
 	}
 	
-	this.pressLoginButton = function(){
-		that.searchForLoginButton(document.body);
-		if (vulCheckerHelper.sortedAttrInfoMap.length <= vulCheckerHelper.indexToClick) {
-			self.port.emit("noLoginButtonFound","");
-			return;			//no login button found, tell ccc that.
+	this.reportCandidates = function(){
+		that.flattenedResults = new Array();
+		that.results = new Array();		//clean results in case this is a second click attempt and the first click did not navigate the page.
+		that.tryFindInvisibleLoginButton = false;			//reset strategy
+		that.relaxedStringMatch = false;
+		var curStrategy = 0;
+		while (true){
+			that.searchForLoginButton(document.body);
+			that.results[curStrategy] = that.sortedAttrInfoMap;
+			curStrategy++;
+			if (!that.tryAnotherStrategy() || that.userInfoFound) break;
 		}
-		self.port.emit("loginInfo",{"loginButtonXPath":vulCheckerHelper.getXPath(vulCheckerHelper.sortedAttrInfoMap[vulCheckerHelper.indexToClick].node), "loginButtonOuterHTML":vulCheckerHelper.sortedAttrInfoMap[vulCheckerHelper.indexToClick].node.outerHTML});
-	}
-	
-	this.automaticPressLoginButton = function(){
-		self.port.emit("getIndexOfLoginButtonToPress",0);
-	}
-	
-	this.delayedPressLoginButton = function(){
-		self.port.emit("checkTestingStatus",0);
+		if (that.userInfoFound){
+			self.port.emit("reportCandidates",[{
+				score: -999, 
+				node: null, 
+				strategy: null,
+				XPath: "USER_INFO_EXISTS!",
+				outerHTML: "USER_INFO_EXISTS!",
+				original_index: 0
+			}]);
+			return;
+		}
+		//TODO:flatten the results, get rid of duplicates and populate strategy field.
+		var pointers = Array.apply(null, new Array(curStrategy)).map(Number.prototype.valueOf,0);
+		var j;
+		var maxScore;
+		var maxNode;
+		var maxStrategy;
+		var maxXPath;
+		var maxOuterHTML;
+		var breakFlag;
+		while (true){
+			maxScore = -999;
+			maxStrategy = -1;
+			breakFlag = 0;
+			//merge all sorted arrays.
+			for (j = 0; j < curStrategy; j++)
+			{
+				if (that.results[j].length == 0 || pointers[j] >= that.results[j].length) {
+					//this strategy already depleted and merged, go to the next strategy
+					breakFlag++;
+					continue;
+				}
+				if (maxScore < that.results[j][pointers[j]].score){
+					maxScore = that.results[j][pointers[j]].score;
+					maxNode = that.results[j][pointers[j]].node;
+					maxXPath = that.getXPath(that.results[j][pointers[j]].node);
+					maxOuterHTML = that.results[j][pointers[j]].node.outerHTML;
+					maxStrategy = j;
+				}
+			}
+			if (maxStrategy != -1){
+				if (that.flattenedResults.length == 0 || maxNode != that.flattenedResults[that.flattenedResults.length-1].node){		//avoid duplicate candidate (another strategy is to boost duplicate's score, but we can worry about this later.
+					that.flattenedResults.push({
+						score: maxScore, 
+						node: maxNode, 
+						strategy: maxStrategy,
+						XPath: maxXPath,
+						outerHTML: maxOuterHTML,
+						original_index: that.flattenedResults.length
+					});
+				}
+				pointers[maxStrategy]++;
+			}
+			if (breakFlag == curStrategy) break;
+		}
+		self.port.emit("reportCandidates",that.flattenedResults);
 	}
 	
 	this.getXPath = function(element) {
@@ -289,6 +371,7 @@ function VulCheckerHelper() {
 	
 		this.sortedAttrInfoMap = [];
 		this.AttrInfoMap = [];
+		this.userInfoFound = false;
 		this.count = 0;
 		this.hasFB = false;									
 		this.hasLogin = false;								
@@ -324,43 +407,27 @@ scroll(y);
 
 if (self.port)
 {
-	//Doublecheck that the application didn't run into a confused state - phase 2 not updated promptly.
-	self.port.on("userClickedPressLoginButton",function(action){
-		vulCheckerHelper.account = [];
-		vulCheckerHelper.pressLoginButton();
-	});
-	self.port.on("sendLoginButtonInformation",function(response){
-		vulCheckerHelper.account = response.account;
-		vulCheckerHelper.searchForSignUpForFB = response.searchForSignUpForFB;
-		self.port.emit("sendLoginButtonInformation",vulCheckerHelper.sendLoginButtonInformation(response));
-	});
+	//press login button worker has two duties:
+	//1: report all candidates under all configurations (upon request).
+	//2: click a specific candidate given a strategy.
 	self.port.on("after_modification_sendLoginButtonInformation",function(response){
 		vulCheckerHelper.account = response.account;
 		self.port.emit("after_modification_sendLoginButtonInformation",vulCheckerHelper.sendLoginButtonInformation(response));
 	});
-	self.port.on("indexOfLoginButtonToPress", function (response){
-		//tell background we are about to press the login button.
-		//response should contain whether background page has detected that FB has been visited.
-		vulCheckerHelper.tryFindInvisibleLoginButton = response.tryFindInvisibleLoginButton;
-		vulCheckerHelper.indexToClick = response.indexToClick;
-		vulCheckerHelper.loginClickAttempts = response.loginClickAttempts;
-		if (response.shouldClick) vulCheckerHelper.pressLoginButton();			//this condition ensures that once FB traffic is seen, we do not want to press login button again.
-	});
-	self.port.on("checkTestingStatus", function (response){
-		//check if background is in active checking.
+	//duty 1: report candidates
+	self.port.on("reportCandidates", function (response){
+		//need three things from response: current account, if we are looking for sign up for FB, and what's the current click attempt number
 		vulCheckerHelper.account = response.account;
 		vulCheckerHelper.searchForSignUpForFB = response.searchForSignUpForFB;
-		if (response.shouldClick) vulCheckerHelper.automaticPressLoginButton();		//need to set a lenient timer, since if the fb traffic is not seen in this time, it's going to click the login button again, which resets the connection - this may create an infinite loop. Current setting is that if the login button is pressed more than twice, it gives up.
+		vulCheckerHelper.loginClickAttempts = response.loginClickAttempts;
+		vulCheckerHelper.reportCandidates();		//Just report the candidates, don't click on anything yet.
 	});
-	self.port.on("readyToClick", function(){
-		if (vulCheckerHelper.sortedAttrInfoMap.length > vulCheckerHelper.indexToClick) {
-			vulCheckerHelper.sortedAttrInfoMap[vulCheckerHelper.indexToClick].node.click();
-			vulCheckerHelper.clickedButtons.push(vulCheckerHelper.getXPath(vulCheckerHelper.sortedAttrInfoMap[vulCheckerHelper.indexToClick].node));		//record the clicked button, so that we don't click the same button next time if the page doesn't nav away.
-		}
+	//duty 2: click candidate
+	self.port.on("clickCandidate", function(response){
+		//need 1 thing from response: which candidate (rank) are we clicking.
+		vulCheckerHelper.flattenedResults[response.original_index].node.click();
+		vulCheckerHelper.clickedButtons.push(vulCheckerHelper.getXPath(vulCheckerHelper.flattenedResults[response.original_index].node));		//record the clicked button, so that we don't click the same button next time if the page doesn't nav away.
 	});
-	//window.addEventListener('load',vulCheckerHelper.delayedPressLoginButton);				//must not do this. FF's gonna give u stupid hidden window error.
-	self.port.emit("clearPressLoginButtonTimer",0);
-	setTimeout(vulCheckerHelper.delayedPressLoginButton,5000);
 }
 else
 {
