@@ -62,6 +62,7 @@ function VulCheckerHelper() {
 		if (!that.searchForSignUpForFB)
 		{
 			output += (inputStr.match(/login/gi)!=null) ? 1 : 0;
+			output += (inputStr.match(/oauth/gi)!=null) ? 1 : 0;
 			output += (inputStr.match(/log\sin/gi)!=null) ? 1 : 0;
 			output += (inputStr.match(/sign\sin/gi)!=null) ? 1 : 0;
 			output += (inputStr.match(/signin/gi)!=null) ? 1 : 0;
@@ -73,7 +74,7 @@ function VulCheckerHelper() {
 				output += (inputStr.match(/forum/gi)!=null) ? 1 : 0;
 			}
 			
-			that.hasLogin = that.hasLogin || (inputStr.match(/login/gi)!=null || inputStr.match(/log\sin/gi)!=null || inputStr.match(/sign\sin/gi)!=null || inputStr.match(/signin/gi)!=null || inputStr.match(/sign-in/gi)!=null || inputStr.match(/sign_in/gi)!=null || (inputStr.match(/connect/gi)!=null && inputStr.match(/connect[a-zA-Z]/gi)==null));
+			that.hasLogin = that.hasLogin || inputStr.match(/oauth/gi)!=null || (inputStr.match(/login/gi)!=null || inputStr.match(/log\sin/gi)!=null || inputStr.match(/sign\sin/gi)!=null || inputStr.match(/signin/gi)!=null || inputStr.match(/sign-in/gi)!=null || inputStr.match(/sign_in/gi)!=null || (inputStr.match(/connect/gi)!=null && inputStr.match(/connect[a-zA-Z]/gi)==null));
 			//connect is a more common word, we need to at least restrict its existence, for example, we want to rule out "Connecticut" and "connection".
 			//More heuristics TODO: give more weight to inputStr if it contains the exact strings: 'login with Facebook', 'connect with Facebook', 'sign in with facebook', etc.
 			that.hasLogin = that.hasLogin || (that.relaxedStringMatch && (inputStr.match(/account/gi)!=null || inputStr.match(/forum/gi)!=null));
@@ -82,13 +83,14 @@ function VulCheckerHelper() {
 		else {
 			//search for sign up with facebook, etc.
 			output += (inputStr.match(/signup/gi)!=null) ? 1 : 0;
+			output += (inputStr.match(/oauth/gi)!=null) ? 1 : 0;
 			output += (inputStr.match(/sign\sup/gi)!=null) ? 1 : 0;
 			output += (inputStr.match(/sign_up/gi)!=null) ? 1 : 0;
 			output += (inputStr.match(/sign-up/gi)!=null) ? 1 : 0;
 			output += (inputStr.match(/register/gi)!=null) ? 1 : 0;
 			output += (inputStr.match(/create/gi)!=null) ? 1 : 0;
 			output += (inputStr.match(/join/gi)!=null) ? 1 : 0;
-			that.hasLogin = that.hasLogin || (inputStr.match(/signup/gi)!=null || inputStr.match(/sign\sup/gi)!=null || inputStr.match(/sign_up/gi)!=null || inputStr.match(/sign-up/gi)!=null || inputStr.match(/create/gi)!=null || inputStr.match(/join/gi)!=null);				//semantically this should be that.hasSignUp, but we just put hasLogin here for simplicity.	
+			that.hasLogin = that.hasLogin || inputStr.match(/oauth/gi)!=null || (inputStr.match(/signup/gi)!=null || inputStr.match(/sign\sup/gi)!=null || inputStr.match(/sign_up/gi)!=null || inputStr.match(/sign-up/gi)!=null || inputStr.match(/create/gi)!=null || inputStr.match(/join/gi)!=null);				//semantically this should be that.hasSignUp, but we just put hasLogin here for simplicity.	
 			
 		}
 			
