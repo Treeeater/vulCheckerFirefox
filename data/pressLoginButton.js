@@ -410,10 +410,6 @@ if (self.port)
 	//press login button worker has two duties:
 	//1: report all candidates under all configurations (upon request).
 	//2: click a specific candidate given a strategy.
-	self.port.on("after_modification_sendLoginButtonInformation",function(response){
-		vulCheckerHelper.account = response.account;
-		self.port.emit("after_modification_sendLoginButtonInformation",vulCheckerHelper.sendLoginButtonInformation(response));
-	});
 	//duty 1: report candidates
 	self.port.on("reportCandidates", function (response){
 		//need three things from response: current account, if we are looking for sign up for FB, and what's the current click attempt number

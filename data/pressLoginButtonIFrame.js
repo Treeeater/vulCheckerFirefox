@@ -408,18 +408,22 @@ if (self.port && (document.URL.indexOf('http://www.facebook.com/login.php') == -
 					score: 999, 
 					node: document.getElementById('fbRegistrationLogin'), 
 					strategy: 5,				//5 means widget
+					XPath: vulCheckerHelper.getXPath(document.getElementById('fbRegistrationLogin')),
+					outerHTML: document.getElementById('fbRegistrationLogin').outerHTML,
 					original_index: vulCheckerHelper.flattenedResults.length
 				});
 				self.port.emit("reportCandidates",vulCheckerHelper.flattenedResults);
 			}
 		}
 		else if ((document.URL.indexOf('http://www.facebook.com/plugins/login_button.php')==0 || document.URL.indexOf('https://www.facebook.com/plugins/login_button.php')==0) && document.documentElement.offSetHeight != 0 && document.documentElement.offSetWidth != 0){
-			if (document.getElementsByClassName('pluginFaviconButtonText fwb').length>0) {
+			if (document.getElementsByClassName('fwb').length>0) {
 				vulCheckerHelper.flattenedResults = [];
 				vulCheckerHelper.flattenedResults.push({
 					score: 999, 
-					node: document.getElementsByClassName('pluginFaviconButtonText fwb')[0], 
+					node: document.getElementsByClassName('fwb')[0], 
 					strategy: 5,				//5 means widget
+					XPath: vulCheckerHelper.getXPath(document.getElementsByClassName('fwb')[0]),
+					outerHTML: document.getElementsByClassName('fwb')[0].outerHTML,
 					original_index: vulCheckerHelper.flattenedResults.length
 				});
 				self.port.emit("reportCandidates",vulCheckerHelper.flattenedResults);
