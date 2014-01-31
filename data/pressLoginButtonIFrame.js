@@ -305,6 +305,7 @@ function VulCheckerHelper() {
 		}
 		//TODO:flatten the results, get rid of duplicates and populate strategy field.
 		var pointers = Array.apply(null, new Array(curStrategy)).map(Number.prototype.valueOf,0);
+		var i;
 		var j;
 		var maxScore;
 		var maxNode;
@@ -312,6 +313,7 @@ function VulCheckerHelper() {
 		var maxXPath;
 		var maxOuterHTML;
 		var breakFlag;
+		var dupFlag;
 		while (true){
 			maxScore = -999;
 			maxStrategy = -1;
@@ -333,7 +335,16 @@ function VulCheckerHelper() {
 				}
 			}
 			if (maxStrategy != -1){
-				if (that.flattenedResults.length == 0 || maxNode != that.flattenedResults[that.flattenedResults.length-1].node){		//avoid duplicate candidate (another strategy is to boost duplicate's score, but we can worry about this later.
+				dupFlag = false;
+				for (i = 0; i < that.flattenedResults.length; i++)
+				{
+					if (that.flattenedResults[i].node == maxNode) {
+						dupFlag = true;
+						break;
+					}
+				}
+				if (!dupFlag){		
+					//avoid duplicate candidate (another strategy is to boost duplicate's score, but we can worry about this later.
 					that.flattenedResults.push({
 						score: maxScore, 
 						node: maxNode, 
