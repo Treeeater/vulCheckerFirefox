@@ -358,7 +358,8 @@ function VulCheckerHelper() {
 			}
 			if (breakFlag == curStrategy) break;
 		}
-		if (that.flattenedResults.length != 0) self.port.emit("reportCandidates",that.flattenedResults);		//if results is empty, don't bother to send this iframe result.
+		if ((!!self.port) && that.flattenedResults.length != 0) self.port.emit("reportCandidates",that.flattenedResults);
+		else return that.flattenedResults;			//for console debugging purposes.
 	}
 	
 	this.getXPath = function(element) {
@@ -458,6 +459,5 @@ if (self.port && (document.URL.indexOf('http://www.facebook.com/login.php') == -
 }
 else
 {
-	vulCheckerHelper.searchForLoginButton(document.body);
-	log(vulCheckerHelper.sortedAttrInfoMap);
+	console.log(vulCheckerHelper.reportCandidates());
 }

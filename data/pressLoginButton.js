@@ -356,7 +356,8 @@ function VulCheckerHelper() {
 			}
 			if (breakFlag == curStrategy) break;
 		}
-		self.port.emit("reportCandidates",that.flattenedResults);
+		if (self.port) self.port.emit("reportCandidates",that.flattenedResults);
+		else return that.flattenedResults;			//for console debugging purposes.
 	}
 	
 	this.getXPath = function(element) {
@@ -440,6 +441,5 @@ if (self.port)
 }
 else
 {
-	vulCheckerHelper.searchForLoginButton(document.body);
-	console.log(vulCheckerHelper.sortedAttrInfoMap);
+	console.log(vulCheckerHelper.reportCandidates());
 }

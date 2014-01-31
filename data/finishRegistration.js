@@ -593,15 +593,9 @@ if (self.port){
 			debug = response.debug;
 		});
 		self.port.on("startRegister",function(response){
-			if (response.manualClick){
-				log('manual clicked from popup.html to finish registration...');
-				registration.tryCompleteRegistration();
-			}
-			else{
-				log("Yet to see submit button clicked from iframes, starting to register from Top...");
-				registration.shouldClickSubmitButton = true;
-				setTimeout(registration.tryCompleteRegistration,2000);			//wait for extra js to load.
-			}
+			log("Yet to see submit button clicked from iframes, starting to register from Top...");
+			registration.shouldClickSubmitButton = true;
+			setTimeout(registration.tryCompleteRegistration,2000);			//wait for extra js to load.
 		});
 	}
 }
