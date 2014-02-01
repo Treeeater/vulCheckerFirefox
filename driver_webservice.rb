@@ -21,6 +21,20 @@ def kill_process(pid)
 	Process.kill(9, *to_kill)
 end
 
+def kill_process_by_name(pname)
+	to_kill = Array.new
+	ProcTable.ps do |proc|
+		to_kill << proc.pid if pname.downcase == proc.comm.downcase
+	end
+	to_kill.each{|p|
+		begin
+			kill_process(p)
+		rescue
+		end
+	}
+end
+
+
 def sendMail(recipient, title, message)
 	begin
 		Mail.deliver do
@@ -87,6 +101,8 @@ i = 0
 client.query("UPDATE `jobs` SET `started`=0, `startTime`='' WHERE `started`='1' AND done != '1'")
 
 while (true)
+	#kill any crashreporter.exe launched in this period.
+	kill_process_by_name("crashreporter.exe")
 	#reclaim completed jobs first.
 	for i in 0..totalSessions-1
 		if (remainingSessions.include? i) then next end			#we only reclaim running (and finished) sessions.

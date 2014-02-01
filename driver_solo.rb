@@ -69,6 +69,19 @@ def kill_process(pid)
 	Process.kill(9, *to_kill)
 end
 
+def kill_process_by_name(pname)
+	to_kill = Array.new
+	ProcTable.ps do |proc|
+		to_kill << proc.pid if pname.downcase == proc.comm.downcase
+	end
+	to_kill.each{|p|
+		begin
+			kill_process(p)
+		rescue
+		end
+	}
+end
+
 i = 0
 WebSessions = 3
 while (i < WebSessions)
@@ -109,6 +122,8 @@ end
 
 while (true)
 	i = 0
+	#kill any crashreporter.exe launched in this period.
+	kill_process_by_name("crashreporter.exe")
 	while (i < totalSessions)
 		if (File.exists?("vulCheckerProfile#{i}/testResults/finished.txt"))
 			begin
