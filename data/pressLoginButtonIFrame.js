@@ -20,7 +20,7 @@ function VulCheckerHelper() {
 	this.userInfoFound = false;
 	this.iframeClickedOuterHTML = [];
 	this.iframeClickedXPATH = [];
-	this.loginClickAttempts = 1;
+	this.loginClickAttempts = 0;
 	this.results = {};	
 	
 	function createCookie(name,value,days) {
@@ -50,11 +50,11 @@ function VulCheckerHelper() {
 	function calculateFBScore(inputStr)
 	{
 		var output = 0;
-		if (that.loginClickAttempts == 1) {
+		if (that.loginClickAttempts == 0) {
 			output = (inputStr.match(/FB/gi)!=null) ? 1 : 0;
 			output += (inputStr.match(/facebook/gi)!=null) ? 1 : 0;
 		}
-		else if (that.loginClickAttempts > 1) {
+		else if (that.loginClickAttempts > 0) {
 			//after the first click, the page/iframe supposedly should nav to a sign-in heavy content, in this case we should emphasize on facebook string detection, instead of 'sign in' pattern.
 			output = (inputStr.match(/FB/gi)!=null) ? 10 : 0;
 			output += (inputStr.match(/facebook/gi)!=null) ? 10 : 0;

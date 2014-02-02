@@ -676,5 +676,6 @@ if (self.port){
 }
 else {
 	registration.account = {firstName:"chadadarnya",lastName:"isackaldon",email:"chadadarnyaisackaldon@outlook.com"};
+	registration.reportCandidates();
 	console.log(registration.flattenedResults);
 }

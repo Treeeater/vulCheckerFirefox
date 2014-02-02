@@ -664,6 +664,7 @@ if (window.innerHeight >= 100 && window.innerWidth >= 200 && document.documentEl
 	}
 	else {
 		registration.account = {firstName:"chadadarnya",lastName:"isackaldon",email:"chadadarnyaisackaldon@outlook.com"};
+		registration.reportCandidates();
 		console.log(registration.flattenedResults);
 	}
 }
