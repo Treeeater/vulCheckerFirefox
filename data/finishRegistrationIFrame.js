@@ -9,18 +9,41 @@ var Registration = function(){
 	var that = this;
 	this.sortedSubmitButtons = [];
 	this.account;
-	this.attempts = 0;
-	this.submitButtonClicked = false;
 	this.allTopTextInputs = [];		//stores all text inputs that are on top layer.
 	this.allTopTextInputBottomEdges = [];		//stores bottom edges of all inputs.
 	this.inputBotEdge = 0;			//stores the bottommost edge of all inputs
 	this.disableRestrictionOnLinking = false;		//relax restriction on linking.
+	this.relaxBotEdge = false;						//relax restriction to finding bot edges on inputs that share common ancestor forms.
+	this.flattenedResults = [];
+	this.clickedButtons = [];
+	
 	var uniqueRadioButtons = [];
 	var filledRadioButtonNames = [];
 	var randomString = function(length, chars) {
 		var result = '';
 		for (var i = length; i > 0; --i) result += chars[Math.round(Math.random() * (chars.length - 1))];
 		return result;
+	}
+	
+	this.getXPath = function(element) {
+		var document = element.ownerDocument;
+		if (element.id!=='' && typeof element.id != 'undefined')
+			return "//"+element.tagName+"[@id='"+element.id+"']";
+		if (element===document.body)
+			return '/HTML/' + element.tagName;
+
+		var ix = 0;
+		if (typeof element.parentNode != 'undefined' && element.parentNode != null)
+		{
+			var siblings = element.parentNode.childNodes;
+			for (var i= 0; i<siblings.length; i++) {
+				var sibling= siblings[i];
+				if (sibling===element)
+					return that.getXPath(element.parentNode)+'/'+element.tagName+'['+(ix+1)+']';
+				if (sibling.nodeType===1 && sibling.tagName===element.tagName)
+					ix++;
+			}
+		}
 	}
 	
 	this.isChildElement = function(parent, child){
@@ -35,6 +58,24 @@ var Registration = function(){
 		}
 		return false;
 	}
+	
+	this.tryAnotherStrategy = function(){
+		if (!that.relaxBotEdge && !that.disableRestrictionOnLinking){
+			that.relaxBotEdge = true;
+			return true;
+		}
+		if (that.relaxBotEdge && !that.disableRestrictionOnLinking){
+			that.relaxBotEdge = false;
+			that.disableRestrictionOnLinking = true;
+			return true;
+		}
+		if (!that.relaxBotEdge && that.disableRestrictionOnLinking){
+			that.relaxBotEdge = true;
+			that.disableRestrictionOnLinking = true;
+			return true;
+		}
+		return false;			//no other strategies available
+	};
 	
 	this.onTopLayer = function(ele){
 		//given an element, returns true if it's likely to be on the topmost layer, false if otherwise.
@@ -420,7 +461,23 @@ var Registration = function(){
 		for (i = 0; i < suspects.length; i++){
 			//Heuristic: eliminate those suspects whose position is not lower than all input text elements:
 			var TLtop = $(suspects[i]).offset().top;
-			if (TLtop < that.inputBotEdge) continue;
+			//input bottom edge restriction
+			if (!that.relaxBotEdge){
+				if (TLtop < that.inputBotEdge) continue;
+			}
+			else {
+				var eliminated = false;
+				var j = 0;
+				for (j = 0; j < that.allTopTextInputs.length; j++){
+					if (that.commonParentDistance(suspects[i],that.allTopTextInputs[j]) < 2 && TLtop < that.allTopTextInputBottomEdges[j] - that.allTopTextInputs[j].offsetHeight/2) eliminated = true;
+				}
+				if (eliminated) continue;
+			}
+			//duplicate button restriction
+			if (that.clickedButtons.indexOf(that.getXPath(suspects[i])) != -1) {
+				//avoiding clicking on the same button twice, now ignoring the duplicate button...
+				continue;
+			}
 			//Heuristic: submit button cannot be too large:
 			if (suspects[i].offsetHeight > 150 || suspects[i].offsetWidth > 800) continue;
 			var curScore = 0;
@@ -443,49 +500,6 @@ var Registration = function(){
 				submitButtons.push({node:suspects[i],score:curScore});
 			}
 		}
-		if (submitButtons.length == 0){
-			//Cannot find submit button after eliminating all buttons that are above all inputs, relax this a bit now.
-			log("Cannot find submit button when eliminating all buttons that are above text inputs, now relaxing this...");
-			for (i = 0; i < suspects.length; i++){
-				//Heuristic: eliminate those suspects whose position is not lower than all input text elements that have a close common parent with this suspect:
-				var TLtop = $(suspects[i]).offset().top;
-				var eliminated = false;
-				var j = 0;
-				for (j = 0; j < that.allTopTextInputs.length; j++){
-					if (that.commonParentDistance(suspects[i],that.allTopTextInputs[j]) < 2 && TLtop < that.allTopTextInputBottomEdges[j] - that.allTopTextInputs[j].offsetHeight/2) eliminated = true;
-				}
-				if (eliminated) continue;
-				//Heuristic: submit button cannot be too large:
-				if (suspects[i].offsetHeight > 150 || suspects[i].offsetWidth > 800) continue;
-				var curScore = 0;
-				for (j = 0; j < suspects[i].attributes.length; j++)
-				{
-					//if (suspects[i].attributes[j].name.indexOf('on') == 0) continue;		//Heuristics: event handlers doesn't count.
-					var temp = suspects[i].attributes[j].name + "=" + suspects[i].attributes[j].value;
-					curScore += that.computeSubmitButtonTextScore(temp.toLowerCase());
-				}
-				var directChildrenTextContent = $(suspects[i]).contents().filter(function() {
-					if (this.nodeType == 3) return true;
-					if (this.nodeName == "EM") return true;
-					if (this.nodeName == "B") return true;
-					if (this.nodeName == "I") return true;
-					if (this.nodeName == "U") return true;
-					return false;
-				}).text().toLowerCase();
-				curScore += that.computeSubmitButtonTextScore(directChildrenTextContent);
-				if (curScore >= 1){
-					submitButtons.push({node:suspects[i],score:curScore});
-				}
-			}
-		}
-		//relax linking form restriction:
-		if (submitButtons.length == 0 && !that.disableRestrictionOnLinking){
-			that.disableRestrictionOnLinking = true;
-			log('Cannot find submit button when eliminating linking-like forms, now relaxing this...')
-			that.tryFindSubmitButton();
-			that.disableRestrictionOnLinking = false;
-			return;
-		}
 		for (i = 0; i < submitButtons.length; i++)
 		{
 			//sort the submitButtons.
@@ -504,6 +518,77 @@ var Registration = function(){
 				submitButtons[maxindex].score = -1;
 			}
 		}
+	}
+	
+	this.reportCandidates = function(){
+		that.flattenedResults = [];
+		that.results = new Array();		//clean results in case this is a second click attempt and the first click did not navigate the page.
+		that.relaxBotEdge = false;
+		that.disableRestrictionOnLinking = false;
+		var curStrategy = 0;
+		while (true){
+			that.tryFindSubmitButton();
+			that.results[curStrategy] = that.sortedSubmitButtons;
+			curStrategy++;
+			if (!that.tryAnotherStrategy()) break;
+		}
+		//TODO:flatten the results, get rid of duplicates and populate strategy field.
+		var pointers = Array.apply(null, new Array(curStrategy)).map(Number.prototype.valueOf,0);
+		var i;
+		var j;
+		var maxScore;
+		var maxNode;
+		var maxStrategy;
+		var maxXPath;
+		var maxOuterHTML;
+		var breakFlag;
+		var dupFlag;
+		while (true){
+			maxScore = -999;
+			maxStrategy = -1;
+			breakFlag = 0;
+			//merge all sorted arrays.
+			for (j = 0; j < curStrategy; j++)
+			{
+				if (that.results[j].length == 0 || pointers[j] >= that.results[j].length) {
+					//this strategy already depleted and merged, go to the next strategy
+					breakFlag++;
+					continue;
+				}
+				if (maxScore < that.results[j][pointers[j]].score){
+					maxScore = that.results[j][pointers[j]].score;
+					maxNode = that.results[j][pointers[j]].node;
+					maxXPath = that.getXPath(that.results[j][pointers[j]].node);
+					maxOuterHTML = that.results[j][pointers[j]].node.outerHTML;
+					maxStrategy = j;
+				}
+			}
+			if (maxStrategy != -1){
+				dupFlag = false;
+				for (i = 0; i < that.flattenedResults.length; i++)
+				{
+					if (that.flattenedResults[i].node == maxNode) {
+						dupFlag = true;
+						break;
+					}
+				}
+				if (!dupFlag){		
+					//avoid duplicate candidate (another strategy is to boost duplicate's score, but we can worry about this later.
+					that.flattenedResults.push({
+						score: maxScore, 
+						node: maxNode, 
+						strategy: maxStrategy,
+						XPath: maxXPath,
+						outerHTML: maxOuterHTML,
+						original_index: that.flattenedResults.length
+					});
+				}
+				pointers[maxStrategy]++;
+			}
+			if (breakFlag == curStrategy) break;
+		}
+		if (self.port) self.port.emit("reportCandidates",that.flattenedResults);
+		else return that.flattenedResults;			//for console debugging purposes.
 	}
 	
 	this.findInputBottomEdge = function(){
@@ -541,59 +626,44 @@ var Registration = function(){
 			if (offSetY > that.inputBotEdge) that.inputBotEdge = offSetY;
 		}
 	}
-
-	var clickSubmitButton = function(){
-		log("Clicking on submit button from IFrame: " + that.sortedSubmitButtons[0].node.outerHTML);
-		that.submitButtonClicked = true;
-		that.sortedSubmitButtons[0].node.click();
-		self.port.emit("registrationSubmitted",{"elementsToClick":[],"buttonToClick":[]});
+	
+	this.resetStatus = function()
+	{
+		that.sortedSubmitButtons = [];
+		uniqueRadioButtons = [];
+		filledRadioButtonNames = [];
 	}
 	
-	this.tryCompleteRegistration = function(){
-		//need to confirm that this iframe is on top layer in the first place before searching for all the inputs/buttons.
-		//This is however hard to do because of SOP restriction and also possible redirection at iframe src. We cannot simply compare src attribute and worker.url to get the iframe handle from host page.
-		//if (that.sortedSubmitButtons.length > 0) return;
-		if (that.submitButtonClicked) return;
-		that.tryProcessRadio();
-		that.tryProcessSelects();
-		that.tryFillInInputs();
-		that.findInputBottomEdge();
-		that.tryFindSubmitButton();
-		that.attempts++;
-		if (typeof self.port != "undefined" && registration.sortedSubmitButtons.length>0) {
-			setTimeout(clickSubmitButton,500);			//give some time for all the shenanigans to settle
-		}
-		if (that.sortedSubmitButtons.length == 0 && that.attempts <= 2) setTimeout(that.tryCompleteRegistration,2000);		//tackle situations where page is first created but are blank, and contents are filled in afterwards.
-	}
 }
 
 var registration = new Registration();
 var inputFilledMessage = "Iframe: All fields populated. Ready to click submit button.";
-var delayedCall = function(){
-	if (window.innerHeight < 100 || window.innerWidth < 200) return;	//shouldn't cope with iframe that's too small, this eliminate some FPs.
-	self.port.emit("shouldRegisterIframe","");							//iframe finish registration worker start automatically, don't need ccc to issue a command; However, they only work if capturingPhase is 4 or 10.
-}
 
-if (self.port){
-	if (document.documentElement.offSetHeight != 0 && document.documentElement.offSetWidth != 0 && document.URL.indexOf('plugins/likebox.php')==-1) {
+if (window.innerHeight >= 100 && window.innerWidth >= 200 && document.documentElement.offSetHeight != 0 && document.documentElement.offSetWidth != 0 && document.URL.indexOf('plugins/likebox.php')==-1){
+	if (self.port) {
 		//why bother trying an invisible iframe?
 		//Ignore plugin likeboxes.
-		setTimeout(delayedCall,1000);
-		self.port.on("shouldRegisterIframe",function (response){
+		self.port.on("init", function(response){
+			registration.account = response.accountsInfo;
 			debug = response.debug;
-			if (response.shouldRegisterIframe) {
-				log("https iframe detected while capturing phase is 4 or 10 and the site needs registration.");
-				self.port.emit("getUserInfo","");
-			}
 		});
-		self.port.on("issueUserInfo",function(response){
-			registration.account = response;
-			registration.tryCompleteRegistration();
+		self.port.on("reportSubmitButtonCandidates",function(response){
+			registration.resetStatus();
+			registration.findInputBottomEdge();
+			registration.reportCandidates();
+			self.port.emit("reportSubmitButtonCandidates", registration.flattenedResults);
+		});
+		self.port.on("clickSubmitButton",function(response){
+			registration.resetStatus();
+			registration.tryProcessRadio();
+			registration.tryProcessSelects();
+			registration.tryFillInInputs();
+			registration.flattenedResults[response.original_index].node.click();
+			registration.clickedButtons.push(registration.getXPath(registration.flattenedResults[response.original_index].node));		//record the clicked button, so that 
 		});
 	}
-}
-else{
-	registration.account = {firstName:"chadadarnya",lastName:"isackaldon",email:"chadadarnyaisackaldon@outlook.com"};
-	registration.tryCompleteRegistration();			//for debugging.
-	if (registration.sortedSubmitButtons.length>0) log(registration.sortedSubmitButtons);
+	else {
+		registration.account = {firstName:"chadadarnya",lastName:"isackaldon",email:"chadadarnyaisackaldon@outlook.com"};
+		console.log(registration.flattenedResults);
+	}
 }
