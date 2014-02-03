@@ -455,6 +455,7 @@ var Registration = function(){
 			if ($(temp[i]).offset().top < 100) continue;
 			if (!that.onTopLayer(temp[i])) continue;
 			if (that.isLinkingForm(temp[i])) continue;
+			if (temp[i].href.toLowerCase().indexOf('mailto:') == 0) continue;
 			suspects.push(temp[i]);
 		}
 		temp = document.getElementsByTagName('img');

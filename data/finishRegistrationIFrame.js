@@ -450,6 +450,7 @@ var Registration = function(){
 		for (i = 0; i < temp.length; i++){
 			if (!that.onTopLayer(temp[i])) continue;
 			if (that.isLinkingForm(temp[i])) continue;
+			if (temp[i].href.toLowerCase().indexOf('mailto:') == 0) continue;
 			suspects.push(temp[i]);
 		}
 		temp = document.getElementsByTagName('img');

@@ -164,6 +164,9 @@ function VulCheckerHelper() {
 		if (curNode.nodeName == "INPUT") {
 			if (curNode.type != "button" && curNode.type != "image" && curNode.type != "submit") return false;
 		}
+		if (curNode.nodeName == "A") {
+			if (curNode.href.toLowerCase().indexOf('mailto:') == 0) return false;
+		}
 		if (that.clickedButtons.indexOf(that.getXPath(curNode)) != -1) {
 			//avoiding clicking on the same button twice, now ignoring the duplicate button...
 			return false;
@@ -339,6 +342,7 @@ function VulCheckerHelper() {
 				for (i = 0; i < that.flattenedResults.length; i++)
 				{
 					if (that.flattenedResults[i].node == maxNode) {
+						that.flattenedResults[i].stats = that.flattenedResults[i].stats + maxStrategy.toString() + "/" + maxScore.toString() + "/" + pointers[maxStrategy].toString() + ";";
 						dupFlag = true;
 						break;
 					}
@@ -351,7 +355,8 @@ function VulCheckerHelper() {
 						strategy: maxStrategy,
 						XPath: maxXPath,
 						outerHTML: maxOuterHTML,
-						original_index: that.flattenedResults.length
+						original_index: that.flattenedResults.length,
+						stats: maxStrategy.toString() + "/" + maxScore.toString() + "/" + pointers[maxStrategy].toString() + ";"			//this is for USENIX experiment purposes.
 					});
 				}
 				pointers[maxStrategy]++;

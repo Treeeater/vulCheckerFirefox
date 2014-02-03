@@ -19,7 +19,6 @@ function VulCheckerHelper() {
 	this.clickedButtons = [];
 	this.userInfoFound = false;
 	this.iframeClickedOuterHTML = [];
-	this.iframeClickedXPATH = [];
 	this.loginClickAttempts = 0;
 	this.results = {};	
 	
@@ -176,8 +175,10 @@ function VulCheckerHelper() {
 		if (curNode.nodeName == "INPUT") {
 			if (curNode.type != "button" && curNode.type != "image" && curNode.type != "submit") return false;
 		}
-		curNodeXPATH = that.getXPath(curNode);
-		if (that.clickedButtons.indexOf(curNodeXPATH) != -1 || that.iframeClickedXPATH.indexOf(curNodeXPATH) != -1) {
+		if (curNode.nodeName == "A") {
+			if (curNode.href.toLowerCase().indexOf('mailto:') == 0) return false;
+		}
+		if (that.clickedButtons.indexOf(that.getXPath(curNode)) != -1) {
 			//avoiding clicking on the same button twice, now ignoring the duplicate button.
 			return false;
 		}
@@ -341,6 +342,7 @@ function VulCheckerHelper() {
 				for (i = 0; i < that.flattenedResults.length; i++)
 				{
 					if (that.flattenedResults[i].node == maxNode) {
+						that.flattenedResults[i].stats = that.flattenedResults[i].stats + maxStrategy.toString() + "/" + maxScore.toString() + "/" + pointers[maxStrategy].toString() + ";";
 						dupFlag = true;
 						break;
 					}
@@ -353,7 +355,8 @@ function VulCheckerHelper() {
 						strategy: maxStrategy,
 						XPath: maxXPath,
 						outerHTML: maxOuterHTML,
-						original_index: that.flattenedResults.length
+						original_index: that.flattenedResults.length,
+						stats: maxStrategy.toString() + "/" + maxScore.toString() + "/" + pointers[maxStrategy].toString() + ";"
 					});
 				}
 				pointers[maxStrategy]++;
@@ -426,7 +429,8 @@ if (self.port && (document.URL.indexOf('http://www.facebook.com/login.php') == -
 					strategy: 5,				//5 means widget
 					XPath: vulCheckerHelper.getXPath(document.getElementById('fbRegistrationLogin')),
 					outerHTML: document.getElementById('fbRegistrationLogin').outerHTML,
-					original_index: vulCheckerHelper.flattenedResults.length
+					original_index: vulCheckerHelper.flattenedResults.length,
+					stats: "-1/999/0;"
 				});
 				self.port.emit("reportCandidates",vulCheckerHelper.flattenedResults);
 			}
@@ -440,7 +444,8 @@ if (self.port && (document.URL.indexOf('http://www.facebook.com/login.php') == -
 					strategy: 5,				//5 means widget
 					XPath: vulCheckerHelper.getXPath(document.getElementsByClassName('fwb')[0]),
 					outerHTML: document.getElementsByClassName('fwb')[0].outerHTML,
-					original_index: vulCheckerHelper.flattenedResults.length
+					original_index: vulCheckerHelper.flattenedResults.length,
+					stats: "-1/999/0;"
 				});
 				self.port.emit("reportCandidates",vulCheckerHelper.flattenedResults);
 			}
