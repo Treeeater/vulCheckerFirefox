@@ -50,51 +50,65 @@ function VulCheckerHelper() {
 	{
 		var output = 0;
 		if (that.loginClickAttempts == 0) {
-			output = (inputStr.match(/FB/gi)!=null) ? 1 : 0;
-			output += (inputStr.match(/facebook/gi)!=null) ? 1 : 0;
+			output = (inputStr.match(/FB/gi)!=null) ? inputStr.match(/FB/gi).length : 0;
+			output += (inputStr.match(/facebook/gi)!=null) ? inputStr.match(/facebook/gi).length : 0;
+			that.stringSig[0] += (inputStr.match(/FB/gi)!=null) ? inputStr.match(/FB/gi).length : 0;
+			that.stringSig[1] += (inputStr.match(/facebook/gi)!=null) ? inputStr.match(/facebook/gi).length : 0;
 		}
 		else if (that.loginClickAttempts > 0) {
 			//after the first click, the page/iframe supposedly should nav to a sign-in heavy content, in this case we should emphasize on facebook string detection, instead of 'sign in' pattern.
-			output = (inputStr.match(/FB/gi)!=null) ? 10 : 0;
-			output += (inputStr.match(/facebook/gi)!=null) ? 10 : 0;
+			output = (inputStr.match(/FB/gi)!=null) ? 10 * inputStr.match(/FB/gi).length : 0;
+			output += (inputStr.match(/facebook/gi)!=null) ? 10 * inputStr.match(/facebook/gi).length : 0;
+			that.stringSig[0] += (inputStr.match(/FB/gi)!=null) ? inputStr.match(/FB/gi).length : 0;
+			that.stringSig[1] += (inputStr.match(/facebook/gi)!=null) ? inputStr.match(/facebook/gi).length : 0;
 		}
-		if (!that.searchForSignUpForFB)
-		{
-			output += (inputStr.match(/login/gi)!=null) ? 1 : 0;
-			output += (inputStr.match(/oauth/gi)!=null) ? 1 : 0;
-			output += (inputStr.match(/log\sin/gi)!=null) ? 1 : 0;
-			output += (inputStr.match(/sign\sin/gi)!=null) ? 1 : 0;
-			output += (inputStr.match(/signin/gi)!=null) ? 1 : 0;
-			output += (inputStr.match(/sign-in/gi)!=null) ? 1 : 0;
-			output += (inputStr.match(/sign_in/gi)!=null) ? 1 : 0;
-			output += (inputStr.match(/connect/gi)!=null) ? 1 : 0;
-			if (that.relaxedStringMatch) {
-				output += (inputStr.match(/account/gi)!=null) ? 1 : 0;
-				output += (inputStr.match(/forum/gi)!=null) ? 1 : 0;
-			}
-			
-			that.hasLogin = that.hasLogin || inputStr.match(/oauth/gi)!=null || (inputStr.match(/login/gi)!=null || inputStr.match(/log\sin/gi)!=null || inputStr.match(/sign\sin/gi)!=null || inputStr.match(/signin/gi)!=null || inputStr.match(/sign-in/gi)!=null || inputStr.match(/sign_in/gi)!=null || (inputStr.match(/connect/gi)!=null && inputStr.match(/connect[a-zA-Z]/gi)==null));
-			//connect is a more common word, we need to at least restrict its existence, for example, we want to rule out "Connecticut" and "connection".
-			//More heuristics TODO: give more weight to inputStr if it contains the exact strings: 'login with Facebook', 'connect with Facebook', 'sign in with facebook', etc.
-			that.hasLogin = that.hasLogin || (that.relaxedStringMatch && (inputStr.match(/account/gi)!=null || inputStr.match(/forum/gi)!=null));
-		
-		}
-		else {
-			//search for sign up with facebook, etc.
-			output += (inputStr.match(/signup/gi)!=null) ? 1 : 0;
-			output += (inputStr.match(/oauth/gi)!=null) ? 1 : 0;
-			output += (inputStr.match(/sign\sup/gi)!=null) ? 1 : 0;
-			output += (inputStr.match(/sign_up/gi)!=null) ? 1 : 0;
-			output += (inputStr.match(/sign-up/gi)!=null) ? 1 : 0;
-			output += (inputStr.match(/register/gi)!=null) ? 1 : 0;
-			output += (inputStr.match(/create/gi)!=null) ? 1 : 0;
-			output += (inputStr.match(/join/gi)!=null) ? 1 : 0;
-			that.hasLogin = that.hasLogin || inputStr.match(/oauth/gi)!=null || (inputStr.match(/signup/gi)!=null || inputStr.match(/sign\sup/gi)!=null || inputStr.match(/sign_up/gi)!=null || inputStr.match(/sign-up/gi)!=null || inputStr.match(/create/gi)!=null || inputStr.match(/join/gi)!=null);				//semantically this should be that.hasSignUp, but we just put hasLogin here for simplicity.	
-			
-		}
-			
 		//bonus to fb and login existing both.
 		that.hasFB = that.hasFB || (inputStr.match(/FB/gi)!=null || inputStr.match(/facebook/gi)!=null);
+		
+		if (!that.searchForSignUpForFB)
+		{
+			var i = 0;
+			var temp;
+			var regexes = [/oauth/gi, /log[\s-_]?[io]n/gi, /sign[\s-_]?[io]n/gi, /connect$|connect[^a-zA-Z]/gi];	
+			//"connect" is a more common word, we need to at least restrict its existence, for example, we want to rule out "Connecticut" and "connection".
+			if (that.relaxedStringMatch) {
+				regexes = regexes.concat([/account$|account[^a-zA-Z]/gi, /forum/gi]);		//so is 'account'
+				for (i = 0; i < regexes.length; i++)
+				{
+					temp = inputStr.match(regexes[i]);
+					output += (temp!=null) ? temp.length : 0;
+					that.stringSig[i+2] += (temp!=null) ? temp.length : 0;
+					that.hasLogin = that.hasLogin || temp!=null;
+				}
+			}
+			else {
+				for (i = 0; i < regexes.length; i++)
+				{
+					temp = inputStr.match(regexes[i]);
+					output += (temp!=null) ? temp.length : 0;
+					that.hasLogin = that.hasLogin || temp!=null;
+				}
+				regexes = regexes.concat([/account$|account[^a-zA-Z]/gi, /forum/gi]);
+				for (i = 0; i < regexes.length; i++)
+				{
+					temp = inputStr.match(regexes[i]);
+					that.stringSig[i+2] += (temp!=null) ? temp.length : 0;			//although we don't count them into score, still want to know the distribution.
+				}
+			}
+			//More heuristics TODO: give more weight to inputStr if it contains the exact strings: 'login with Facebook', 'connect with Facebook', 'sign in with facebook', etc.
+		}
+		else {
+			var regexes = [/oauth/gi, /sign[\s-_]?up/gi, /register/gi, /create/gi, /join/gi];	
+			//"connect" is a more common word, we need to at least restrict its existence, for example, we want to rule out "Connecticut" and "connection".
+			var i = 0;
+			var temp;
+			for (i = 0; i < regexes.length; i++)
+			{
+				temp = inputStr.match(regexes[i]);
+				output += ((temp!=null) ? temp.length : 0);
+				that.hasLogin = that.hasLogin || (temp!=null);
+			}			
+		}
 		
 		//penalty on share/like
 		that.hasLikeOrShare = that.hasLikeOrShare || (inputStr.match(/share/gi)!=null || inputStr.match(/like/gi)!=null);
@@ -102,9 +116,10 @@ function VulCheckerHelper() {
 		return output;
 	}
 
-	function AttrInfoClass(thisNode, thisScore) {
+	function AttrInfoClass(thisNode, thisScore, thisStringSig) {
 		this.node = thisNode;
 		this.score = thisScore;
+		this.stringSig = thisStringSig;
 		this.strategy = -1;
 		this.worker = null;
 		return this;
@@ -200,6 +215,7 @@ function VulCheckerHelper() {
 			that.hasFB = false;									//to indicate if this element has facebook-meaning term.
 			that.hasLogin = false;								//to indicate if this element has login-meaning term.
 			that.hasLikeOrShare = false;							//to indicate if this element has share/like word.
+			that.stringSig = Array.apply(null, new Array(8)).map(Number.prototype.valueOf,0);
 			for (i = 0; i < curNode.attributes.length; i++)
 			{
 				var temp = curNode.attributes[i].name + "=" + curNode.attributes[i].value + ";"
@@ -216,7 +232,7 @@ function VulCheckerHelper() {
 			if (that.hasLikeOrShare && !that.hasLogin) curScore = -1;						//ignore like or share button without login.
 			if ((curNode.offsetHeight > 150 || curNode.offsetWidth > 400) && curNode.nodeName != "BUTTON" && curNode.nodeName != "A" ) curScore = -1;		//ignore non-A and non-Button type login buttons that are too large, they may just be overlays.
 			if (!that.tryFindInvisibleLoginButton) {if (curNode.offsetWidth <= 0 || curNode.offsetHeight <= 0) curScore = -1;}		//ignore invisible element.
-			var temp = new AttrInfoClass(curNode, curScore);
+			var temp = new AttrInfoClass(curNode, curScore, that.stringSig.join("|"));
 			that.AttrInfoMap[that.count] = temp;
 			that.count++;
 		}
@@ -277,7 +293,7 @@ function VulCheckerHelper() {
 			}
 			if (max == 0) {return;}
 			else {
-				that.sortedAttrInfoMap[i] = new AttrInfoClass(that.AttrInfoMap[maxindex].node, that.AttrInfoMap[maxindex].score);
+				that.sortedAttrInfoMap[i] = new AttrInfoClass(that.AttrInfoMap[maxindex].node, that.AttrInfoMap[maxindex].score, that.AttrInfoMap[maxindex].stringSig);
 				that.AttrInfoMap[maxindex].score = -1;
 			}
 		}
@@ -315,6 +331,7 @@ function VulCheckerHelper() {
 		var maxStrategy;
 		var maxXPath;
 		var maxOuterHTML;
+		var maxStringSig;
 		var breakFlag;
 		var dupFlag;
 		while (true){
@@ -334,6 +351,7 @@ function VulCheckerHelper() {
 					maxNode = that.results[j][pointers[j]].node;
 					maxXPath = that.getXPath(that.results[j][pointers[j]].node);
 					maxOuterHTML = that.results[j][pointers[j]].node.outerHTML;
+					maxStringSig = that.results[j][pointers[j]].stringSig;
 					maxStrategy = j;
 				}
 			}
@@ -353,6 +371,7 @@ function VulCheckerHelper() {
 						score: maxScore, 
 						node: maxNode, 
 						strategy: maxStrategy,
+						stringSig: maxStringSig,
 						XPath: maxXPath,
 						outerHTML: maxOuterHTML,
 						original_index: that.flattenedResults.length,
