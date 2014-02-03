@@ -640,6 +640,7 @@ var registration = new Registration();
 var inputFilledMessage = "Iframe: All fields populated. Ready to click submit button.";
 
 if (window.innerHeight >= 100 && window.innerWidth >= 200 && document.documentElement.offSetHeight != 0 && document.documentElement.offSetWidth != 0 && document.URL.indexOf('plugins/likebox.php')==-1){
+	console.log(document.URL);
 	if (self.port) {
 		//why bother trying an invisible iframe?
 		//Ignore plugin likeboxes.
@@ -649,15 +650,14 @@ if (window.innerHeight >= 100 && window.innerWidth >= 200 && document.documentEl
 		});
 		self.port.on("reportSubmitButtonCandidates",function(response){
 			registration.resetStatus();
+			registration.tryProcessRadio();
+			registration.tryProcessSelects();
+			registration.tryFillInInputs();
 			registration.findInputBottomEdge();
 			registration.reportCandidates();
 			self.port.emit("reportSubmitButtonCandidates", registration.flattenedResults);
 		});
 		self.port.on("clickSubmitButton",function(response){
-			registration.resetStatus();
-			registration.tryProcessRadio();
-			registration.tryProcessSelects();
-			registration.tryFillInInputs();
 			registration.flattenedResults[response.original_index].node.click();
 			registration.clickedButtons.push(registration.getXPath(registration.flattenedResults[response.original_index].node));		//record the clicked button, so that 
 		});

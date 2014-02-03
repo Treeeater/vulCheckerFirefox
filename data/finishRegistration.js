@@ -660,15 +660,14 @@ if (self.port){
 		});
 		self.port.on("reportSubmitButtonCandidates",function(response){
 			registration.resetStatus();
+			registration.tryProcessRadio();
+			registration.tryProcessSelects();
+			registration.tryFillInInputs();
 			registration.findInputBottomEdge();
 			registration.reportCandidates();
 			self.port.emit("reportSubmitButtonCandidates", registration.flattenedResults);
 		});
 		self.port.on("clickSubmitButton",function(response){
-			registration.resetStatus();
-			registration.tryProcessRadio();
-			registration.tryProcessSelects();
-			registration.tryFillInInputs();
 			registration.flattenedResults[response.original_index].node.click();
 			registration.clickedButtons.push(registration.getXPath(registration.flattenedResults[response.original_index].node));		//record the clicked button, so that 
 		});
