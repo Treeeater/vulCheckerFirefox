@@ -82,6 +82,15 @@ def kill_process_by_name(pname)
 	}
 end
 
+def check_process_running(pid)
+	ProcTable.ps do |proc|
+		if proc.pid == pid
+			return true
+		end
+	end
+	return false
+end
+
 i = 0
 WebSessions = 3
 while (i < WebSessions)
@@ -120,6 +129,7 @@ while (i < totalSessions)
 	sleep(5)
 end
 
+timer = 0
 while (true)
 	i = 0
 	#kill any crashreporter.exe launched in this period.
@@ -137,19 +147,34 @@ while (true)
 		if (finishedPids.length == totalSessions)
 			exit
 		end
-		currentFileCount[i] = Dir.entries("vulCheckerProfile#{i}/testResults/").length - 2		#. and .. doesn't count
-		if (previousFileCount[i] != currentFileCount[i])
-			previousFileCount[i] = currentFileCount[i]
-		elsif !finishedPids.include?(i)
-			begin
-				kill_process(pids[i])
-			rescue Errno::ESRCH
-				#if we can't kill the process because the process already died, that's fine. We just want to restart the process.
-			end
-			sleep(10)									# wait for the child processes to close
+		p check_process_running(pids[i])
+		if (!check_process_running(pids[i]))
+			#if firefox crashed themselves during experiments, restart it.
 			pids[i] = spawn "cfx run -p vulCheckerProfile#{i}"
+			sleep(10)
+		end
+		if (timer == SLEEPTIME)
+			#these code only execute per SLEEPTIME
+			currentFileCount[i] = Dir.entries("vulCheckerProfile#{i}/testResults/").length - 2		#. and .. doesn't count
+			if (previousFileCount[i] != currentFileCount[i])
+				previousFileCount[i] = currentFileCount[i]
+			elsif !finishedPids.include?(i)
+				begin
+					kill_process(pids[i])
+				rescue Errno::ESRCH
+					#if we can't kill the process because the process already died, that's fine. We just want to restart the process.
+				end
+				sleep(10)									# wait for the child processes to close
+				pids[i] = spawn "cfx run -p vulCheckerProfile#{i}"
+				sleep(10)
+			end
 		end
 		i+=1
 	end
-	sleep(SLEEPTIME)
+	if (timer == SLEEPTIME)
+		timer = 0
+	else
+		timer += 10
+	end
+	sleep(10)
 end
