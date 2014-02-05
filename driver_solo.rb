@@ -83,13 +83,12 @@ def kill_process_by_name(pname)
 end
 
 def check_process_running(pid)
-	begin
-		if Process.kill(0,pid)==1
+	ProcTable.ps do |proc|
+		if proc.pid == pid
 			return true
 		end
-	rescue
-		return false
 	end
+	return false
 end
 
 i = 0
