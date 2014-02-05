@@ -450,7 +450,7 @@ if (self.port && (document.URL.indexOf('http://www.facebook.com/login.php') == -
 					outerHTML: document.getElementById('fbRegistrationLogin').outerHTML,
 					original_index: vulCheckerHelper.flattenedResults.length,
 					stats: "-1/999/0;",
-					stringSig: "-1|-1|-1|-1|-1|-1|-1|-1"
+					stringSig: "NA|NA|NA|NA|NA|NA|NA|NA"
 				});
 				self.port.emit("reportCandidates",vulCheckerHelper.flattenedResults);
 			}
@@ -466,7 +466,7 @@ if (self.port && (document.URL.indexOf('http://www.facebook.com/login.php') == -
 					outerHTML: document.getElementsByClassName('fwb')[0].outerHTML,
 					original_index: vulCheckerHelper.flattenedResults.length,
 					stats: "-1/999/0;",
-					stringSig: "-1|-1|-1|-1|-1|-1|-1|-1"
+					stringSig: "NA|NA|NA|NA|NA|NA|NA|NA"
 				});
 				self.port.emit("reportCandidates",vulCheckerHelper.flattenedResults);
 			}
