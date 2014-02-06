@@ -147,7 +147,7 @@ while (true)
 		if (finishedPids.length == totalSessions)
 			exit
 		end
-		if (!check_process_running(pids[i]))
+		if (!finishedPids.include?(i) && !check_process_running(pids[i]))
 			#if firefox crashed themselves during experiments, restart it.
 			pids[i] = spawn "cfx run -p vulCheckerProfile#{i}"
 			sleep(10)
