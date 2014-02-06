@@ -1,5 +1,6 @@
 if (ARGV.length != 2)
 	p "ARGV0: input csv.  ARGV1: output js"
+	exit
 end
 
 records = IO.read(ARGV[0]).split("\n")

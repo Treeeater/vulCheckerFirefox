@@ -1,5 +1,6 @@
 if (ARGV.length!=3)
 	p "ARGV0: old input csv, ARGV1: newly created input csv, ARGV2: output csv"
+	exit
 end
 
 a = File.read(ARGV[0]).split("\n")

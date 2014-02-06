@@ -1,5 +1,6 @@
-if ARGV.length != 3
-	p "[usage]: ARGV0: input file, ARGV1: output csv file, ARGV2: output error.js file"
+if !(ARGV.length == 3 || ARGV.length == 2)
+	p "[usage]: ARGV0: input file, ARGV1: output csv file, ARGV2 (optional): output error.js file"
+	exit
 end
 
 fh = File.open(ARGV[0],"r")
@@ -88,5 +89,5 @@ statRecords.each_key{|k|
 }
 
 File.open(ARGV[1],"w"){|f| f.write(outputCSV)}
-File.open(ARGV[2],"w"){|f| f.write("exports.testList = ['#{outputErrorSites.join("','")}'];")}
+if (ARGV[2]) then File.open(ARGV[2],"w"){|f| f.write("exports.testList = ['#{outputErrorSites.join("','")}'];")} end
 

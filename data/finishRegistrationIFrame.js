@@ -641,7 +641,6 @@ var registration = new Registration();
 var inputFilledMessage = "Iframe: All fields populated. Ready to click submit button.";
 
 if (window.innerHeight >= 100 && window.innerWidth >= 200 && document.documentElement.offSetHeight != 0 && document.documentElement.offSetWidth != 0 && document.URL.indexOf('plugins/likebox.php')==-1){
-	console.log(document.URL);
 	if (self.port) {
 		//why bother trying an invisible iframe?
 		//Ignore plugin likeboxes.
