@@ -14,6 +14,8 @@ function VulCheckerHelper() {
 	this.searchForSignUpForFB = false;
 	this.indexToClick = 0;
 	this.relaxedStringMatch = false;
+	this.candidatesWithPreviousCriteria = "";
+	this.searchingUsingPreviousCriteria = false;
 	
 	this.account = [];
 	this.clickedButtons = [];
@@ -21,6 +23,11 @@ function VulCheckerHelper() {
 	this.iframeClickedOuterHTML = [];
 	this.loginClickAttempts = 0;
 	this.results = {};	
+	
+	hashCode = function(s){
+		if (s.length == 0) return "0";
+		return s.split("").reduce(function(a,b){a=((a<<5)-a)+b.charCodeAt(0);return a&a},0);              
+	}
 	
 	function createCookie(name,value,days) {
 		if (days) {
@@ -69,10 +76,10 @@ function VulCheckerHelper() {
 		{
 			var i = 0;
 			var temp;
-			var regexes = [/oauth/gi, /log[\s-_]?[io]n/gi, /sign[\s-_]?[io]n/gi, /connect$|connect[^a-zA-Z]/gi];	
+			var regexes = [/log[\s-_]?[io]n/gi, /sign[\s-_]?[io]n/gi, /connect$|connect[^a-zA-Z]/gi];	
 			//"connect" is a more common word, we need to at least restrict its existence, for example, we want to rule out "Connecticut" and "connection".
 			if (that.relaxedStringMatch) {
-				regexes = regexes.concat([/account$|account[^a-zA-Z]/gi, /forum/gi]);		//so is 'account'
+				regexes = regexes.concat([/oauth/gi, /account$|account[^a-zA-Z]/gi, /forum/gi]);		//so is 'account'
 				for (i = 0; i < regexes.length; i++)
 				{
 					temp = inputStr.match(regexes[i]);
@@ -88,18 +95,16 @@ function VulCheckerHelper() {
 					output += (temp!=null) ? temp.length : 0;
 					that.hasLogin = that.hasLogin || temp!=null;
 				}
-				regexes = regexes.concat([/account$|account[^a-zA-Z]/gi, /forum/gi]);
+				regexes = regexes.concat([/oauth/gi, /account$|account[^a-zA-Z]/gi, /forum/gi]);
 				for (i = 0; i < regexes.length; i++)
 				{
 					temp = inputStr.match(regexes[i]);
 					that.stringSig[i+2] += (temp!=null) ? temp.length : 0;			//although we don't count them into score, still want to know the distribution.
 				}
 			}
-			//More heuristics TODO: give more weight to inputStr if it contains the exact strings: 'login with Facebook', 'connect with Facebook', 'sign in with facebook', etc.
 		}
 		else {
 			var regexes = [/oauth/gi, /sign[\s-_]?up/gi, /register/gi, /create/gi, /join/gi];	
-			//"connect" is a more common word, we need to at least restrict its existence, for example, we want to rule out "Connecticut" and "connection".
 			var i = 0;
 			var temp;
 			for (i = 0; i < regexes.length; i++)
@@ -163,8 +168,6 @@ function VulCheckerHelper() {
 		var document = ele.ownerDocument;
 		var inputWidth = ele.offsetWidth;
 		var inputHeight = ele.offsetHeight;
-		//heuristics: any element with a too large dimension cannot be input/submit, it must be just a underlaying div/layer.
-		if (inputWidth >= screen.availWidth/4 || inputHeight >= screen.availHeight/4) return false;
 		if (inputWidth <= 0 || inputHeight <= 0) return false;			//Elements that are on top layer must be visible.
 		var position = $(ele).offset();
 		var j;
@@ -193,8 +196,9 @@ function VulCheckerHelper() {
 		if (curNode.nodeName == "A") {
 			if (curNode.href.toLowerCase().indexOf('mailto:') == 0) return false;
 		}
-		if (that.clickedButtons.indexOf(that.getXPath(curNode)) != -1) {
-			//avoiding clicking on the same button twice, now ignoring the duplicate button.
+		if (that.clickedButtons.indexOf(that.getXPath(curNode)) != -1 && !that.searchingUsingPreviousCriteria) {
+			//avoiding clicking on the same button twice, now ignoring the duplicate button...
+			//but when reporting previous candidates, don't care about this.
 			return false;
 		}
 		if (that.iframeClickedOuterHTML.indexOf(curNode.outerHTML) != -1) {
@@ -299,7 +303,7 @@ function VulCheckerHelper() {
 		}
 	}
 	
-	this.reportCandidates = function(){
+	this.getPreviousCandidates = function(){
 		that.flattenedResults = new Array();
 		that.results = new Array();		//clean results in case this is a second click attempt and the first click did not navigate the page.
 		that.tryFindInvisibleLoginButton = false;			//reset strategy
@@ -312,14 +316,102 @@ function VulCheckerHelper() {
 			if (!that.tryAnotherStrategy() || that.userInfoFound) break;
 		}
 		if (that.userInfoFound){
-			self.port.emit("reportCandidates",[{
+			return "-1";
+		}
+		//TODO:flatten the results, get rid of duplicates and populate strategy field.
+		var pointers = Array.apply(null, new Array(curStrategy)).map(Number.prototype.valueOf,0);
+		var i;
+		var j;
+		var maxScore;
+		var maxNode;
+		var maxStrategy;
+		var maxXPath;
+		var maxOuterHTML;
+		var maxStringSig;
+		var breakFlag;
+		var dupFlag;
+		while (true){
+			maxScore = -999;
+			maxStrategy = -1;
+			breakFlag = 0;
+			//merge all sorted arrays.
+			for (j = 0; j < curStrategy; j++)
+			{
+				if (that.results[j].length == 0 || pointers[j] >= that.results[j].length) {
+					//this strategy already depleted and merged, go to the next strategy
+					breakFlag++;
+					continue;
+				}
+				if (maxScore < that.results[j][pointers[j]].score){
+					maxScore = that.results[j][pointers[j]].score;
+					maxNode = that.results[j][pointers[j]].node;
+					maxXPath = that.getXPath(that.results[j][pointers[j]].node);
+					maxOuterHTML = that.results[j][pointers[j]].node.outerHTML;
+					maxStringSig = that.results[j][pointers[j]].stringSig;
+					maxStrategy = j;
+				}
+			}
+			if (maxStrategy != -1){
+				dupFlag = false;
+				for (i = 0; i < that.flattenedResults.length; i++)
+				{
+					if (that.flattenedResults[i].node == maxNode) {
+						that.flattenedResults[i].stats = that.flattenedResults[i].stats + "," + maxStrategy.toString() + "/" + pointers[maxStrategy].toString();
+						dupFlag = true;
+						break;
+					}
+				}
+				if (!dupFlag){		
+					//avoid duplicate candidate (another strategy is to boost duplicate's score, but we can worry about this later.
+					that.flattenedResults.push({
+						score: maxScore, 
+						node: maxNode, 
+						strategy: maxStrategy,
+						stringSig: maxStringSig,
+						XPath: maxXPath,
+						outerHTML: maxOuterHTML,
+						original_index: that.flattenedResults.length,
+						score: maxScore,
+						stats: maxStrategy.toString() + "/" + pointers[maxStrategy].toString(),			//this is for USENIX experiment purposes.
+						iframe: false,
+						visible: that.onTopLayer(maxNode)
+					});
+				}
+				pointers[maxStrategy]++;
+			}
+			if (breakFlag == curStrategy) break;
+		}
+		return that.flattenedResults.reduce(function(p,c,i,a){return p + c.XPath + ";\n";},"");			//for console debugging purposes.
+	}
+	
+	this.reportCandidates = function(){
+		if (that.loginClickAttempts > 0){
+			that.searchingUsingPreviousCriteria = true;
+			that.loginClickAttempts--;		//temporarily decrease this by one, we know it's always greater than 1.
+			that.candidatesWithPreviousCriteria = that.getPreviousCandidates();
+			that.searchingUsingPreviousCriteria = false;
+			that.loginClickAttempts++;		//reset it
+		}
+		that.flattenedResults = new Array();
+		that.results = new Array();		//clean results in case this is a second click attempt and the first click did not navigate the page.
+		that.tryFindInvisibleLoginButton = false;			//reset strategy
+		that.relaxedStringMatch = false;
+		var curStrategy = 0;
+		while (true){
+			that.searchForLoginButton(document.body);
+			that.results[curStrategy] = that.sortedAttrInfoMap;
+			curStrategy++;
+			if (!that.tryAnotherStrategy() || that.userInfoFound) break;
+		}
+		if (that.userInfoFound){
+			self.port.emit("reportCandidates",{result:[{
 				score: -999, 
 				node: null, 
 				strategy: null,
 				XPath: "USER_INFO_EXISTS!",
 				outerHTML: "USER_INFO_EXISTS!",
 				original_index: 0
-			}]);
+			}], candidatesWithPreviousCriteria:"-1", candidatesWithCurrentCriteria:"-1"});
 			return;
 		}
 		//TODO:flatten the results, get rid of duplicates and populate strategy field.
@@ -360,7 +452,7 @@ function VulCheckerHelper() {
 				for (i = 0; i < that.flattenedResults.length; i++)
 				{
 					if (that.flattenedResults[i].node == maxNode) {
-						that.flattenedResults[i].stats = that.flattenedResults[i].stats + maxStrategy.toString() + "/" + maxScore.toString() + "/" + pointers[maxStrategy].toString() + ";";
+						that.flattenedResults[i].stats = that.flattenedResults[i].stats + "," + maxStrategy.toString() + "/" + pointers[maxStrategy].toString();
 						dupFlag = true;
 						break;
 					}
@@ -375,14 +467,17 @@ function VulCheckerHelper() {
 						XPath: maxXPath,
 						outerHTML: maxOuterHTML,
 						original_index: that.flattenedResults.length,
-						stats: maxStrategy.toString() + "/" + maxScore.toString() + "/" + pointers[maxStrategy].toString() + ";"
+						score: maxScore,
+						stats: maxStrategy.toString() + "/" + pointers[maxStrategy].toString(),
+						iframe: true,
+						visible: that.onTopLayer(maxNode)
 					});
 				}
 				pointers[maxStrategy]++;
 			}
 			if (breakFlag == curStrategy) break;
 		}
-		if ((!!self.port) && that.flattenedResults.length != 0) self.port.emit("reportCandidates",that.flattenedResults);
+		if (self.port) self.port.emit("reportCandidates",{result:that.flattenedResults, candidatesWithPreviousCriteria:that.candidatesWithPreviousCriteria, candidatesWithCurrentCriteria:that.flattenedResults.reduce(function(p,c,i,a){return p + c.XPath + ";\n";},"")});
 		else return that.flattenedResults;			//for console debugging purposes.
 	}
 	
@@ -449,10 +544,13 @@ if (self.port && (document.URL.indexOf('http://www.facebook.com/login.php') == -
 					XPath: vulCheckerHelper.getXPath(document.getElementById('fbRegistrationLogin')),
 					outerHTML: document.getElementById('fbRegistrationLogin').outerHTML,
 					original_index: vulCheckerHelper.flattenedResults.length,
-					stats: "-1/999/0;",
-					stringSig: "NA|NA|NA|NA|NA|NA|NA|NA"
+					score: 999,
+					stats: "-1/0;",
+					stringSig: "NA|NA|NA|NA|NA|NA|NA|NA",
+					iframe: true,
+					visible: vulCheckerHelper.onTopLayer(maxNode)
 				});
-				self.port.emit("reportCandidates",vulCheckerHelper.flattenedResults);
+				self.port.emit("reportCandidates",{result:vulCheckerHelper.flattenedResults, candidatesWithPreviousCriteria:"1", candidatesWithCurrentCriteria:"1"});
 			}
 		}
 		else if ((document.URL.indexOf('http://www.facebook.com/plugins/login_button.php')==0 || document.URL.indexOf('https://www.facebook.com/plugins/login_button.php')==0) && document.documentElement.offSetHeight != 0 && document.documentElement.offSetWidth != 0){
@@ -465,10 +563,13 @@ if (self.port && (document.URL.indexOf('http://www.facebook.com/login.php') == -
 					XPath: vulCheckerHelper.getXPath(document.getElementsByClassName('fwb')[0]),
 					outerHTML: document.getElementsByClassName('fwb')[0].outerHTML,
 					original_index: vulCheckerHelper.flattenedResults.length,
-					stats: "-1/999/0;",
-					stringSig: "NA|NA|NA|NA|NA|NA|NA|NA"
+					score: 999,
+					stats: "-1/0;",
+					stringSig: "NA|NA|NA|NA|NA|NA|NA|NA",
+					iframe: true,
+					visible: vulCheckerHelper.onTopLayer(maxNode)
 				});
-				self.port.emit("reportCandidates",vulCheckerHelper.flattenedResults);
+				self.port.emit("reportCandidates",{result:vulCheckerHelper.flattenedResults, candidatesWithPreviousCriteria:"2", candidatesWithCurrentCriteria:"2"});
 			}
 		}
 		else if (document.URL.indexOf('http://www.facebook.com/plugins/')==0 || document.URL.indexOf('https://www.facebook.com/plugins/')==0){

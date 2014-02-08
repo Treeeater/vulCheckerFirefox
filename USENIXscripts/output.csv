@@ -82,14 +82,14 @@ http://www.androidcentral.com,error,,,,,,,,,,,,,,,,,,,,,,,,,,,
 http://www.etsy.com,TRUE,2,7,0,5,0,6,0,0,0,0,3,0,0,0,29,0,1,0,1,1,1,0,0,1,0,0,0
 http://www.wayfair.com,noFB,,,,,,,,,,,,,,,,,,,,,,,,,,,
 http://www.zap2it.com,FALSE,1,13,-1,0,-1,0,0,3,0,1,0,1,0,0,,,,,,,,,,,,,
-http://www.liveleak.com,error,,,,,,,,,,,,,,,,,,,,,,,,,,,
+http://www.liveleak.com,FALSE,1,12,0,0,0,0,0,2,0,2,0,0,0,0,,,,,,,,,,,,,
 http://www.wattpad.com,FALSE,1,14,0,0,0,0,2,1,0,1,2,0,0,0,,,,,,,,,,,,,
 http://www.nj.com,FALSE,2,13,-1,0,-1,0,2,1,0,0,2,0,0,0,49,0,0,0,0,0,4,0,1,0,0,0,0
 http://www.retailmenot.com,FALSE,2,9,0,2,0,2,0,0,0,5,0,0,0,0,73,0,0,0,0,0,6,1,4,0,0,0,0
 http://www.barackobama.com,FALSE,2,8,0,0,0,0,0,0,0,4,0,0,0,0,40,0,0,0,0,0,3,0,2,0,0,0,0
 http://www.townhall.com,TRUE,2,7,0,0,0,0,0,0,0,3,0,0,0,0,30,0,0,0,0,0,2,0,0,0,2,0,0
 http://www.kickstarter.com,FALSE,1,14,-1,0,-1,0,1,2,0,1,0,2,0,0,,,,,,,,,,,,,
-http://www.thechive.com,error,,,,,,,,,,,,,,,,,,,,,,,,,,,
+http://www.thechive.com,FALSE,2,7,-1,0,-1,0,0,0,0,3,0,0,0,0,41,0,0,0,0,1,2,1,1,0,1,0,0
 http://www.everydayhealth.com,FALSE,1,13,-1,0,-1,0,0,3,0,2,0,0,0,0,,,,,,,,,,,,,
 http://www.travelzoo.com,FALSE,1,12,-1,0,-1,0,2,0,0,0,2,0,0,0,,,,,,,,,,,,,
 http://www.softonic.com,FALSE,2,10,-1,0,-1,0,0,0,0,6,0,0,0,0,49,-1,1,-1,1,1,3,0,0,0,1,0,0
@@ -489,7 +489,7 @@ http://www.pizap.com,FALSE,2,6,0,0,0,0,0,0,0,1,1,0,0,0,19,0,1,0,1,0,1,0,1,0,0,0,
 http://www.knoxnews.com,FALSE,1,13,-1,0,-1,0,0,2,0,1,0,2,0,0,,,,,,,,,,,,,
 http://www.crosscards.com,FALSE,2,7,0,0,0,0,0,0,0,3,0,0,1,0,39,0,0,0,0,0,3,0,1,0,0,0,0
 http://www.trails.com,TRUE,1,13,0,0,0,0,0,3,0,2,0,0,1,0,,,,,,,,,,,,,
-http://www.tennessean.com,error,,,,,,,,,,,,,,,,,,,,,,,,,,,
+http://www.tennessean.com,FALSE,1,14,-1,0,-1,0,0,2,0,4,0,0,0,0,,,,,,,,,,,,,
 http://www.coolsavings.com,TRUE,2,7,0,0,0,0,0,0,0,1,2,0,0,0,50,0,0,0,0,3,1,0,0,1,1,0,0
 http://www.hi5.com,FALSE,1,13,0,0,0,0,0,3,0,1,0,1,0,0,,,,,,,,,,,,,
 http://www.redrobin.com,TRUE,2,5,-1,0,-1,0,0,0,0,1,0,0,0,0,30,-1,0,-1,0,0,3,0,0,0,0,0,0
@@ -528,7 +528,7 @@ http://www.givemesport.com,FALSE,1,999,-1,-1,-1,-1,NA,NA,NA,NA,NA,NA,NA,NA,,,,,,
 http://www.rgj.com,FALSE,1,14,-1,0,-1,0,0,2,0,4,0,0,0,0,,,,,,,,,,,,,
 http://www.adage.com,TRUE,1,12,0,0,0,0,0,3,0,1,0,0,0,0,,,,,,,,,,,,,
 http://www.memory-alpha.org,FALSE,2,8,0,1,0,1,0,0,0,4,0,0,0,0,51,0,0,0,0,0,4,0,2,0,1,0,0
-http://www.mandatory.com,error,,,,,,,,,,,,,,,,,,,,,,,,,,,
+http://www.mandatory.com,FALSE,2,8,0,0,0,0,0,0,0,3,1,0,0,0,51,0,0,0,0,1,3,0,3,0,0,0,0
 http://www.gamefly.com,TRUE,1,11,0,0,0,0,0,2,0,1,0,0,0,0,,,,,,,,,,,,,
 http://www.blekko.com,TRUE,2,5,-1,1,-1,0,0,0,0,1,0,0,1,0,999,-1,-1,-1,-1,NA,NA,NA,NA,NA,NA,NA,NA
 http://www.quibblo.com,TRUE,2,7,0,0,0,0,0,0,0,3,0,0,0,0,10,0,17,0,17,0,1,0,0,0,0,0,0
@@ -934,7 +934,7 @@ http://www.trib.com,TRUE,1,10,-1,1,-1,1,1,0,0,1,0,0,0,0,,,,,,,,,,,,,
 http://www.kraftfirsttaste.com,TRUE,2,10,0,0,0,0,0,0,0,1,5,0,0,0,41,0,1,0,1,1,2,0,1,2,0,0,0
 http://www.streetadvisor.com,FALSE,2,6,-1,4,-1,0,0,0,0,0,2,0,3,0,40,-1,0,-1,0,0,4,0,0,0,0,0,0
 http://www.pennysaverusa.com,FALSE,2,16,-1,0,-1,0,4,12,0,0,0,0,0,0,52,-1,0,-1,0,2,2,0,4,0,0,0,0
-http://www.themetapicture.com,error,,,,,,,,,,,,,,,,,,,,,,,,,,,
+http://www.themetapicture.com,FALSE,2,1,-1,0,-1,0,1,0,0,0,0,0,0,0,20,1,1,1,1,0,1,0,1,0,1,0,0
 http://www.loveagain.com,FALSE,1,12,0,0,0,0,2,1,0,0,0,1,0,0,,,,,,,,,,,,,
 http://www.perfectmatch.com,TRUE,2,6,0,0,0,0,0,0,0,2,0,0,0,0,21,-1,1,-1,1,1,0,0,3,0,0,0,0
 http://www.espnfc.com,FALSE,1,11,0,0,0,0,0,2,0,0,0,1,0,0,,,,,,,,,,,,,
@@ -949,7 +949,7 @@ http://www.flipsnack.com,FALSE,2,7,0,0,0,0,0,0,0,1,2,0,0,0,40,0,0,0,0,0,3,0,1,0,
 http://www.uniqlo.com,TRUE,2,5,-1,-1,-1,2,0,0,0,0,0,0,1,0,29,0,1,0,1,1,1,0,1,0,0,0,0
 http://www.shiftgig.com,FALSE,1,15,-1,0,-1,0,1,2,2,0,0,2,0,0,,,,,,,,,,,,,
 http://www.prankdial.com,FALSE,1,10,0,1,0,1,0,1,0,1,0,0,0,0,,,,,,,,,,,,,
-http://www.classifieds1000.com,error,,,,,,,,,,,,,,,,,,,,,,,,,,,
+http://www.classifieds1000.com,FALSE,2,6,0,0,0,0,0,0,0,2,0,0,0,0,19,0,0,0,0,0,1,0,1,0,0,0,0
 http://www.hometalk.com,FALSE,1,16,0,0,0,0,3,2,0,2,1,0,0,0,,,,,,,,,,,,,
 http://www.date.com,FALSE,2,6,0,0,0,0,0,0,0,2,0,0,0,0,999,-1,-1,-1,-1,NA,NA,NA,NA,NA,NA,NA,NA
 http://www.axs.com,FALSE,1,15,-1,0,-1,0,2,2,0,1,2,0,0,0,,,,,,,,,,,,,
@@ -966,7 +966,7 @@ http://www.startwire.com,FALSE,2,6,0,0,0,0,0,0,0,2,0,0,0,0,29,0,0,0,0,0,2,0,0,0,
 http://www.urbandecay.com,FALSE,2,7,0,1,0,1,0,0,0,1,2,0,1,0,999,-1,-1,-1,-1,NA,NA,NA,NA,NA,NA,NA,NA
 http://www.seizethedeal.com,error,,,,,,,,,,,,,,,,,,,,,,,,,,,
 http://www.flickr.com,FALSE,2,5,2,2,2,3,0,0,0,0,1,0,0,0,44,0,0,0,0,1,2,0,2,4,0,0,0
-http://www.justfab.com,error,,,,,,,,,,,,,,,,,,,,,,,,,,,
+http://www.justfab.com,TRUE,1,15,-1,0,-1,0,2,2,0,3,0,0,0,0,,,,,,,,,,,,,
 http://www.active.com,TRUE,2,6,0,1,0,1,0,0,0,1,1,0,0,0,20,1,1,1,1,0,2,0,0,0,0,0,0
 http://www.madmimi.com,TRUE,1,13,-1,0,-1,0,1,3,0,1,0,0,0,0,,,,,,,,,,,,,
 http://www.liquor.com,TRUE,1,999,-1,-1,-1,-1,NA,NA,NA,NA,NA,NA,NA,NA,,,,,,,,,,,,,
