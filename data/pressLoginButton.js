@@ -383,7 +383,7 @@ function VulCheckerHelper() {
 			}
 			if (breakFlag == curStrategy) break;
 		}
-		return that.flattenedResults.reduce(function(p,c,i,a){return p + c.XPath + ";\n";},"");			//for console debugging purposes.
+		return that.flattenedResults.map(function(ele,index,arr){return ele.XPath;}).sort().join("\n");			//for console debugging purposes.
 	}
 	
 	this.reportCandidates = function(){
@@ -479,7 +479,7 @@ function VulCheckerHelper() {
 			}
 			if (breakFlag == curStrategy) break;
 		}
-		if (self.port) self.port.emit("reportCandidates",{result:that.flattenedResults, candidatesWithPreviousCriteria:that.candidatesWithPreviousCriteria, candidatesWithCurrentCriteria:that.flattenedResults.reduce(function(p,c,i,a){return p + c.XPath + ";\n";},"")});
+		if (self.port) self.port.emit("reportCandidates",{result:that.flattenedResults, candidatesWithPreviousCriteria:that.candidatesWithPreviousCriteria, candidatesWithCurrentCriteria:that.flattenedResults.map(function(ele,index,arr){return ele.XPath;}).sort().join("\n")});
 		else return that.flattenedResults;			//for console debugging purposes.
 	}
 	
