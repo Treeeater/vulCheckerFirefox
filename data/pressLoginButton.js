@@ -108,7 +108,6 @@ function VulCheckerHelper() {
 		
 		//penalty on share/like
 		that.hasLikeOrShare = that.hasLikeOrShare || (inputStr.match(/share/gi)!=null || inputStr.match(/like/gi)!=null);
-		
 		return output;
 	}
 
@@ -221,6 +220,7 @@ function VulCheckerHelper() {
 			if (that.hasLogin) curScore += 4;												//this is used to offset a lot of 'follow us on facebook' buttons.
 			if (that.hasFB && that.hasLogin) curScore += 4;									//extra score if both terms are found.
 			if (that.hasLikeOrShare && !that.hasLogin) curScore = -1;						//ignore like or share button without login.
+			if (that.hasLikeOrShare && that.hasLogin) curScore = 1;							//if it has both, reduce the score to the minimum(serve as backup)
 			if ((curNode.offsetHeight > 150 || curNode.offsetWidth > 400) && curNode.nodeName != "BUTTON" && curNode.nodeName != "A" ) curScore = -1;		//ignore non-A and non-Button type login buttons that are too large, they may just be overlays.
 			if (!that.tryFindInvisibleLoginButton) {if (curNode.offsetWidth <= 0 || curNode.offsetHeight <= 0) curScore = -1;}		//ignore invisible element.
 			var temp = new AttrInfoClass(curNode, curScore, that.stringSig.join("|"));
