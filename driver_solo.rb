@@ -8,13 +8,24 @@ include Sys
 require 'rbconfig'
 is_windows = (RbConfig::CONFIG['host_os'] =~ /mswin|mingw|cygwin/)
 
-SLEEPTIME = 1500		#configurable: timeout.
-
 
 #sanity check
-if (ARGV.length != 2)
-	p "wrong number of arguments. needs 2, 1st: testlist file name, 2nd: # of concurrent sessions"
+if (ARGV.length != 2 && ARGV.length != 3)
+	p "wrong number of arguments. needs 2, 1st: testlist file name, 2nd: # of concurrent sessions. Optional: 3rd arg controls the timeout of each test on one individual site."
 	exit 
+end
+
+if (ARGV[2]!=nil)
+	begin
+		sleeptime = ARGV[2].to_i
+		p "Using specified sleeptime @ #{sleeptime}"
+	rescue
+		p "entered sleeptime is not recognized, please enter a numerical value as third parameter."
+		exit
+	end
+else
+	sleeptime = 1500 
+	p "Using DEFAULT sleeptime @ #{sleeptime}"
 end
 
 failedSiteFileName = ARGV[0]
@@ -152,7 +163,7 @@ while (true)
 			pids[i] = spawn "cfx run -p vulCheckerProfile#{i}"
 			sleep(10)
 		end
-		if (timer == SLEEPTIME)
+		if (timer == sleeptime)
 			#these code only execute per SLEEPTIME
 			currentFileCount[i] = Dir.entries("vulCheckerProfile#{i}/testResults/").length - 2		#. and .. doesn't count
 			if (previousFileCount[i] != currentFileCount[i])
@@ -170,7 +181,7 @@ while (true)
 		end
 		i+=1
 	end
-	if (timer == SLEEPTIME)
+	if (timer == sleeptime)
 		timer = 0
 	else
 		timer += 10
