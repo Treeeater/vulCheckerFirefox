@@ -16,7 +16,6 @@ function VulCheckerHelper() {
 	this.results = {};					//used to store candidate information.
 	
 	hashCode = function(s){
-		if (s.length == 0) return "0";
 		return s.split("").reduce(function(a,b){a=((a<<5)-a)+b.charCodeAt(0);return a&a},0);              
 	}
 	
@@ -413,7 +412,7 @@ function VulCheckerHelper() {
 				XPath: "USER_INFO_EXISTS!",
 				outerHTML: "USER_INFO_EXISTS!",
 				original_index: 0
-			}], candidatesWithPreviousCriteria:"-1", candidatesWithCurrentCriteria:"-1"});
+			}], candidatesWithPreviousCriteria:"-1", candidatesWithCurrentCriteria:"-1", url:(document.URL.indexOf("?")==-1?document.URL:document.URL.substr(0,document.URL.indexOf("?")))});
 			return;
 		}
 		//TODO:flatten the results, get rid of duplicates and populate strategy field.
@@ -454,7 +453,7 @@ function VulCheckerHelper() {
 				for (i = 0; i < that.flattenedResults.length; i++)
 				{
 					if (that.flattenedResults[i].node == maxNode) {
-						that.flattenedResults[i].stats = that.flattenedResults[i].stats + "," + maxStrategy.toString() + "/" + pointers[maxStrategy].toString();
+						that.flattenedResults[i].stats = that.flattenedResults[i].stats + "," + maxStrategy.toString() + "/" + (pointers[maxStrategy]+1).toString();
 						dupFlag = true;
 						break;
 					}
@@ -470,7 +469,7 @@ function VulCheckerHelper() {
 						outerHTML: maxOuterHTML,
 						original_index: that.flattenedResults.length,
 						score: maxScore,
-						stats: maxStrategy.toString() + "/" + pointers[maxStrategy].toString(),			//this is for USENIX experiment purposes.
+						stats: maxStrategy.toString() + "/" + (pointers[maxStrategy]+1).toString(),			//this is for USENIX experiment purposes.
 						iframe: false,
 						visible: that.onTopLayer(maxNode)
 					});
@@ -479,7 +478,7 @@ function VulCheckerHelper() {
 			}
 			if (breakFlag == curStrategy) break;
 		}
-		if (self.port) self.port.emit("reportCandidates",{result:that.flattenedResults, candidatesWithPreviousCriteria:that.candidatesWithPreviousCriteria, candidatesWithCurrentCriteria:that.flattenedResults.map(function(ele,index,arr){return ele.XPath;}).sort().join("\n")});
+		if (self.port) self.port.emit("reportCandidates",{result:that.flattenedResults, candidatesWithPreviousCriteria:that.candidatesWithPreviousCriteria, candidatesWithCurrentCriteria:that.flattenedResults.map(function(ele,index,arr){return ele.XPath;}).sort().join("\n"),url:(document.URL.indexOf("?")==-1?document.URL:document.URL.substr(0,document.URL.indexOf("?")))});
 		else return that.flattenedResults;			//for console debugging purposes.
 	}
 	
