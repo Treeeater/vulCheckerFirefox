@@ -1,5 +1,5 @@
-if !(ARGV.length == 2)
-	p "[usage]: ARGV0: input result file, ARGV1: output csv file"
+if !(ARGV.length == 3)
+	p "[usage]: ARGV0: input result file, ARGV1: succeeded clicks output csv file, ARGV2: failed clicks output csv file"
 	exit
 end
 
@@ -7,13 +7,15 @@ fh = File.open(ARGV[0],"r")
 siteURL = ""
 
 class ClickInfo
-	attr_accessor :site, :success, :clickNo, :O_rank, :minClicksNeeded, :fromIframe, :visible, :stringSig, :score, :clickStrategyAndRank, :xPath, :outerHTML, :clickURL, :dup, :futile
+	attr_accessor :site, :success, :clickNo, :O_rank, :minClicksNeeded, :fromIframe, :visible, :stringSig, :score, :clickStrategyAndRank, :xPath, :outerHTML, :clickURL, :futile
 	def initialize()
 		@minClicksNeeded = 999
+		@futile = false
 	end
 end
 
-outputCSV = "Site,success,clickNo,O-rank,clicksNeeded,fromIframe, visible,FB,Facebook,OAuth,login,signin,connect,account,forum,Score,VSr,ISr,VRr,IRr,clickURL,outerHTML,XPath,dup,visited\n"
+outputCSVSuccess = "Site,success,clickNo,O-rank,clicksNeeded,fromIframe, visible,FB,Facebook,OAuth,login,signin,connect,account,forum,Score,VSr,ISr,VRr,IRr,clickURL,outerHTML,XPath,futile\n"
+outputCSVFailed = "Site,success,clickNo,O-rank,clicksNeeded,fromIframe, visible,FB,Facebook,OAuth,login,signin,connect,account,forum,Score,VSr,ISr,VRr,IRr,clickURL,outerHTML,XPath,futile\n"
 outputErrorSites = Array.new
 statRecords = Hash.new
 clicks = Array.new
@@ -21,7 +23,6 @@ siteURL = ""
 fh.each_line{|l|
 	l.chomp!
 	success = false
-	dup = false
 	futile = false
 	ignore = true
 	if (l.start_with? "Testing site:") 
@@ -40,8 +41,9 @@ fh.each_line{|l|
 		ignore = false
 	end
 	if (ignore) then next end
-	if (l[-4..-1]=="dup,") then dup = true end
-	if (l[-7..-1]=="futile,") then futile = true end
+	if (l[-7..-1]=="futile,")
+		futile = true 
+	end
 	if (siteURL == "") then next end
 	clicks = l.split(';')
 	clicks.each_index{|c_i|
@@ -53,14 +55,14 @@ fh.each_line{|l|
 		xPath = items[-3]
 		outerHTML = items[-2]
 		url = items[-1]
-		key = "#{url}#{xPath}#{outerHTML}"
+		key = "#{url}#{xPath}#{outerHTML}#{c_i+1}"
 		if (statRecords[siteURL][key] == nil) then statRecords[siteURL][key] = ClickInfo.new end
 		statRecords[siteURL][key].clickURL = url
 		statRecords[siteURL][key].xPath = xPath
 		statRecords[siteURL][key].outerHTML = outerHTML
 		statRecords[siteURL][key].site = siteURL
 		statRecords[siteURL][key].success = statRecords[siteURL][key].success || success
-		statRecords[siteURL][key].clickNo = c_i
+		statRecords[siteURL][key].clickNo = c_i+1
 		statRecords[siteURL][key].O_rank = items[0]
 		if (statRecords[siteURL][key].minClicksNeeded > clicks.length && success)
 			statRecords[siteURL][key].minClicksNeeded = clicks.length
@@ -74,38 +76,65 @@ fh.each_line{|l|
 		if (items.length > 9) then statRecords[siteURL][key].clickStrategyAndRank[items[6].split("/")[0].to_i] = items[6].split("/")[1] end
 		if (items.length > 10) then statRecords[siteURL][key].clickStrategyAndRank[items[7].split("/")[0].to_i] = items[7].split("/")[1] end
 		if (items.length > 11) then statRecords[siteURL][key].clickStrategyAndRank[items[8].split("/")[0].to_i] = items[8].split("/")[1] end
-		statRecords[siteURL][key].dup = dup
-		statRecords[siteURL][key].futile = futile
+		if (c_i == clicks.length - 2)
+			#last click could be futile, previous must not be.
+			statRecords[siteURL][key].futile = futile
+		end
 	}
 }
 
 statRecords.each_key{|k|
 	statRecords[k].each_value{|c|
-		outputCSV += (k + ",")
-		outputCSV += (c.success.to_s + ",")
-		outputCSV += (c.clickNo.to_s + ",")
-		outputCSV += (c.O_rank.to_s + ",")
-		if (c.minClicksNeeded == 999) then c.minClicksNeeded = "NA" end
-		outputCSV += (c.minClicksNeeded.to_s + ",")
-		outputCSV += (c.fromIframe.to_s + ",")
-		outputCSV += (c.visible.to_s + ",")
-		outputCSV += (c.stringSig.join(",") + ",")
-		outputCSV += (c.score + ",")
-		for j in 0..3
-			if (c.clickStrategyAndRank[j])
-				outputCSV += (c.clickStrategyAndRank[j] + ",")
-			else
-				outputCSV += "NA,"
+		if (c.success)
+			outputCSVSuccess += (k + ",")
+			outputCSVSuccess += (c.success.to_s + ",")
+			outputCSVSuccess += (c.clickNo.to_s + ",")
+			outputCSVSuccess += (c.O_rank.to_s + ",")
+			if (c.minClicksNeeded == 999) then c.minClicksNeeded = "NA" end
+			outputCSVSuccess += (c.minClicksNeeded.to_s + ",")
+			outputCSVSuccess += (c.fromIframe.to_s + ",")
+			outputCSVSuccess += (c.visible.to_s + ",")
+			outputCSVSuccess += (c.stringSig.join(",") + ",")
+			outputCSVSuccess += (c.score + ",")
+			for j in 0..3
+				if (c.clickStrategyAndRank[j])
+					outputCSVSuccess += (c.clickStrategyAndRank[j] + ",")
+				else
+					outputCSVSuccess += "NA,"
+				end
 			end
+			outputCSVSuccess += (c.clickURL + ",")
+			outputCSVSuccess += (c.xPath + ",")
+			outputCSVSuccess += (c.outerHTML + ",")
+			outputCSVSuccess += ("false")
+			outputCSVSuccess += "\n"
+		else
+			outputCSVFailed += (k + ",")
+			outputCSVFailed += (c.success.to_s + ",")
+			outputCSVFailed += (c.clickNo.to_s + ",")
+			outputCSVFailed += (c.O_rank.to_s + ",")
+			if (c.minClicksNeeded == 999) then c.minClicksNeeded = "NA" end
+			outputCSVFailed += (c.minClicksNeeded.to_s + ",")
+			outputCSVFailed += (c.fromIframe.to_s + ",")
+			outputCSVFailed += (c.visible.to_s + ",")
+			outputCSVFailed += (c.stringSig.join(",") + ",")
+			outputCSVFailed += (c.score + ",")
+			for j in 0..3
+				if (c.clickStrategyAndRank[j])
+					outputCSVFailed += (c.clickStrategyAndRank[j] + ",")
+				else
+					outputCSVFailed += "NA,"
+				end
+			end
+			outputCSVFailed += (c.clickURL + ",")
+			outputCSVFailed += (c.xPath + ",")
+			outputCSVFailed += (c.outerHTML + ",")
+			outputCSVFailed += (c.futile.to_s)
+			outputCSVFailed += "\n"
 		end
-		outputCSV += (c.clickURL + ",")
-		outputCSV += (c.xPath + ",")
-		outputCSV += (c.outerHTML + ",")
-		outputCSV += (c.dup.to_s + ",")
-		outputCSV += (c.futile.to_s + ",")
-		outputCSV += "\n"
 	}
 }
 
-File.open(ARGV[1],"w"){|f| f.write(outputCSV)}
+File.open(ARGV[1],"w"){|f| f.write(outputCSVSuccess)}
+File.open(ARGV[2],"w"){|f| f.write(outputCSVFailed)}
 
