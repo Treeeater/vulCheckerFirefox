@@ -20,7 +20,6 @@ function VulCheckerHelper() {
 	this.account = [];
 	//this.clickedButtons = [];
 	this.userInfoFound = false;
-	this.iframeClickedOuterHTML = [];
 	this.loginClickAttempts = 0;
 	this.results = {};	
 	
@@ -200,10 +199,6 @@ function VulCheckerHelper() {
 			//but when reporting previous candidates, don't care about this.
 			return false;
 		}*/
-		if (that.iframeClickedOuterHTML.indexOf(curNode.outerHTML) != -1) {
-			//avoiding clicking on the same button twice, now ignoring the duplicate button.
-			return false;
-		}
 		return (that.tryFindInvisibleLoginButton || that.onTopLayer(curNode));
 	}
 	
@@ -234,7 +229,7 @@ function VulCheckerHelper() {
 			if (that.hasFB && that.hasLogin) curScore += 4;									//extra score if both terms are found.
 			if (that.hasLikeOrShare && !that.hasLogin) curScore = -1;						//ignore like or share button without login.
 			if (that.hasLikeOrShare && that.hasLogin) curScore = 1;							//if it has both, reduce the score to the minimum(serve as backup)
-			if ((curNode.offsetHeight > 150 || curNode.offsetWidth > 400) && curNode.nodeName != "BUTTON" && curNode.nodeName != "A" ) curScore = -1;		//ignore non-A and non-Button type login buttons that are too large, they may just be overlays.
+			//if ((curNode.offsetHeight > 150 || curNode.offsetWidth > 400) && curNode.nodeName != "BUTTON" && curNode.nodeName != "A" ) curScore = -1;		//ignore non-A and non-Button type login buttons that are too large, they may just be overlays.
 			if (!that.tryFindInvisibleLoginButton) {if (curNode.offsetWidth <= 0 || curNode.offsetHeight <= 0) curScore = -1;}		//ignore invisible element.
 			var temp = new AttrInfoClass(curNode, curScore, that.stringSig.join("|"));
 			that.AttrInfoMap[that.count] = temp;
@@ -374,7 +369,12 @@ function VulCheckerHelper() {
 						score: maxScore,
 						stats: maxStrategy.toString() + "/" + (pointers[maxStrategy]+1).toString(),			//this is for USENIX experiment purposes.
 						iframe: false,
-						visible: that.onTopLayer(maxNode)
+						visible: that.onTopLayer(maxNode),
+						width: Math.floor(maxNode.offsetWidth),
+						height: Math.floor(maxNode.offsetHeight),
+						type: maxNode.nodeName,
+						x: Math.floor($(maxNode).offset().left),
+						y: Math.floor($(maxNode).offset().top)
 					});
 				}
 				pointers[maxStrategy]++;
@@ -470,7 +470,12 @@ function VulCheckerHelper() {
 						score: maxScore,
 						stats: maxStrategy.toString() + "/" + (pointers[maxStrategy]+1).toString(),
 						iframe: true,
-						visible: that.onTopLayer(maxNode)
+						visible: that.onTopLayer(maxNode),
+						width: Math.floor(maxNode.offsetWidth),
+						height: Math.floor(maxNode.offsetHeight),
+						type: maxNode.nodeName,
+						x: Math.floor($(maxNode).offset().left),
+						y: Math.floor($(maxNode).offset().top)
 					});
 				}
 				pointers[maxStrategy]++;
