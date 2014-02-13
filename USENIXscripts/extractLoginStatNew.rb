@@ -7,15 +7,15 @@ fh = File.open(ARGV[0],"r")
 siteURL = ""
 
 class ClickInfo
-	attr_accessor :site, :success, :clickNo, :O_rank, :minClicksNeeded, :fromIframe, :visible, :stringSig, :score, :clickStrategyAndRank, :xPath, :outerHTML, :clickURL, :futile
+	attr_accessor :site, :success, :clickNo, :O_rank, :minClicksNeeded, :fromIframe, :visible, :w, :h, :type, :x, :y, :stringSig, :score, :clickStrategyAndRank, :xPath, :outerHTML, :clickURL, :futile
 	def initialize()
 		@minClicksNeeded = 999
 		@futile = false
 	end
 end
 
-outputCSVSuccess = "Site,success,clickNo,O-rank,clicksNeeded,fromIframe, visible,FB,Facebook,OAuth,login,signin,connect,account,forum,Score,VSr,ISr,VRr,IRr,clickURL,outerHTML,XPath,futile\n"
-outputCSVFailed = "Site,success,clickNo,O-rank,clicksNeeded,fromIframe, visible,FB,Facebook,OAuth,login,signin,connect,account,forum,Score,VSr,ISr,VRr,IRr,clickURL,outerHTML,XPath,futile\n"
+outputCSVSuccess = "Site,success,clickNo,O-rank,clicksNeeded,fromIframe,visible,w,h,type,x, y,FB,Facebook,OAuth,login,signin,connect,account,forum,Score,VSr,ISr,VRr,IRr,clickURL,outerHTML,XPath,futile\n"
+outputCSVFailed = "Site,success,clickNo,O-rank,clicksNeeded,fromIframe,visible,w,h,type,x, y,FB,Facebook,OAuth,login,signin,connect,account,forum,Score,VSr,ISr,VRr,IRr,clickURL,outerHTML,XPath,futile\n"
 outputErrorSites = Array.new
 statRecords = Hash.new
 clicks = Array.new
@@ -55,8 +55,13 @@ fh.each_line{|l|
 		xPath = items[-3]
 		outerHTML = items[-2]
 		url = items[-1]
-		key = "#{url}#{xPath}#{outerHTML}#{c_i+1}"
+		key = "#{url}#{xPath}#{outerHTML}"
 		if (statRecords[siteURL][key] == nil) then statRecords[siteURL][key] = ClickInfo.new end
+		statRecords[siteURL][key].w = items[-8]
+		statRecords[siteURL][key].h = items[-7]
+		statRecords[siteURL][key].type = items[-6]
+		statRecords[siteURL][key].x = items[-5]
+		statRecords[siteURL][key].y = items[-4]
 		statRecords[siteURL][key].clickURL = url
 		statRecords[siteURL][key].xPath = xPath
 		statRecords[siteURL][key].outerHTML = outerHTML
@@ -72,10 +77,10 @@ fh.each_line{|l|
 		statRecords[siteURL][key].stringSig = items[3].split("|")
 		statRecords[siteURL][key].score = items[4]
 		statRecords[siteURL][key].clickStrategyAndRank = Array.new
-		if (items.length > 8) then statRecords[siteURL][key].clickStrategyAndRank[items[5].split("/")[0].to_i] = items[5].split("/")[1] end
-		if (items.length > 9) then statRecords[siteURL][key].clickStrategyAndRank[items[6].split("/")[0].to_i] = items[6].split("/")[1] end
-		if (items.length > 10) then statRecords[siteURL][key].clickStrategyAndRank[items[7].split("/")[0].to_i] = items[7].split("/")[1] end
-		if (items.length > 11) then statRecords[siteURL][key].clickStrategyAndRank[items[8].split("/")[0].to_i] = items[8].split("/")[1] end
+		if (items.length > 10) then statRecords[siteURL][key].clickStrategyAndRank[items[5].split("/")[0].to_i] = items[5].split("/")[1] end
+		if (items.length > 11) then statRecords[siteURL][key].clickStrategyAndRank[items[6].split("/")[0].to_i] = items[6].split("/")[1] end
+		if (items.length > 12) then statRecords[siteURL][key].clickStrategyAndRank[items[7].split("/")[0].to_i] = items[7].split("/")[1] end
+		if (items.length > 13) then statRecords[siteURL][key].clickStrategyAndRank[items[8].split("/")[0].to_i] = items[8].split("/")[1] end
 		if (c_i == clicks.length - 2)
 			#last click could be futile, previous must not be.
 			statRecords[siteURL][key].futile = futile
@@ -94,6 +99,11 @@ statRecords.each_key{|k|
 			outputCSVSuccess += (c.minClicksNeeded.to_s + ",")
 			outputCSVSuccess += (c.fromIframe.to_s + ",")
 			outputCSVSuccess += (c.visible.to_s + ",")
+			outputCSVSuccess += (c.w.to_s + ",")
+			outputCSVSuccess += (c.h.to_s + ",")
+			outputCSVSuccess += (c.type.to_s + ",")
+			outputCSVSuccess += (c.x.to_s + ",")
+			outputCSVSuccess += (c.y.to_s + ",")
 			outputCSVSuccess += (c.stringSig.join(",") + ",")
 			outputCSVSuccess += (c.score + ",")
 			for j in 0..3
@@ -117,6 +127,11 @@ statRecords.each_key{|k|
 			outputCSVFailed += (c.minClicksNeeded.to_s + ",")
 			outputCSVFailed += (c.fromIframe.to_s + ",")
 			outputCSVFailed += (c.visible.to_s + ",")
+			outputCSVFailed += (c.w.to_s + ",")
+			outputCSVFailed += (c.h.to_s + ",")
+			outputCSVFailed += (c.type.to_s + ",")
+			outputCSVFailed += (c.x.to_s + ",")
+			outputCSVFailed += (c.y.to_s + ",")
 			outputCSVFailed += (c.stringSig.join(",") + ",")
 			outputCSVFailed += (c.score + ",")
 			for j in 0..3

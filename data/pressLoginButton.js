@@ -8,6 +8,7 @@ function VulCheckerHelper() {
 	this.relaxedStringMatch = false;
 	this.candidatesWithPreviousCriteria = "";
 	this.searchingUsingPreviousCriteria = false;
+	this.maxCandidatesAllowedEachStrategy = 5;
 	
 	this.account = [];
 	//this.clickedButtons = [];
@@ -274,6 +275,7 @@ function VulCheckerHelper() {
 			return;
 		}
 		computeAsRoot(rootNode);
+		//sort
 		var i = 0;
 		var j = 0;
 		for (i = 0; i < that.count; i++)
@@ -287,21 +289,14 @@ function VulCheckerHelper() {
 					maxindex = j;
 				}
 			}
-			if (max == 0) {return;}
+			if (max == 0) {break;}
 			else {
 				that.sortedAttrInfoMap[i] = new AttrInfoClass(that.AttrInfoMap[maxindex].node, that.AttrInfoMap[maxindex].score, that.AttrInfoMap[maxindex].stringSig);
 				that.AttrInfoMap[maxindex].score = -1;
 			}
 		}
-	}
-	
-	this.sendLoginButtonInformation = function(response){
-		//only send the first click, second click shall be ignored.
-		that.tryFindInvisibleLoginButton = response.tryFindInvisibleLoginButton;
-		that.searchForLoginButton(document.body);			//this doesn't necessarily mean a login button is found. sortedAttrInfoMap could be empty.
-		if (that.userInfoFound) return {"loginButtonXPath":"USER_INFO_EXISTS!", "loginButtonOuterHTML":"USER_INFO_EXISTS!"};
-		if (vulCheckerHelper.sortedAttrInfoMap.length <= response.indexToClick) return {"loginButtonXPath":"", "loginButtonOuterHTML":""};			//no login button found.
-		return {"loginButtonXPath":vulCheckerHelper.getXPath(vulCheckerHelper.sortedAttrInfoMap[response.indexToClick].node), "loginButtonOuterHTML":vulCheckerHelper.sortedAttrInfoMap[response.indexToClick].node.outerHTML};
+		//From each strategy, obtain at most that.maxCandidatesAllowedEachStrategy candidates.
+		that.sortedAttrInfoMap.splice(that.maxCandidatesAllowedEachStrategy, that.sortedAttrInfoMap.length);
 	}
 	
 	this.getPreviousCandidates = function(){
@@ -387,7 +382,7 @@ function VulCheckerHelper() {
 			}
 			if (breakFlag == curStrategy) break;
 		}
-		return that.flattenedResults.map(function(ele,index,arr){return ele.XPath;}).sort().join("\n");			//for console debugging purposes.
+		return that.flattenedResults.map(function(ele,index,arr){return ele.XPath+ele.width.toString()+ele.height.toString()+ele.visible.toString()+ele.x.toString()+ele.y.toString();}).sort().join("\n");			//for console debugging purposes.
 	}
 	
 	this.reportCandidates = function(){
@@ -488,7 +483,7 @@ function VulCheckerHelper() {
 			}
 			if (breakFlag == curStrategy) break;
 		}
-		if (self.port) self.port.emit("reportCandidates",{result:that.flattenedResults, candidatesWithPreviousCriteria:that.candidatesWithPreviousCriteria, candidatesWithCurrentCriteria:that.flattenedResults.map(function(ele,index,arr){return ele.XPath;}).sort().join("\n"),url:(document.URL.indexOf("?")==-1?document.URL:document.URL.substr(0,document.URL.indexOf("?")))});
+		if (self.port) self.port.emit("reportCandidates",{result:that.flattenedResults, candidatesWithPreviousCriteria:that.candidatesWithPreviousCriteria, candidatesWithCurrentCriteria:that.flattenedResults.map(function(ele,index,arr){return ele.XPath+ele.width.toString()+ele.height.toString()+ele.visible.toString()+ele.x.toString()+ele.y.toString();}).sort().join("\n"),url:(document.URL.indexOf("?")==-1?document.URL:document.URL.substr(0,document.URL.indexOf("?")))});
 		else return that.flattenedResults;			//for console debugging purposes.
 	}
 	
@@ -562,6 +557,7 @@ if (self.port)
 		vulCheckerHelper.account = response.account;
 		vulCheckerHelper.searchForSignUpForFB = response.searchForSignUpForFB;
 		vulCheckerHelper.loginClickAttempts = response.loginClickAttempts;
+		vulCheckerHelper.maxCandidatesAllowedEachStrategy = response.maxCandidatesAllowedEachStrategy;
 		vulCheckerHelper.reportCandidates();		//Just report the candidates, don't click on anything yet.
 	});
 	//duty 2: click candidate

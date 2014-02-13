@@ -16,6 +16,7 @@ function VulCheckerHelper() {
 	this.relaxedStringMatch = false;
 	this.candidatesWithPreviousCriteria = "";
 	this.searchingUsingPreviousCriteria = false;
+	this.maxCandidatesAllowedEachStrategy = 5;
 	
 	this.account = [];
 	//this.clickedButtons = [];
@@ -277,6 +278,7 @@ function VulCheckerHelper() {
 			if (document.URL.indexOf('http://www.facebook.com/plugins/') == -1 && document.URL.indexOf('https://www.facebook.com/plugins/') == -1) return;
 		}
 		computeAsRoot(rootNode);
+		//sort
 		var i = 0;
 		var j = 0;
 		for (i = 0; i < that.count; i++)
@@ -290,12 +292,14 @@ function VulCheckerHelper() {
 					maxindex = j;
 				}
 			}
-			if (max == 0) {return;}
+			if (max == 0) {break;}
 			else {
 				that.sortedAttrInfoMap[i] = new AttrInfoClass(that.AttrInfoMap[maxindex].node, that.AttrInfoMap[maxindex].score, that.AttrInfoMap[maxindex].stringSig);
 				that.AttrInfoMap[maxindex].score = -1;
 			}
 		}
+		//From each strategy, obtain at most that.maxCandidatesAllowedEachStrategy candidates.
+		that.sortedAttrInfoMap.splice(that.maxCandidatesAllowedEachStrategy, that.sortedAttrInfoMap.length);
 	}
 	
 	this.getPreviousCandidates = function(){
@@ -381,7 +385,7 @@ function VulCheckerHelper() {
 			}
 			if (breakFlag == curStrategy) break;
 		}
-		return that.flattenedResults.map(function(ele,index,arr){return ele.XPath;}).sort().join("\n");			//for console debugging purposes.
+		return that.flattenedResults.map(function(ele,index,arr){return ele.XPath+ele.width.toString()+ele.height.toString()+ele.visible.toString()+ele.x.toString()+ele.y.toString();}).sort().join("\n");			//for console debugging purposes.
 	}
 	
 	this.reportCandidates = function(){
@@ -482,7 +486,7 @@ function VulCheckerHelper() {
 			}
 			if (breakFlag == curStrategy) break;
 		}
-		if (self.port) self.port.emit("reportCandidates",{result:that.flattenedResults, candidatesWithPreviousCriteria:that.candidatesWithPreviousCriteria, candidatesWithCurrentCriteria:that.flattenedResults.map(function(ele,index,arr){return ele.XPath;}).sort().join("\n"),url:(document.URL.indexOf("?")==-1?document.URL:document.URL.substr(0,document.URL.indexOf("?")))});
+		if (self.port) self.port.emit("reportCandidates",{result:that.flattenedResults, candidatesWithPreviousCriteria:that.candidatesWithPreviousCriteria, candidatesWithCurrentCriteria:that.flattenedResults.map(function(ele,index,arr){return ele.XPath+ele.width.toString()+ele.height.toString()+ele.visible.toString()+ele.x.toString()+ele.y.toString();}).sort().join("\n"),url:(document.URL.indexOf("?")==-1?document.URL:document.URL.substr(0,document.URL.indexOf("?")))});
 		else return that.flattenedResults;			//for console debugging purposes.
 	}
 	
@@ -536,6 +540,7 @@ if (self.port && (document.URL.indexOf('http://www.facebook.com/login.php') == -
 		vulCheckerHelper.account = response.account;
 		vulCheckerHelper.searchForSignUpForFB = response.searchForSignUpForFB;
 		vulCheckerHelper.loginClickAttempts = response.loginClickAttempts;
+		vulCheckerHelper.maxCandidatesAllowedEachStrategy = response.maxCandidatesAllowedEachStrategy;
 		//two special cases, don't need to go through reportCandidates (iframe specific)
 		if (response.searchForSignUpForFB && (document.URL.indexOf('http://www.facebook.com/plugins/registration')==0 || document.URL.indexOf('https://www.facebook.com/plugins/registration')==0) && document.documentElement.offSetHeight != 0 && document.documentElement.offSetWidth != 0){
 			//make sure register plugin is visible.
@@ -553,7 +558,7 @@ if (self.port && (document.URL.indexOf('http://www.facebook.com/login.php') == -
 					stats: "-1/0;",
 					stringSig: "NA|NA|NA|NA|NA|NA|NA|NA",
 					iframe: true,
-					visible: vulCheckerHelper.onTopLayer(maxNode)
+					visible: vulCheckerHelper.onTopLayer(document.getElementById('fbRegistrationLogin'))
 				});
 				self.port.emit("reportCandidates",{result:vulCheckerHelper.flattenedResults, candidatesWithPreviousCriteria:"1", candidatesWithCurrentCriteria:"1",url:(document.URL.indexOf("?")==-1?document.URL:document.URL.substr(0,document.URL.indexOf("?")))});
 			}
@@ -572,7 +577,7 @@ if (self.port && (document.URL.indexOf('http://www.facebook.com/login.php') == -
 					stats: "-1/0;",
 					stringSig: "NA|NA|NA|NA|NA|NA|NA|NA",
 					iframe: true,
-					visible: vulCheckerHelper.onTopLayer(maxNode)
+					visible: vulCheckerHelper.onTopLayer(document.getElementsByClassName('fwb')[0])
 				});
 				self.port.emit("reportCandidates",{result:vulCheckerHelper.flattenedResults, candidatesWithPreviousCriteria:"2", candidatesWithCurrentCriteria:"2",url:(document.URL.indexOf("?")==-1?document.URL:document.URL.substr(0,document.URL.indexOf("?")))});
 			}
