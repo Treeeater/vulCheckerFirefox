@@ -2,3 +2,6 @@ vulcheckerProfile
 test
 doc
 lib/configuration.js
+lib/dividedTestList.js
+lib/webServiceFile*
+vulCheckerProfile*
