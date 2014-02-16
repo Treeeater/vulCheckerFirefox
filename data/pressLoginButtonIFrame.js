@@ -555,10 +555,15 @@ if (self.port && (document.URL.indexOf('http://www.facebook.com/login.php') == -
 					outerHTML: document.getElementById('fbRegistrationLogin').outerHTML,
 					original_index: vulCheckerHelper.flattenedResults.length,
 					score: 999,
-					stats: "-1/0;",
+					stats: "-1/0",
 					stringSig: "NA|NA|NA|NA|NA|NA|NA|NA",
 					iframe: true,
-					visible: vulCheckerHelper.onTopLayer(document.getElementById('fbRegistrationLogin'))
+					visible: vulCheckerHelper.onTopLayer(document.getElementById('fbRegistrationLogin')),
+					width: Math.floor(document.getElementById('fbRegistrationLogin').offsetWidth),
+					height: Math.floor(document.getElementById('fbRegistrationLogin').offsetHeight),
+					type: document.getElementById('fbRegistrationLogin').nodeName,
+					x: Math.floor($(document.getElementById('fbRegistrationLogin')).offset().left),
+					y: Math.floor($(document.getElementById('fbRegistrationLogin')).offset().top)
 				});
 				self.port.emit("reportCandidates",{result:vulCheckerHelper.flattenedResults, candidatesWithPreviousCriteria:"1", candidatesWithCurrentCriteria:"1",url:(document.URL.indexOf("?")==-1?document.URL:document.URL.substr(0,document.URL.indexOf("?")))});
 			}
@@ -574,10 +579,15 @@ if (self.port && (document.URL.indexOf('http://www.facebook.com/login.php') == -
 					outerHTML: document.getElementsByClassName('fwb')[0].outerHTML,
 					original_index: vulCheckerHelper.flattenedResults.length,
 					score: 999,
-					stats: "-1/0;",
+					stats: "-1/0",
 					stringSig: "NA|NA|NA|NA|NA|NA|NA|NA",
 					iframe: true,
-					visible: vulCheckerHelper.onTopLayer(document.getElementsByClassName('fwb')[0])
+					visible: vulCheckerHelper.onTopLayer(document.getElementsByClassName('fwb')[0]),
+					width: Math.floor(document.getElementsByClassName('fwb')[0].offsetWidth),
+					height: Math.floor(document.getElementsByClassName('fwb')[0].offsetHeight),
+					type: document.getElementsByClassName('fwb')[0].nodeName,
+					x: Math.floor($(document.getElementsByClassName('fwb')[0]).offset().left),
+					y: Math.floor($(document.getElementsByClassName('fwb')[0]).offset().top)
 				});
 				self.port.emit("reportCandidates",{result:vulCheckerHelper.flattenedResults, candidatesWithPreviousCriteria:"2", candidatesWithCurrentCriteria:"2",url:(document.URL.indexOf("?")==-1?document.URL:document.URL.substr(0,document.URL.indexOf("?")))});
 			}

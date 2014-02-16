@@ -1,5 +1,5 @@
-if !(ARGV.length == 2)
-	p "[usage]: ARGV0: input result file, ARGV1: output csv"
+if !(ARGV.length == 2 || ARGV.length == 1)
+	p "[usage]: ARGV0: input result file, ARGV1: output csv (optional)"
 	exit
 end
 
@@ -86,6 +86,8 @@ fh.each_line{|l|
 }
 
 statRecordsClicksNeeded = Hash.new
+oneClickNeeded = 0
+twoClicksNeeded = 0
 statRecords.each_key{|url|
 	if (statRecordsClicksNeeded[url] == nil) then statRecordsClicksNeeded[url] = 999 end
 	statRecords[url].each_value{|r|
@@ -93,10 +95,19 @@ statRecords.each_key{|url|
 			statRecordsClicksNeeded[url] = r.minClicksNeeded
 		end
 	}
+	if (statRecordsClicksNeeded[url] == 1)
+		oneClickNeeded += 1
+	elsif (statRecordsClicksNeeded[url] == 2)
+		twoClicksNeeded += 1
+	else 
+		p "Error: " + url
+	end
 }
 
 output = "URL,clicksNeeded\n" + statRecordsClicksNeeded.flatten.each.inject(""){|product, a|
 	if (a.to_s =~ /^\d*$/) then product+a.to_s+"\n" else product+a.to_s+"," end
 }
 
-File.open(ARGV[1],"w"){|f| f.write(output)}
+p oneClickNeeded
+p twoClicksNeeded
+if (ARGV[1]!=nil) then File.open(ARGV[1],"w"){|f| f.write(output)} end
