@@ -16,6 +16,8 @@ end
 
 outputCSVSuccess = "Site,success,clickNo,O-rank,clicksNeeded,fromIframe,visible,w,h,type,x, y,FB,Facebook,OAuth,login,signin,connect,account,forum,Score,VSr,ISr,VRr,IRr,clickURL,outerHTML,XPath,futile\n"
 outputCSVFailed = "Site,success,clickNo,O-rank,clicksNeeded,fromIframe,visible,w,h,type,x, y,FB,Facebook,OAuth,login,signin,connect,account,forum,Score,VSr,ISr,VRr,IRr,clickURL,outerHTML,XPath,futile\n"
+outputCSVSuccessArray = []
+outputCSVFailedArray = []
 outputErrorSites = Array.new
 statRecords = Hash.new
 clicks = Array.new
@@ -28,6 +30,7 @@ fh.each_line{|l|
 	if (l.start_with? "Testing site:") 
 		siteURL = l[14..-1]
 		clicks = Hash.new
+		if (siteURL == "") then next end
 		statRecords[siteURL] = clicks
 		next
 	end
@@ -44,7 +47,6 @@ fh.each_line{|l|
 	if (l[-7..-1]=="futile,")
 		futile = true 
 	end
-	if (siteURL == "") then next end
 	clicks = l.split(';')
 	clicks.each_index{|c_i|
 		items = clicks[c_i].split(",")
@@ -91,65 +93,67 @@ fh.each_line{|l|
 statRecords.each_key{|k|
 	statRecords[k].each_value{|c|
 		if (c.success)
-			outputCSVSuccess += (k + ",")
-			outputCSVSuccess += (c.success.to_s + ",")
-			outputCSVSuccess += (c.clickNo.to_s + ",")
-			outputCSVSuccess += (c.O_rank.to_s + ",")
+			temp = (k + ",")
+			temp += (c.success.to_s + ",")
+			temp += (c.clickNo.to_s + ",")
+			temp += (c.O_rank.to_s + ",")
 			if (c.minClicksNeeded == 999) then c.minClicksNeeded = "NA" end
-			outputCSVSuccess += (c.minClicksNeeded.to_s + ",")
-			outputCSVSuccess += (c.fromIframe.to_s + ",")
-			outputCSVSuccess += (c.visible.to_s + ",")
-			outputCSVSuccess += (c.w.to_s + ",")
-			outputCSVSuccess += (c.h.to_s + ",")
-			outputCSVSuccess += (c.type.to_s + ",")
-			outputCSVSuccess += (c.x.to_s + ",")
-			outputCSVSuccess += (c.y.to_s + ",")
-			outputCSVSuccess += (c.stringSig.join(",") + ",")
-			outputCSVSuccess += (c.score + ",")
+			temp += (c.minClicksNeeded.to_s + ",")
+			temp += (c.fromIframe.to_s + ",")
+			temp += (c.visible.to_s + ",")
+			temp += (c.w.to_s + ",")
+			temp += (c.h.to_s + ",")
+			temp += (c.type.to_s + ",")
+			temp += (c.x.to_s + ",")
+			temp += (c.y.to_s + ",")
+			temp += (c.stringSig.join(",") + ",")
+			temp += (c.score + ",")
 			for j in 0..3
 				if (c.clickStrategyAndRank[j])
-					outputCSVSuccess += (c.clickStrategyAndRank[j] + ",")
+					temp += (c.clickStrategyAndRank[j] + ",")
 				else
-					outputCSVSuccess += "NA,"
+					temp += "NA,"
 				end
 			end
-			outputCSVSuccess += (c.clickURL + ",")
-			outputCSVSuccess += (c.xPath + ",")
-			outputCSVSuccess += (c.outerHTML + ",")
-			outputCSVSuccess += ("false")
-			outputCSVSuccess += "\n"
+			temp += (c.clickURL + ",")
+			temp += (c.xPath + ",")
+			temp += (c.outerHTML + ",")
+			temp += ("false")
+			temp += "\n"
+			outputCSVSuccessArray.push(temp)
 		else
-			outputCSVFailed += (k + ",")
-			outputCSVFailed += (c.success.to_s + ",")
-			outputCSVFailed += (c.clickNo.to_s + ",")
-			outputCSVFailed += (c.O_rank.to_s + ",")
+			temp = (k + ",")
+			temp += (c.success.to_s + ",")
+			temp += (c.clickNo.to_s + ",")
+			temp += (c.O_rank.to_s + ",")
 			if (c.minClicksNeeded == 999) then c.minClicksNeeded = "NA" end
-			outputCSVFailed += (c.minClicksNeeded.to_s + ",")
-			outputCSVFailed += (c.fromIframe.to_s + ",")
-			outputCSVFailed += (c.visible.to_s + ",")
-			outputCSVFailed += (c.w.to_s + ",")
-			outputCSVFailed += (c.h.to_s + ",")
-			outputCSVFailed += (c.type.to_s + ",")
-			outputCSVFailed += (c.x.to_s + ",")
-			outputCSVFailed += (c.y.to_s + ",")
-			outputCSVFailed += (c.stringSig.join(",") + ",")
-			outputCSVFailed += (c.score + ",")
+			temp += (c.minClicksNeeded.to_s + ",")
+			temp += (c.fromIframe.to_s + ",")
+			temp += (c.visible.to_s + ",")
+			temp += (c.w.to_s + ",")
+			temp += (c.h.to_s + ",")
+			temp += (c.type.to_s + ",")
+			temp += (c.x.to_s + ",")
+			temp += (c.y.to_s + ",")
+			temp += (c.stringSig.join(",") + ",")
+			temp += (c.score + ",")
 			for j in 0..3
 				if (c.clickStrategyAndRank[j])
-					outputCSVFailed += (c.clickStrategyAndRank[j] + ",")
+					temp += (c.clickStrategyAndRank[j] + ",")
 				else
-					outputCSVFailed += "NA,"
+					temp += "NA,"
 				end
 			end
-			outputCSVFailed += (c.clickURL + ",")
-			outputCSVFailed += (c.xPath + ",")
-			outputCSVFailed += (c.outerHTML + ",")
-			outputCSVFailed += (c.futile.to_s)
-			outputCSVFailed += "\n"
+			temp += (c.clickURL + ",")
+			temp += (c.xPath + ",")
+			temp += (c.outerHTML + ",")
+			temp += (c.futile.to_s)
+			temp += "\n"
+			outputCSVFailedArray.push(temp)
 		end
 	}
 }
 
-File.open(ARGV[1],"w"){|f| f.write(outputCSVSuccess)}
-File.open(ARGV[2],"w"){|f| f.write(outputCSVFailed)}
+File.open(ARGV[1],"w"){|f| f.write(outputCSVSuccess + outputCSVSuccessArray.join(""))}
+File.open(ARGV[2],"w"){|f| f.write(outputCSVFailed + outputCSVFailedArray.join(""))}
 
