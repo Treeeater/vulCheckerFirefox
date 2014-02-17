@@ -91,7 +91,9 @@ density2ndSuc = Hash.new(0)
 density2ndFail = Hash.new(0)
 
 statRecords.each_key{|url|
+	stored = Hash.new
 	statRecords[url].each_value{|r|
+		if (stored[[r.x,r.y,r.w,r.h,r.xPath]]) then next end 
 		if (r.fromIframe == "true") then next end
 		if (r.visible != "true") then next end
 		if (r.w == "0" || r.h == "0") then next end
@@ -103,12 +105,14 @@ statRecords.each_key{|url|
 						density1stSuc[[r.x + i, r.y + j]] += 1
 					end
 				end
+				stored[[r.x,r.y,r.w,r.h,r.xPath]] = true
 			else
 				for i in 0..r.w
 					for j in 0..r.h
 						density1stFail[[r.x + i, r.y + j]] += 1
 					end
 				end
+				stored[[r.x,r.y,r.w,r.h,r.xPath]] = true
 			end
 		elsif (r.clickNo == 2)
 			if (r.success == true)
@@ -117,17 +121,23 @@ statRecords.each_key{|url|
 						density2ndSuc[[r.x + i, r.y + j]] += 1
 					end
 				end
+				stored[[r.x,r.y,r.w,r.h,r.xPath]] = true
 			else
 				for i in 0..r.w
 					for j in 0..r.h
 						density2ndFail[[r.x + i, r.y + j]] += 1
 					end
 				end
+				stored[[r.x,r.y,r.w,r.h,r.xPath]] = true
 			end			
 		end
 	}
 }
 
+# outputDensity1stSuc = "\\,"+Array(0..189).join(",") + "\n"
+# outputDensity1stFail = "\\,"+Array(0..189).join(",") + "\n"
+# outputDensity2ndSuc = "\\,"+Array(0..189).join(",") + "\n"
+# outputDensity2ndFail = "\\,"+Array(0..189).join(",") + "\n"
 outputDensity1stSuc = ""
 outputDensity1stFail = ""
 outputDensity2ndSuc = ""
@@ -156,11 +166,15 @@ for j in 0..120
 	temp2 = Array.new
 	temp3 = Array.new
 	temp4 = Array.new
+	# outputDensity1stSuc+="#{j},"
+	# outputDensity1stFail+="#{j},"
+	# outputDensity2ndSuc+="#{j},"
+	# outputDensity2ndFail+="#{j},"
 	for i in 0..192
-		temp1.push((density1stSuc[[i,j]]/maxDensity1stSuc.to_f).to_s)
-		temp2.push((density1stFail[[i,j]]/maxDensity1stFail.to_f).to_s)
-		temp3.push((density2ndSuc[[i,j]]/maxDensity2ndSuc.to_f).to_s)
-		temp4.push((density2ndFail[[i,j]]/maxDensity2ndFail.to_f).to_s)
+		temp1.push((density1stSuc[[i,j]]).to_s)
+		temp2.push((density1stFail[[i,j]]).to_s)
+		temp3.push((density2ndSuc[[i,j]]).to_s)
+		temp4.push((density2ndFail[[i,j]]).to_s)
 	end
 	outputDensity1stSuc += temp1.join(",") + "\n"
 	outputDensity1stFail += temp2.join(",") + "\n"
