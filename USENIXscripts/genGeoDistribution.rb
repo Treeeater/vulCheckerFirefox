@@ -1,5 +1,5 @@
-if !(ARGV.length == 2)
-	p "[usage]: ARGV0: input result file, ARGV1: output csv"
+if !(ARGV.length == 1)
+	p "[usage]: ARGV0: input result file"
 	exit
 end
 
@@ -85,39 +85,90 @@ fh.each_line{|l|
 	}
 }
 
-density = Hash.new(0)
+density1stSuc = Hash.new(0)
+density1stFail = Hash.new(0)
+density2ndSuc = Hash.new(0)
+density2ndFail = Hash.new(0)
 
 statRecords.each_key{|url|
 	statRecords[url].each_value{|r|
 		if (r.fromIframe == "true") then next end
-		if (r.success != true) then next end
 		if (r.visible != "true") then next end
 		if (r.w == "0" || r.h == "0") then next end
-		if (r.clickNo != 2) then next end
-		for i in 0..r.w
-			for j in 0..r.h
-				density[[r.x + i, r.y + j]] += 1
+		if (r.stringSig[0]=="NA") then next end			#ignore widgets.
+		if (r.clickNo == 1)
+			if (r.success == true)
+				for i in 0..r.w
+					for j in 0..r.h
+						density1stSuc[[r.x + i, r.y + j]] += 1
+					end
+				end
+			else
+				for i in 0..r.w
+					for j in 0..r.h
+						density1stFail[[r.x + i, r.y + j]] += 1
+					end
+				end
 			end
+		elsif (r.clickNo == 2)
+			if (r.success == true)
+				for i in 0..r.w
+					for j in 0..r.h
+						density2ndSuc[[r.x + i, r.y + j]] += 1
+					end
+				end
+			else
+				for i in 0..r.w
+					for j in 0..r.h
+						density2ndFail[[r.x + i, r.y + j]] += 1
+					end
+				end
+			end			
 		end
 	}
 }
 
-output = ""
-maxDensity = -1
+outputDensity1stSuc = ""
+outputDensity1stFail = ""
+outputDensity2ndSuc = ""
+outputDensity2ndFail = ""
+maxDensity1stSuc = -1
+maxDensity1stFail = -1
+maxDensity2ndSuc = -1
+maxDensity2ndFail = -1
 
 for i in 0..192
 	for j in 0..120
-		if (maxDensity < density[[i,j]]) then maxDensity = density[[i,j]] end
+		if (maxDensity1stSuc < density1stSuc[[i,j]]) then maxDensity1stSuc = density1stSuc[[i,j]] end
+		if (maxDensity1stFail < density1stFail[[i,j]]) then maxDensity1stFail = density1stFail[[i,j]] end
+		if (maxDensity2ndSuc < density2ndSuc[[i,j]]) then maxDensity2ndSuc = density2ndSuc[[i,j]] end
+		if (maxDensity2ndFail < density2ndFail[[i,j]]) then maxDensity2ndFail = density2ndFail[[i,j]] end
 	end
 end
 
-p maxDensity
+p maxDensity1stSuc
+p maxDensity1stFail
+p maxDensity2ndSuc
+p maxDensity2ndFail
 
 for j in 0..120
+	temp1 = Array.new
+	temp2 = Array.new
+	temp3 = Array.new
+	temp4 = Array.new
 	for i in 0..192
-		output += (density[[i,j]]/maxDensity.to_f).to_s+","
+		temp1.push((density1stSuc[[i,j]]/maxDensity1stSuc.to_f).to_s)
+		temp2.push((density1stFail[[i,j]]/maxDensity1stFail.to_f).to_s)
+		temp3.push((density2ndSuc[[i,j]]/maxDensity2ndSuc.to_f).to_s)
+		temp4.push((density2ndFail[[i,j]]/maxDensity2ndFail.to_f).to_s)
 	end
-	output += "\n"
+	outputDensity1stSuc += temp1.join(",") + "\n"
+	outputDensity1stFail += temp2.join(",") + "\n"
+	outputDensity2ndSuc += temp3.join(",") + "\n"
+	outputDensity2ndFail += temp4.join(",") + "\n"
 end
 
-File.open(ARGV[1],"w"){|f| f.write(output)}
+File.open("density1stSuc.csv","w"){|f| f.write(outputDensity1stSuc)}
+File.open("density1stFail.csv","w"){|f| f.write(outputDensity1stFail)}
+File.open("density2ndSuc.csv","w"){|f| f.write(outputDensity2ndSuc)}
+File.open("density2ndFail.csv","w"){|f| f.write(outputDensity2ndFail)}

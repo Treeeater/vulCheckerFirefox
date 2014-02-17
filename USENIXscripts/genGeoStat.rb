@@ -5,7 +5,7 @@ end
 
 fh = File.open(ARGV[0],"r")
 siteURL = ""
-quantile = 20
+quantile = 50
 
 class ClickInfo
 	attr_accessor :site, :success, :clickNo, :O_rank, :minClicksNeeded, :fromIframe, :visible, :w, :h, :type, :x, :y, :stringSig, :score, :clickStrategyAndRank, :xPath, :outerHTML, :clickURL, :futile
@@ -124,16 +124,16 @@ for i in 1..quantile
 	output += widthSuc[i*widthSuc.length/quantile - 1].to_s + ","
 end
 
-output+="\nheightSuc,"
-
-for i in 1..quantile
-	output += heightSuc[i*heightSuc.length/quantile - 1].to_s + ","
-end
-
 output += "\nwidthFail,"
 
 for i in 1..quantile
 	output += widthFail[i*widthFail.length/quantile - 1].to_s + ","
+end
+
+output+="\nheightSuc,"
+
+for i in 1..quantile
+	output += heightSuc[i*heightSuc.length/quantile - 1].to_s + ","
 end
 
 output+="\nheightFail,"
