@@ -96,7 +96,7 @@ statRecords.each_key{|url|
 	statRecords[url].each_value{|r|
 		if (r.fromIframe == "true") then next end
 		if (r.w == 0 || r.h == 0) then next end
-		if (r.clickNo != 1) then next end
+		#if (r.clickNo != 2) then next end
 		if (r.success)
 			widthSuc.push(r.w)
 			heightSuc.push(r.h)

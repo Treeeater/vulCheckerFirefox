@@ -85,8 +85,8 @@ fh.each_line{|l|
 	}
 }
 
-ButtonTypeSuccess = Hash.new
-ButtonTypeFailure = Hash.new
+ButtonTypeSuccess = Hash.new(0)
+ButtonTypeFailure = Hash.new(0)
 visibleSuc = 0
 invisibleSuc = 0
 visibleFail = 0
@@ -97,7 +97,7 @@ iframeFail = 0
 mainFail = 0
 statRecords.each_value{|sr|
 	sr.each_value{|r|
-		if (r.clickNo != 1) then next end			#if i want to get info for a particular click
+		if (r.clickNo != 2) then next end			#if i want to get info for a particular click
 		if (r.success)
 			if (ButtonTypeSuccess[r.type] == nil) then ButtonTypeSuccess[r.type] = 1 else ButtonTypeSuccess[r.type] += 1 end
 			if (r.visible == "true") then visibleSuc+=1 else invisibleSuc+=1 end
@@ -112,12 +112,12 @@ statRecords.each_value{|sr|
 
 output = "Type, success, failure, suc/fail\n"
 ButtonTypeSuccess.each_key{|k|
-	output += (k + "," + ButtonTypeSuccess[k].to_s + "," + ButtonTypeFailure[k].to_s + "," + (ButtonTypeSuccess[k] / ButtonTypeFailure[k].to_f).to_s + "\n")
+	output += (k + "," + ButtonTypeSuccess[k].to_s + "," + ButtonTypeFailure[k].to_s + "," + (ButtonTypeSuccess[k] / (ButtonTypeFailure[k]+ButtonTypeSuccess[k]).to_f).to_s + "\n")
 }
 
-output += ("visible" + "," + visibleSuc.to_s + "," + visibleFail.to_s + ","+ (visibleSuc/visibleFail.to_f).to_s + "\n")
-output += ("invisible" + "," + invisibleSuc.to_s + "," + invisibleFail.to_s + ","+ (invisibleSuc/invisibleFail.to_f).to_s + "\n")
-output += ("iframe" + "," + iframeSuc.to_s + "," + iframeFail.to_s + ","+ (iframeSuc/iframeFail.to_f).to_s + "\n")
-output += ("main" + "," + mainSuc.to_s + "," + mainFail.to_s + ","+ (mainSuc/mainFail.to_f).to_s + "\n")
+output += ("visible" + "," + visibleSuc.to_s + "," + visibleFail.to_s + ","+ (visibleSuc/(visibleFail+visibleSuc).to_f).to_s + "\n")
+output += ("invisible" + "," + invisibleSuc.to_s + "," + invisibleFail.to_s + ","+ (invisibleSuc/(invisibleFail+invisibleSuc).to_f).to_s + "\n")
+output += ("iframe" + "," + iframeSuc.to_s + "," + iframeFail.to_s + ","+ (iframeSuc/(iframeFail+iframeSuc).to_f).to_s + "\n")
+output += ("main" + "," + mainSuc.to_s + "," + mainFail.to_s + ","+ (mainSuc/(mainFail+mainSuc).to_f).to_s + "\n")
 
 File.open(ARGV[1],"w"){|f| f.write(output)}

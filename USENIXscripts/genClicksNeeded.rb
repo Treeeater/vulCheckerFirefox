@@ -52,7 +52,7 @@ fh.each_line{|l|
 		xPath = items[-3]
 		outerHTML = items[-2]
 		url = items[-1]
-		key = "#{url}#{xPath}#{outerHTML}"
+		key = "#{url}#{xPath}#{outerHTML}#{c_i}"
 		if (statRecords[siteURL][key] == nil) then statRecords[siteURL][key] = ClickInfo.new end
 		statRecords[siteURL][key].w = items[-8]
 		statRecords[siteURL][key].h = items[-7]
@@ -88,12 +88,20 @@ fh.each_line{|l|
 statRecordsClicksNeeded = Hash.new
 oneClickNeeded = 0
 twoClicksNeeded = 0
+successfulClickNumber = [0,0,0]
+clickNumber = [0,0,0]
 statRecords.each_key{|url|
 	if (statRecordsClicksNeeded[url] == nil) then statRecordsClicksNeeded[url] = 999 end
 	statRecords[url].each_value{|r|
 		if (r.minClicksNeeded < statRecordsClicksNeeded[url])
 			statRecordsClicksNeeded[url] = r.minClicksNeeded
 		end
+		if (r.clickNo != 1 && r.clickNo != 2)
+			p url
+			next
+		end
+		if (r.success) then successfulClickNumber[r.clickNo] += 1 end
+		clickNumber[r.clickNo] += 1
 	}
 	if (statRecordsClicksNeeded[url] == 1)
 		oneClickNeeded += 1
@@ -108,6 +116,10 @@ output = "URL,clicksNeeded\n" + statRecordsClicksNeeded.flatten.each.inject(""){
 	if (a.to_s =~ /^\d*$/) then product+a.to_s+"\n" else product+a.to_s+"," end
 }
 
-p oneClickNeeded
-p twoClicksNeeded
+p "requiring one clicks:" + oneClickNeeded.to_s
+p "requiring two clicks:" + twoClicksNeeded.to_s
+p successfulClickNumber[1]
+p clickNumber[1]
+p successfulClickNumber[2]
+p clickNumber[2]
 if (ARGV[1]!=nil) then File.open(ARGV[1],"w"){|f| f.write(output)} end

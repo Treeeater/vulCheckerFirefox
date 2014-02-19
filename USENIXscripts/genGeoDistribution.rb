@@ -5,6 +5,7 @@ end
 
 fh = File.open(ARGV[0],"r")
 siteURL = ""
+Granularity = 3
 
 class ClickInfo
 	attr_accessor :site, :success, :clickNo, :O_rank, :minClicksNeeded, :fromIframe, :visible, :w, :h, :type, :x, :y, :stringSig, :score, :clickStrategyAndRank, :xPath, :outerHTML, :clickURL, :futile
@@ -54,11 +55,11 @@ fh.each_line{|l|
 		url = items[-1]
 		key = "#{url}#{xPath}#{outerHTML}#{c_i}"
 		if (statRecords[siteURL][key] == nil) then statRecords[siteURL][key] = ClickInfo.new end
-		statRecords[siteURL][key].w = (items[-8].to_i/10).ceil
-		statRecords[siteURL][key].h = (items[-7].to_i/10).ceil
+		statRecords[siteURL][key].w = (items[-8].to_i/Granularity).ceil
+		statRecords[siteURL][key].h = (items[-7].to_i/Granularity).ceil
 		statRecords[siteURL][key].type = items[-6]
-		statRecords[siteURL][key].x = (items[-5].to_i/10).floor
-		statRecords[siteURL][key].y = (items[-4].to_i/10).floor
+		statRecords[siteURL][key].x = (items[-5].to_i/Granularity).floor
+		statRecords[siteURL][key].y = (items[-4].to_i/Granularity).floor
 		statRecords[siteURL][key].clickURL = url
 		statRecords[siteURL][key].xPath = xPath
 		statRecords[siteURL][key].outerHTML = outerHTML
@@ -142,6 +143,7 @@ outputDensity1stSuc = ""
 outputDensity1stFail = ""
 outputDensity2ndSuc = ""
 outputDensity2ndFail = ""
+=begin
 maxDensity1stSuc = -1
 maxDensity1stFail = -1
 maxDensity2ndSuc = -1
@@ -160,8 +162,8 @@ p maxDensity1stSuc
 p maxDensity1stFail
 p maxDensity2ndSuc
 p maxDensity2ndFail
-
-for j in 0..120
+=end
+for j in 0..(1200/Granularity)
 	temp1 = Array.new
 	temp2 = Array.new
 	temp3 = Array.new
@@ -170,7 +172,7 @@ for j in 0..120
 	# outputDensity1stFail+="#{j},"
 	# outputDensity2ndSuc+="#{j},"
 	# outputDensity2ndFail+="#{j},"
-	for i in 0..192
+	for i in 0..(1920/Granularity)
 		temp1.push((density1stSuc[[i,j]]).to_s)
 		temp2.push((density1stFail[[i,j]]).to_s)
 		temp3.push((density2ndSuc[[i,j]]).to_s)

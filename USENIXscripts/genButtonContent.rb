@@ -84,8 +84,8 @@ fh.each_line{|l|
 		end
 	}
 }
-FB = [0, 0]
-Facebook = [0, 0]
+fB = [0, 0]
+facebook = [0, 0]
 logion = [0, 0]
 signion = [0, 0]
 connect = [0, 0]
@@ -94,9 +94,9 @@ account = [0, 0]
 forum = [0, 0]
 statRecords.each_value{|sr|
 	sr.each_value{|r|
-		if (r.clickNo != 1) then next end			#if i want to get info for a particular click
-		FB[(r.success ? 0:1)] += r.stringSig[0].to_i
-		Facebook[(r.success ? 0:1)] += r.stringSig[1].to_i
+		if (r.clickNo != 2) then next end			#if i want to get info for a particular click
+		fB[(r.success ? 0:1)] += r.stringSig[0].to_i
+		facebook[(r.success ? 0:1)] += r.stringSig[1].to_i
 		logion[(r.success ? 0:1)] += r.stringSig[2].to_i
 		signion[(r.success ? 0:1)] += r.stringSig[3].to_i
 		connect[(r.success ? 0:1)] += r.stringSig[4].to_i
@@ -107,8 +107,8 @@ statRecords.each_value{|sr|
 }
 
 output = "FB, Facebook, logion, signion, connect, oauth, account, forum\n"
-output += "#{FB[0]},#{Facebook[0]},#{logion[0]},#{signion[0]},#{connect[0]},#{oauth[0]},#{account[0]},#{forum[0]}\n"
-output += "#{FB[1]},#{Facebook[1]},#{logion[1]},#{signion[1]},#{connect[1]},#{oauth[1]},#{account[1]},#{forum[1]}\n"
-output += "#{FB[0].to_f/FB[1]},#{Facebook[0].to_f/Facebook[1]},#{logion[0].to_f/logion[1]},#{signion[0].to_f/signion[1]},#{connect[0].to_f/connect[1]},#{oauth[0].to_f/oauth[1]},#{account[0].to_f/account[1]},#{forum[0].to_f/forum[1]}\n"
+output += "#{fB[0]},#{facebook[0]},#{logion[0]},#{signion[0]},#{connect[0]},#{oauth[0]},#{account[0]},#{forum[0]}\n"
+output += "#{fB[1]},#{facebook[1]},#{logion[1]},#{signion[1]},#{connect[1]},#{oauth[1]},#{account[1]},#{forum[1]}\n"
+output += "#{fB[0].to_f/(fB[1]+fB[0])},#{facebook[0].to_f/(facebook[1]+facebook[0])},#{logion[0].to_f/(logion[1]+logion[0])},#{signion[0].to_f/(signion[1]+signion[0])},#{connect[0].to_f/(connect[1]+connect[0])},#{oauth[0].to_f/(oauth[1]+oauth[0])},#{account[0].to_f/(account[1]+account[0])},#{forum[0].to_f/(forum[1]+forum[0])}\n"
 
 File.open(ARGV[1],"w"){|f| f.write(output)}
