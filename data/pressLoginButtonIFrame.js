@@ -264,6 +264,7 @@ function VulCheckerHelper() {
 	}
 	
 	function checkAccountInfoPresense(node){
+		if (document.domain.indexOf('facebook.com')!=-1) return false;			//never search in iframes w/ domain == facebook.com, it will contain things like fbid
 		var fullContent = node.innerHTML.toLowerCase();
 		var re = /_gig_llu=.*?;/
 		var temp = document.cookie;
@@ -285,6 +286,7 @@ function VulCheckerHelper() {
 	this.searchForLoginButton = function(rootNode) {
 		that.init();
 		if (checkAccountInfoPresense(rootNode)) {
+			that.userInfoFound = true;
 			return;
 		}
 		if (document.URL.indexOf('http://www.facebook.com/') == 0 || document.URL.indexOf('https://www.facebook.com/') == 0) {
@@ -414,6 +416,7 @@ function VulCheckerHelper() {
 		that.results = new Array();		//clean results in case this is a second click attempt and the first click did not navigate the page.
 		that.tryFindInvisibleLoginButton = false;			//reset strategy
 		that.relaxedStringMatch = false;
+		that.searchUpperRight = false;
 		var curStrategy = 0;
 		while (true){
 			that.searchForLoginButton(document.body);

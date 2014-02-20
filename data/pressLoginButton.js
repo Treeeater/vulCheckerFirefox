@@ -462,6 +462,7 @@ function VulCheckerHelper() {
 		that.results = new Array();		//clean results in case this is a second click attempt and the first click did not navigate the page.
 		that.tryFindInvisibleLoginButton = false;			//reset strategy
 		that.relaxedStringMatch = false;
+		that.searchUpperRight = false;
 		var curStrategy = 0;
 		while (true){
 			that.searchForLoginButton(document.body);
