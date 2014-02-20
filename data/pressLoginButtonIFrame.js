@@ -217,13 +217,6 @@ function VulCheckerHelper() {
 		if (preFilter(curNode)) {
 			var i = 0;
 			var curScore = 0;
-			//modify output due to button types.
-			if (that.loginClickAttempts == 0) {
-				if (curNode.nodeName == "BUTTON" || curNode.nodeName == "INPUT" || curNode.nodeName == "A" || curNode.nodeName == "SPAN") curScore = 2;
-			}
-			else {
-				if (curNode.nodeName == "BUTTON" || curNode.nodeName == "SPAN" || curNode.nodeName == "IMG") curScore = 2;
-			}
 			that.hasFB = false;									//to indicate if this element has facebook-meaning term.
 			that.hasLogin = false;								//to indicate if this element has login-meaning term.
 			that.hasLikeOrShare = false;							//to indicate if this element has share/like word.
@@ -245,6 +238,13 @@ function VulCheckerHelper() {
 			if (that.hasLikeOrShare && that.hasLogin) curScore = 1;							//if it has both, reduce the score to the minimum(serve as backup)
 			if ((curNode.offsetHeight > 150 || curNode.offsetWidth > 400) && curNode.nodeName != "BUTTON" && curNode.nodeName != "A" ) curScore = -1;		//ignore non-A and non-Button type login buttons that are too large, they may just be overlays.
 			if (!that.tryFindInvisibleLoginButton) {if (curNode.offsetWidth <= 0 || curNode.offsetHeight <= 0) curScore = -1;}		//ignore invisible element.
+			//modify output due to button types.
+			if (that.loginClickAttempts == 0) {
+				if ((curNode.nodeName == "BUTTON" || curNode.nodeName == "INPUT" || curNode.nodeName == "A" || curNode.nodeName == "SPAN") && curScore > 0) curScore += 2;
+			}
+			else {
+				if ((curNode.nodeName == "BUTTON" || curNode.nodeName == "SPAN" || curNode.nodeName == "IMG") && curScore > 0) curScore += 2;
+			}
 			curScore *= 2;				//from iframe, we learned it's twice as likely to be the correct button.
 			var temp = new AttrInfoClass(curNode, curScore, that.stringSig.join("|"));
 			that.AttrInfoMap[that.count] = temp;
@@ -416,7 +416,6 @@ function VulCheckerHelper() {
 		that.results = new Array();		//clean results in case this is a second click attempt and the first click did not navigate the page.
 		that.tryFindInvisibleLoginButton = false;			//reset strategy
 		that.relaxedStringMatch = false;
-		that.searchUpperRight = false;
 		var curStrategy = 0;
 		while (true){
 			that.searchForLoginButton(document.body);
