@@ -69,6 +69,29 @@ totalSessions = 3
 
 i = 0
 
+configurationContent = <<-STR
+var CONST = require('./const');
+
+exports.debug = false;
+exports.writeFlag = true;
+exports.automatedTestingFlag = true;
+exports.tryFindInvisibleLoginButton = false;
+exports.registrationNeeded = false;
+exports.searchForSignUpForFB = false;
+exports.cleanResultDirectoryUponInit = true;
+exports.webService = true;
+
+exports.SubmitButtonClickDepth = 2;
+exports.LoginButtonCandidateSize = 32;
+exports.SubmitButtonCandidateSize = 2;
+
+exports.USENIX = {experiments: {testLoginButton: false, testRegistrationNeeded:false}};
+
+exports.detectionMode = CONST.dm.access_token_vul | CONST.dm.code_vul | CONST.dm.signed_request_vul | CONST.dm.referrer_vul | CONST.dm.secret_in_body_vul;
+//auto generated below
+//------------------
+STR
+
 while (i < totalSessions)
 	if (!File.exists?("./lib/webServiceFile#{i}"))
 		File.open("./lib/webServiceFile#{i}.js","w+"){|f|}		#just touch all of them.
@@ -234,8 +257,18 @@ while (true)
 			stringToWrite += r["URL"]
 			stringToWrite += "'];"
 			retries = r["retries"].to_i
+			clickDepth = r["clickDepth"]
+			candidateSize = r["candidateSize"]
+			oracleURL = r["oracleURL"]
+			tryUpperRightCorner = r["tryUpperRightCorner"]
+			mustBeHostRelatedDomain = r["mustBeHostRelatedDomain"]
+			configurationContent += "\nexports.LoginButtonClickDepth = #{clickDepth.to_i > 3 ? clickDepth : "3"};"
+			configurationContent += "\nexports.maxCandidatesAllowedEachStrategy = #{candidateSize.to_i > 8 ? candidateSize : "8"};"
+			configurationContent += "\nexports.oracleURL = '#{oracleURL == '' ? "false" : oracleURL}';"
+			configurationContent += "\nexports.tryUpperRightCorner = #{tryUpperRightCorner == 'on' ? 'true' : 'false'};"
+			configurationContent += "\nexports.mustBeHostRelatedDomain = #{mustBeHostRelatedDomain=='on' ? 'true' : 'false'};"
+			File.open("./lib/configuration#{sessionNumber}.js","w+"){|f| f.write(configurationContent)}
 			FileUtils.rm_rf("vulCheckerProfile#{remainingSessions}/testResults")			#clear results dir
-
 			File.open("./lib/webServiceFile#{sessionNumber}.js",'w+'){|f|
 				f.write(stringToWrite)
 			}
