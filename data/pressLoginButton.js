@@ -6,6 +6,7 @@ function VulCheckerHelper() {
 	this.searchForSignUpForFB = false;
 	this.indexToClick = 0;
 	this.relaxedStringMatch = false;
+	this.searchUpperRight = false;
 	this.candidatesWithPreviousCriteria = "";
 	this.searchingUsingPreviousCriteria = false;
 	this.maxCandidatesAllowedEachStrategy = 5;
@@ -49,14 +50,14 @@ function VulCheckerHelper() {
 		var output = 0;
 		if (that.loginClickAttempts == 0) {
 			output = (inputStr.match(/FB/gi)!=null) ? inputStr.match(/FB/gi).length : 0;
-			output += (inputStr.match(/facebook/gi)!=null) ? inputStr.match(/facebook/gi).length : 0;
+			output += (inputStr.match(/facebook/gi)!=null) ? inputStr.match(/facebook/gi).length * 3 : 0;
 			that.stringSig[0] += (inputStr.match(/FB/gi)!=null) ? inputStr.match(/FB/gi).length : 0;
 			that.stringSig[1] += (inputStr.match(/facebook/gi)!=null) ? inputStr.match(/facebook/gi).length : 0;
 		}
 		else if (that.loginClickAttempts > 0) {
 			//after the first click, the page/iframe supposedly should nav to a sign-in heavy content, in this case we should emphasize on facebook string detection, instead of 'sign in' pattern.
-			output = (inputStr.match(/FB/gi)!=null) ? 10 * inputStr.match(/FB/gi).length : 0;
-			output += (inputStr.match(/facebook/gi)!=null) ? 10 * inputStr.match(/facebook/gi).length : 0;
+			output = (inputStr.match(/FB/gi)!=null) ? inputStr.match(/FB/gi).length : 0;
+			output += (inputStr.match(/facebook/gi)!=null) ? 5 * inputStr.match(/facebook/gi).length : 0;
 			that.stringSig[0] += (inputStr.match(/FB/gi)!=null) ? inputStr.match(/FB/gi).length : 0;
 			that.stringSig[1] += (inputStr.match(/facebook/gi)!=null) ? inputStr.match(/facebook/gi).length : 0;
 		}
@@ -68,13 +69,20 @@ function VulCheckerHelper() {
 			var i = 0;
 			var temp;
 			var regexes = [/log[\s-_]?[io]n/gi, /sign[\s-_]?[io]n/gi, /connect$|connect[^a-zA-Z]/gi];	
+			var regexWeights = [];
+			if (that.loginClickAttempts == 0){
+				regexWeights = [4,3,2,5,2,2];
+			}
+			else {
+				regexWeights = [2,1,5,4,0,0];
+			}
 			//"connect" is a more common word, we need to at least restrict its existence, for example, we want to rule out "Connecticut" and "connection".
 			if (that.relaxedStringMatch) {
 				regexes = regexes.concat([/oauth/gi, /account$|account[^a-zA-Z]/gi, /forum/gi]);		//so is 'account'
 				for (i = 0; i < regexes.length; i++)
 				{
 					temp = inputStr.match(regexes[i]);
-					output += (temp!=null) ? temp.length : 0;
+					output += (temp!=null) ? temp.length * regexWeights[i] : 0;
 					that.stringSig[i+2] += (temp!=null) ? temp.length : 0;
 					that.hasLogin = that.hasLogin || temp!=null;
 				}
@@ -83,7 +91,7 @@ function VulCheckerHelper() {
 				for (i = 0; i < regexes.length; i++)
 				{
 					temp = inputStr.match(regexes[i]);
-					output += (temp!=null) ? temp.length : 0;
+					output += (temp!=null) ? temp.length * regexWeights[i] : 0;
 					that.hasLogin = that.hasLogin || temp!=null;
 				}
 				regexes = regexes.concat([/oauth/gi, /account$|account[^a-zA-Z]/gi, /forum/gi]);
@@ -148,6 +156,11 @@ function VulCheckerHelper() {
 			that.relaxedStringMatch = true;
 			return true;
 		}
+		if (that.tryFindInvisibleLoginButton && that.relaxedStringMatch && !that.searchUpperRight && that.loginClickAttempts == 0){
+			//only valid for the first click.
+			that.searchUpperRight = true;
+			return true;
+		}
 		return false;			//no other strategies available
 	};
 	
@@ -202,6 +215,13 @@ function VulCheckerHelper() {
 		if (preFilter(curNode)) {
 			var i = 0;
 			var curScore = 0;
+			//modify output due to button types.
+			if (that.loginClickAttempts == 0) {
+				if (curNode.nodeName == "BUTTON" || curNode.nodeName == "INPUT" || curNode.nodeName == "A" || curNode.nodeName == "SPAN") curScore = 2;
+			}
+			else {
+				if (curNode.nodeName == "BUTTON" || curNode.nodeName == "SPAN" || curNode.nodeName == "IMG") curScore = 2;
+			}
 			that.hasFB = false;									//to indicate if this element has facebook-meaning term.
 			that.hasLogin = false;								//to indicate if this element has login-meaning term.
 			that.hasLikeOrShare = false;							//to indicate if this element has share/like word.
@@ -221,7 +241,7 @@ function VulCheckerHelper() {
 			if (that.hasFB && that.hasLogin) curScore += 4;									//extra score if both terms are found.
 			if (that.hasLikeOrShare && !that.hasLogin) curScore = -1;						//ignore like or share button without login.
 			if (that.hasLikeOrShare && that.hasLogin) curScore = 1;							//if it has both, reduce the score to the minimum(serve as backup)
-			//if ((curNode.offsetHeight > 150 || curNode.offsetWidth > 400) && curNode.nodeName != "BUTTON" && curNode.nodeName != "A" ) curScore = -1;		//ignore non-A and non-Button type login buttons that are too large, they may just be overlays.
+			if ((curNode.offsetHeight > 150 || curNode.offsetWidth > 400) && curNode.nodeName != "BUTTON" && curNode.nodeName != "A" ) curScore = -1;		//ignore non-A and non-Button type login buttons that are too large, they may just be overlays.
 			if (!that.tryFindInvisibleLoginButton) {if (curNode.offsetWidth <= 0 || curNode.offsetHeight <= 0) curScore = -1;}		//ignore invisible element.
 			var temp = new AttrInfoClass(curNode, curScore, that.stringSig.join("|"));
 			that.AttrInfoMap[that.count] = temp;
@@ -274,7 +294,19 @@ function VulCheckerHelper() {
 		if (document.URL.indexOf('http://www.facebook.com/login.php') == 0 || document.URL.indexOf('https://www.facebook.com/login.php') == 0){
 			return;
 		}
-		computeAsRoot(rootNode);
+		if (!that.searchUpperRight){
+			computeAsRoot(rootNode);
+		}
+		else {
+			var candidates = getUpperRightCorner();
+			var i;
+			for (i = 0; i < candidates.length; i++)
+			{
+				var temp = new AttrInfoClass(candidates[i], 3-i, "NA|NA|NA|NA|NA|NA|NA|NA");
+				that.AttrInfoMap[that.count] = temp;
+				that.count++;
+			}
+		}
 		//sort
 		var i = 0;
 		var j = 0;
@@ -297,6 +329,39 @@ function VulCheckerHelper() {
 		}
 		//From each strategy, obtain at most that.maxCandidatesAllowedEachStrategy candidates.
 		that.sortedAttrInfoMap.splice(that.maxCandidatesAllowedEachStrategy, that.sortedAttrInfoMap.length);
+	}
+
+	var getUpperRightCorner = function(){
+		var curX = document.documentElement.clientWidth - 1;
+		var curY = 2;
+		var candidates = [];
+		var excluded = [];				//underlays
+		
+		while (candidates.length < 3){
+			var node = document.elementFromPoint(curX,curY);
+			if (!!node && node.offsetWidth < 300 && node.offsetHeight < 150 && candidates.indexOf(node)==-1 && that.onTopLayer(node) && excluded.indexOf(node)==-1) {
+				var i = 0;
+				for (i = 0; i < candidates.length; i++)
+				{
+					if (that.isChildElement(candidates[i],node)) {
+						excluded.push(candidates.splice(i,1)[0]);
+					}
+				}
+				candidates.push(node);
+			}
+			curX--;
+			if (curX < document.documentElement.clientWidth/2) 				//left side of the page
+			{
+				curX = document.documentElement.clientWidth - 1;
+				curY += 5;
+			}
+			if (curY > document.documentElement.clientHeight/4)
+			{
+				break;
+			}
+		}
+		
+		return candidates;
 	}
 	
 	this.getPreviousCandidates = function(){
