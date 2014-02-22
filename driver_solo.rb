@@ -64,8 +64,13 @@ File.open("./lib/dividedTestList.js",'w'){|f|
 }
 
 if (!Dir.exists?("vulCheckerProfile0"))
-	p "No bootstrapping profile, create one and re-run this script"
+	p "No bootstrapping profile, create one named 'vulCheckerProfile0' and re-run this script"
 	p "Make sure the caching, popup blocker and crash reports are all turned off."
+	exit
+end
+
+if (!File.exists?("lib/configuration0.js"))
+	p "No configuration file, create one named 'lib/configuration0.js' and re-run this script."
 	exit
 end
 
@@ -119,6 +124,9 @@ while (i < totalSessions)
 	if (!Dir.exists?("vulCheckerProfile#{i}"))
 		FileUtils.mkdir_p("vulCheckerProfile#{i}")
 		FileUtils.cp_r(Dir["vulCheckerProfile0/."],"vulCheckerProfile#{i}")
+	end
+	if (!File.exists?("lib/configuration#{i}.js"))
+		FileUtils.cp("lib/configuration0.js","lib/configuration#{i}.js")
 	end
 	if (!Dir.exists?("vulCheckerProfile#{i}/testResults"))
 		FileUtils.mkdir_p("vulCheckerProfile#{i}/testResults")
