@@ -1,7 +1,9 @@
 vulcheckerProfile
 test
 doc
-lib/configuration.js
+lib/configuration*.js
 lib/dividedTestList.js
 lib/webServiceFile*
 vulCheckerProfile*
+USENIXscripts/*.csv
+USENIXscripts/*.jpg
