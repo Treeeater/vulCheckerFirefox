@@ -16,6 +16,7 @@ function VulCheckerHelper() {
 	this.userInfoFound = false;
 	this.loginClickAttempts = 0;
 	this.results = {};					//used to store candidate information.
+	this.rightEdge = 1920;
 	
 	hashCode = function(s){
 		return s.split("").reduce(function(a,b){a=((a<<5)-a)+b.charCodeAt(0);return a&a},0);              
@@ -239,9 +240,17 @@ function VulCheckerHelper() {
 			//modify output due to button types.
 			if (that.loginClickAttempts == 0) {
 				if ((curNode.nodeName == "BUTTON" || curNode.nodeName == "INPUT" || curNode.nodeName == "A" || curNode.nodeName == "SPAN") && curScore > 0) curScore += 2;
+				if (Math.abs(that.rightEdge - $(curNode).offset().left - curNode.offsetWidth) < 100 && $(curNode).offset().top < 50) {
+					//in the top left corner, give it more weight.
+					curScore *= 2
+				}
 			}
 			else {
 				if ((curNode.nodeName == "BUTTON" || curNode.nodeName == "SPAN" || curNode.nodeName == "IMG") && curScore > 0) curScore += 2;
+				if ($(curNode).offset().top < 50 || $(curNode).offset().top > 700) {
+					//in the top or bottom, not middle, give it LESS weight for the SECOND click.
+					curScore /= 2
+				}
 			}
 			var temp = new AttrInfoClass(curNode, curScore, that.stringSig.join("|"));
 			that.AttrInfoMap[that.count] = temp;
@@ -258,6 +267,47 @@ function VulCheckerHelper() {
 		{
 			computeAsRoot(curNode.children[i]);
 		}
+	}
+
+	this.getMargin = function(){
+		rightEdge = 1920;
+		
+		rightEdges = [];
+		leftEdges = [];
+		function collectEdges(node){
+			var i;
+			if (!node) return;
+			if (node.offsetHeight != 0 && node.offsetWidth != 0){
+				var position = $(node).offset();
+				if (position.top + node.offsetHeight <= document.documentElement.clientHeight/4) {
+					rightEdges.push(Math.floor(position.left + node.offsetWidth));
+					leftEdges.push(Math.floor(position.left));
+				}
+			}
+			for (i = 0; i < node.children.length; i++){
+				collectEdges(node.children[i]);
+			}
+		}
+
+		collectEdges(document.body);
+
+		leftEdges = leftEdges.sort(function(a,b){return a-b});
+		rightEdges = rightEdges.sort(function(a,b){return a-b});
+		biggestDiff = -1;
+		r_i = -1;
+		for (i = 0; i < rightEdges.length - 1; i++)
+		{
+			if (rightEdges[i] <= document.documentElement.clientWidth/2) continue;			//right edge cannot be on the left side of the page.
+			if (rightEdges[i] <= leftEdges[leftEdges.length-1]) continue;					//there should not be another element starting right of rightmost edge.
+			if (biggestDiff < rightEdges[i+1] - rightEdges[i]) {
+				biggestDiff = rightEdges[i+1] - rightEdges[i];
+				rightEdge = rightEdges[i];
+				r_i = i;
+			}
+		}
+		
+		if (rightEdge == 1920 && rightEdges[rightEdges.length-1] < 1920) rightEdge = rightEdges[rightEdges.length-1];			//no edge.
+		return rightEdge;
 	}
 
 	function checkAccountInfoPresense(node){
@@ -583,6 +633,7 @@ function VulCheckerHelper() {
 		this.hasFB = false;									
 		this.hasLogin = false;								
 		this.hasLikeOrShare = false;
+		this.rightEdge = this.getMargin();
 	}
 	
 	this.init();
