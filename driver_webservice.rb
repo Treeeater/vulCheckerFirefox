@@ -69,7 +69,7 @@ totalSessions = 3
 
 i = 0
 
-configurationContent = <<-STR
+initialContent = <<-STR
 var CONST = require('./const');
 
 exports.debug = false;
@@ -91,6 +91,8 @@ exports.detectionMode = CONST.dm.access_token_vul | CONST.dm.code_vul | CONST.dm
 //auto generated below
 //------------------
 STR
+
+configurationContent = initialContent
 
 while (i < totalSessions)
 	if (!File.exists?("./lib/webServiceFile#{i}"))
@@ -262,6 +264,7 @@ while (true)
 			oracleURL = r["oracleURL"]
 			tryUpperRightCorner = r["tryUpperRightCorner"]
 			mustBeHostRelatedDomain = r["mustBeHostRelatedDomain"]
+			configurationContent = initialContent
 			configurationContent += "\nexports.LoginButtonClickDepth = #{clickDepth.to_i > 3 ? clickDepth : "3"};"
 			configurationContent += "\nexports.maxCandidatesAllowedEachStrategy = #{candidateSize.to_i > 8 ? candidateSize : "8"};"
 			configurationContent += "\nexports.oracleURL = #{oracleURL == '' ? "false" : ("'"+oracleURL+"'")};"
