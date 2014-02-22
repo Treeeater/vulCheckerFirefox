@@ -85,7 +85,7 @@ exports.SubmitButtonClickDepth = 2;
 exports.LoginButtonCandidateSize = 32;
 exports.SubmitButtonCandidateSize = 2;
 
-exports.USENIX = {experiments: {testLoginButton: false, testRegistrationNeeded:false}};
+exports.USENIX = {experiments: {recordLoginButton: true, testRegistrationNeeded:false, exhaustiveSearchAndRecord:false, searchLoginButtonOnly:false}};
 
 exports.detectionMode = CONST.dm.access_token_vul | CONST.dm.code_vul | CONST.dm.signed_request_vul | CONST.dm.referrer_vul | CONST.dm.secret_in_body_vul;
 //auto generated below
