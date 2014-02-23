@@ -49,6 +49,7 @@ function VulCheckerHelper() {
 	function calculateFBScore(inputStr)
 	{
 		var output = 0;
+		var i = 0;
 		if (that.loginClickAttempts == 0) {
 			output = (inputStr.match(/FB/gi)!=null) ? inputStr.match(/FB/gi).length : 0;
 			output += (inputStr.match(/facebook/gi)!=null) ? inputStr.match(/facebook/gi).length * 3 : 0;
@@ -67,7 +68,6 @@ function VulCheckerHelper() {
 		
 		if (!that.searchForSignUpForFB)
 		{
-			var i = 0;
 			var temp;
 			var regexes = [/log[\s-_]?[io]n/gi, /sign[\s-_]?[io]n/gi, /connect$|connect[^a-zA-Z]/gi];	
 			var regexWeights = [];
@@ -105,7 +105,6 @@ function VulCheckerHelper() {
 		}
 		else {
 			var regexes = [/oauth/gi, /sign[\s-_]?up/gi, /register/gi, /create/gi, /join/gi];
-			var i = 0;
 			var temp;
 			for (i = 0; i < regexes.length; i++)
 			{
@@ -115,6 +114,13 @@ function VulCheckerHelper() {
 			}			
 		}
 		
+		//penalty on google/twitter/other sso idp
+		var otherIdPRegexes = [/google/gi, /twitter/gi];
+		for (i = 0; i < otherIdPRegexes.length; i++)
+		{
+			temp = inputStr.match(otherIdPRegexes[i]);
+			that.hasOtherIdP = that.hasOtherIdP || (temp!=null);
+		}
 		//penalty on share/like
 		that.hasLikeOrShare = that.hasLikeOrShare || (inputStr.match(/share/gi)!=null || inputStr.match(/like/gi)!=null);
 		return output;
@@ -218,7 +224,8 @@ function VulCheckerHelper() {
 			var curScore = 0;
 			that.hasFB = false;									//to indicate if this element has facebook-meaning term.
 			that.hasLogin = false;								//to indicate if this element has login-meaning term.
-			that.hasLikeOrShare = false;							//to indicate if this element has share/like word.
+			that.hasLikeOrShare = false;						//to indicate if this element has share/like word.
+			that.hasOtherIdP = false;							//to indicate if this element includes other IdP's phrases.
 			that.stringSig = Array.apply(null, new Array(8)).map(Number.prototype.valueOf,0);
 			for (i = 0; i < curNode.attributes.length; i++)
 			{
@@ -233,11 +240,8 @@ function VulCheckerHelper() {
 			}
 			if (that.hasLogin) curScore += 4;												//this is used to offset a lot of 'follow us on facebook' buttons.
 			if (that.hasFB && that.hasLogin) curScore += 4;									//extra score if both terms are found.
-			if (that.hasLikeOrShare && !that.hasLogin) curScore = -1;						//ignore like or share button without login.
-			if (that.hasLikeOrShare && that.hasLogin) curScore = 1;							//if it has both, reduce the score to the minimum(serve as backup)
-			if ((curNode.offsetHeight > 150 || curNode.offsetWidth > 400) && curNode.nodeName != "BUTTON" && curNode.nodeName != "A" ) curScore = -1;		//ignore non-A and non-Button type login buttons that are too large, they may just be overlays.
-			if (!that.tryFindInvisibleLoginButton) {if (curNode.offsetWidth <= 0 || curNode.offsetHeight <= 0) curScore = -1;}		//ignore invisible element.
-			//modify output due to button types.
+			
+			//modifiers due to button types and positions.
 			if (that.loginClickAttempts == 0) {
 				if ((curNode.nodeName == "BUTTON" || curNode.nodeName == "INPUT" || curNode.nodeName == "A" || curNode.nodeName == "SPAN") && curScore > 0) curScore += 2;
 				if (Math.abs(that.rightEdge - $(curNode).offset().left - curNode.offsetWidth) < 100 && $(curNode).offset().top < 50) {
@@ -252,6 +256,14 @@ function VulCheckerHelper() {
 					curScore /= 2
 				}
 			}
+			
+			//penalties come last.
+			if (that.hasLikeOrShare && !that.hasLogin) curScore = -1;						//ignore like or share button without login.
+			if (that.hasLikeOrShare && that.hasLogin) curScore = 1;							//if it has both, reduce the score to the minimum(serve as backup)
+			if (that.hasOtherIdP) curScore = 1;												//if it has other phrases, penalize it.
+			if ((curNode.offsetHeight > 150 || curNode.offsetWidth > 400) && curNode.nodeName != "BUTTON" && curNode.nodeName != "A" ) curScore = -1;		//ignore non-A and non-Button type login buttons that are too large, they may just be overlays.
+			if (!that.tryFindInvisibleLoginButton) {if (curNode.offsetWidth <= 0 || curNode.offsetHeight <= 0) curScore = -1;}		//ignore invisible element.
+			
 			var temp = new AttrInfoClass(curNode, curScore, that.stringSig.join("|"));
 			that.AttrInfoMap[that.count] = temp;
 			that.count++;
@@ -633,6 +645,7 @@ function VulCheckerHelper() {
 		this.hasFB = false;									
 		this.hasLogin = false;								
 		this.hasLikeOrShare = false;
+		this.hasOtherIdP = false;
 		this.rightEdge = this.getMargin();
 	}
 	
