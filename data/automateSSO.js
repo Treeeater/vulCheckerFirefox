@@ -87,6 +87,11 @@ self.port.on("action",function(action){
 );
 self.port.on("requestFBAccount", function (response){
 	if (!response.shouldAutomateSSO) return;
+	if (!!response.shouldFlipAccount) {
+		var temp = accounts[1];
+		accounts[1] = accounts[0];
+		accounts[0] = temp;
+	}
 	automateSSO.account = response.FBAccount;
 	if (automateSSO.checkAppError()) return;
 	if (automateSSO.checkEnterPassword()) return;
