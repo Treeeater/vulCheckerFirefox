@@ -90,19 +90,22 @@ oneClickNeeded = 0
 twoClicksNeeded = 0
 successfulClickNumber = [0,0,0]
 clickNumber = [0,0,0]
+maxClickSeenOneSite = -1
 statRecords.each_key{|url|
+	clicksSeenOnThisURL = 0
 	if (statRecordsClicksNeeded[url] == nil) then statRecordsClicksNeeded[url] = 999 end
 	statRecords[url].each_value{|r|
 		if (r.minClicksNeeded < statRecordsClicksNeeded[url])
 			statRecordsClicksNeeded[url] = r.minClicksNeeded
 		end
 		if (r.clickNo != 1 && r.clickNo != 2)
-			p url
 			next
 		end
 		if (r.success) then successfulClickNumber[r.clickNo] += 1 end
 		clickNumber[r.clickNo] += 1
+		clicksSeenOnThisURL += 1
 	}
+	if (maxClickSeenOneSite < clicksSeenOnThisURL) then maxClickSeenOneSite = clicksSeenOnThisURL end
 	if (statRecordsClicksNeeded[url] == 1)
 		oneClickNeeded += 1
 	elsif (statRecordsClicksNeeded[url] == 2)
@@ -118,6 +121,7 @@ output = "URL,clicksNeeded\n" + statRecordsClicksNeeded.flatten.each.inject(""){
 
 p "requiring one clicks:" + oneClickNeeded.to_s
 p "requiring two clicks:" + twoClicksNeeded.to_s
+p "maximum unique clicks attempted on one site: " + maxClickSeenOneSite.to_s
 p successfulClickNumber[1]
 p clickNumber[1]
 p successfulClickNumber[2]
