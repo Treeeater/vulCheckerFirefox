@@ -588,8 +588,7 @@ var Registration = function(){
 			}
 			if (breakFlag == curStrategy) break;
 		}
-		if (self.port) self.port.emit("reportCandidates",that.flattenedResults);
-		else return that.flattenedResults;			//for console debugging purposes.
+		if (!self.port) return that.flattenedResults;			//for console debugging purposes.
 	}
 	
 	this.findInputBottomEdge = function(){
