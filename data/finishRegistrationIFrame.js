@@ -89,7 +89,7 @@ var Registration = function(){
 		var position = $(ele).offset();
 		var j;
 		var score = 0;
-		ele.scrollIntoView();
+		//ele.scrollIntoView();
 		position.top = position.top - window.pageYOffset;
 		position.left = position.left - window.pageXOffset;
 		//Don't judge the input unfairly because of the screen/browser window size.
