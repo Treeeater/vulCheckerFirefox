@@ -265,8 +265,8 @@ while (true)
 			tryUpperRightCorner = r["tryUpperRightCorner"]
 			mustBeHostRelatedDomain = r["mustBeHostRelatedDomain"]
 			configurationContent = initialContent
-			configurationContent += "\nexports.LoginButtonClickDepth = #{clickDepth.to_i > 3 ? clickDepth : "3"};"
-			configurationContent += "\nexports.maxCandidatesAllowedEachStrategy = #{candidateSize.to_i > 8 ? candidateSize : "8"};"
+			configurationContent += "\nexports.LoginButtonClickDepth = #{clickDepth.to_i < 3 ? clickDepth : "3"};"
+			configurationContent += "\nexports.maxCandidatesAllowedEachStrategy = #{candidateSize.to_i < 8 ? candidateSize : "8"};"
 			configurationContent += "\nexports.oracleURL = #{oracleURL == '' ? "false" : ("'"+oracleURL+"'")};"
 			configurationContent += "\nexports.tryUpperRightCorner = #{tryUpperRightCorner == 'on' ? 'true' : 'false'};"
 			configurationContent += "\nexports.mustBeHostRelatedDomain = #{mustBeHostRelatedDomain=='on' ? 'true' : 'false'};"
