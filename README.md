@@ -16,11 +16,19 @@ devtools.chrome.enabled: true
 devtools.debugger.remote-enabled: true
 to enable debugging.
 
-Known bugs (and probably not gonna fix):
+*Extra files*
+configurations0.js -> configurations4.js
+webServiceFile0.js -> webServiceFile2.js
+dividedTestList.js
+All above mentioned files go to lib/
+See sample_extra_files_needed for more information.
 
-1) If the website displays login button on the homepage in an iframe, ccc cannot capture its XPath and correctly clicks it two times, because pressLoginButtonIFrame.js completely works on its own, it simply asks ccc if it needs to find and click the login button, but never returns any information about the button it clicked.
+Also requires localhost/bootstrap.html (can just be an empty file) to work.
+Note: if localhost cannot host bootstrap.html, any other quick-responding sites would do, such as http://www.google.com/, however, connecting to a remote host is always going to be slower than localhost.
 
-Vul list:
+Without these files, SSOScan won't run correctly.
+
+List of vulnerabilities SSOScan can detect:
 [1] Misuse access_token to authenticate users.
 [2] Although code is used, client side exchange of access_token is performed. This also exposes client secret in the traffic. Currently we detect visit to a particular URL for this vul.
 [3] Although signed_request is used, server doesn't check the signature part.
@@ -28,7 +36,7 @@ Vul list:
 [5] User credentials could be leaked if third party script could access HTML document.
 
 
-Scripts:
+Statistics scripts:
 
 extractCSV.rb:  input: results.txt generated from automated testing. output: results.csv, a list of sites and their vul stats.  Missing data means it failed at some point.
 
