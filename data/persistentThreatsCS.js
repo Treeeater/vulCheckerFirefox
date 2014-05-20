@@ -61,7 +61,7 @@ function initDetection(credentials){
 	findThirdPartyScript(document.documentElement);
 	findThirdPartyContent(document.documentElement);
 
-	var url = document.URL;
+	var url = document.URL.substr(0,document.URL.indexOf('#'));			//fragments are not visible in referer header! Thanks Eugene!
 	var html = document.documentElement.innerHTML;
 	
 	if (hasThirdPartyContent){
