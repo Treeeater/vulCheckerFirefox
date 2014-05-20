@@ -1,1 +1,1 @@
-..\addon-sdk-1.15\bin\activate.bat
+..\addon-sdk-1.16\bin\activate.bat
