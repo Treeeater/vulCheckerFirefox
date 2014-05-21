@@ -646,7 +646,7 @@ var inputFilledMessage = "Top: All fields populated. Ready to click submit butto
 
 
 if (self.port){
-	if (document.URL.indexOf("https://www.facebook.com/dialog/registration")==0 && document.getElementById('u_0_1')!=null){
+	if ((document.URL.indexOf("https://www.facebook.com/dialog/registration")==0 || document.URL.indexOf("https://www.facebook.com/v1.0/dialog/registration")==0) && document.getElementById('u_0_1')!=null){
 		//registration plugin.
 		document.getElementById('u_0_1').click();
 	}
