@@ -1,7 +1,6 @@
 function AutomateSSO(){
 
 	this.account = 1;				//indicate which account should be used when logging in.
-	this.checked = false;
 	var that = this;
 	
 	this.accountA = accounts[0];
@@ -22,9 +21,9 @@ function AutomateSSO(){
 	this.checkDialogOAuth = function(){
 		if (document.URL.indexOf("https://www.facebook.com/dialog/oauth")==-1 && document.URL.indexOf("https://www.facebook.com/v1.0/dialog/oauth")==-1) return false;
 		if (document.getElementById('u_0_0') != null && document.getElementById('u_0_0').nodeName == "INPUT") document.getElementById('u_0_0').click();	//gamezone.com customize the SSO experience. I don't know if this is common but let us deal with this first.
-		if (document.getElementsByClassName('selected')[0] == null) return false;
+		if (document.getElementsByClassName('selected layerConfirm')[0] == null) return false;
 		//try to click it
-		document.getElementsByClassName('selected')[0].click();
+		document.getElementsByClassName('selected layerConfirm')[0].click();
 		return true;
 	};
 	
@@ -48,17 +47,16 @@ function AutomateSSO(){
 		//if (document.getElementById('u_0_0') == null) return false;
 		//try to click it
 		//document.getElementById('u_0_0').click();
-		if (document.getElementsByClassName('selected')[0] == null) return false;
+		if (document.getElementsByClassName('selected layerConfirm')[0] == null) return false;
 		//try to click it
-		document.getElementsByClassName('selected')[0].click();
+		document.getElementsByClassName('selected layerConfirm')[0].click();
 		return true;
 	};
 	
 	this.checkEverything = function(){
-		if (that.checked) return;
-		that.checked = true;
 		//init test account name
 		self.port.emit("requestFBAccount",0);
+		window.setTimeout(automateSSO.checkEverything,10000);		//when the user first visits the site and the site asks for post permission, the page never refreshes and SSOScan gets stuck there.
 	};
 	
 	return this;
