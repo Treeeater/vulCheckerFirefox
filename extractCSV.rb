@@ -26,6 +26,7 @@ dnsErrorArray = Array.new
 stalledTemp = Array.new
 stalled = Array.new
 currentSite = ""
+appID = Hash.new
 allSites = Array.new
 errorStateApp = Array.new
 doesNotSupportFB = Array.new
@@ -34,6 +35,9 @@ text.each_line do |line|
 	if line.start_with? "Testing site:"
 		currentSite = line[14..-1].chomp
 		allSites.push(currentSite)
+	end
+	if line.start_with? "App_ID: "
+		appID[currentSite] = line[9..-1].chomp
 	end
 	if (line.include?("Test stalled at Phase 0\n") || line.include?("Test stalled at Phase 1\n"))
 		if !dnsErrorArrayTemp.include?(currentSite)
@@ -120,7 +124,7 @@ doesNotSupportFB.each{|url|
 }
 
 #output
-outputText = "Site URL,token vul,secret vul,signed_request vul,referrer vul,DOM vul\n"
+outputText = "AppID,Site URL,token vul,secret vul,signed_request vul,referrer vul,DOM vul\n"
 completedCases = 0
 failedCasesToTestNext = Array.new
 hash.each_key{|k|
@@ -129,7 +133,7 @@ hash.each_key{|k|
 	else
 		failedCasesToTestNext.push(k)
 	end
-	outputText = outputText + k + ',' + hash[k][0].to_s + ',' + hash[k][1].to_s + ',' + hash[k][2].to_s + ',' + hash[k][3].to_s + ',' + hash[k][4].to_s + "\n"
+	outputText = outputText + (appID[k]==nil ? "unknown":appID[k]) + ',' + k + ',' + hash[k][0].to_s + ',' + hash[k][1].to_s + ',' + hash[k][2].to_s + ',' + hash[k][3].to_s + ',' + hash[k][4].to_s + "\n"
 }
 p "total completed tests: #{completedCases}"
 File.open("Results.csv","w+"){|f|
