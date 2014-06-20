@@ -205,6 +205,7 @@ function VulCheckerHelper() {
 		}
 		if (curNode.nodeName == "A") {
 			if (curNode.href.toLowerCase().indexOf('mailto:') == 0) return false;
+			if (curNode.href.toLowerCase().indexOf('http://l.ak.facebook.com') == 0) return false;
 		}
 		/*if (that.clickedButtons.indexOf(that.getXPath(curNode)) != -1 && !that.searchingUsingPreviousCriteria) {
 			//avoiding clicking on the same button twice, now ignoring the duplicate button...

@@ -206,6 +206,7 @@ function VulCheckerHelper() {
 		}
 		if (curNode.nodeName == "A") {
 			if (curNode.href.toLowerCase().indexOf('mailto:') == 0) return false;
+			if (curNode.href.toLowerCase().indexOf('http://l.ak.facebook.com') == 0) return false;
 		}
 		/*if (that.clickedButtons.indexOf(that.getXPath(curNode)) != -1 && !that.searchingUsingPreviousCriteria) {
 			//avoiding clicking on the same button twice, now ignoring the duplicate button...
@@ -558,7 +559,7 @@ function VulCheckerHelper() {
 
 var vulCheckerHelper = new VulCheckerHelper();
 
-if (self.port && (document.URL.indexOf('http://www.facebook.com/login.php') == -1 && document.URL.indexOf('https://www.facebook.com/login.php') == -1))
+if (self.port && (document.URL.indexOf('http://www.facebook.com/login.php') == -1 && document.URL.indexOf('https://www.facebook.com/login.php') == -1) && (!(window.innerWidth==0 && window.innerHeight==0 && document.URL.indexOf('facebook.com/plugins')!=-1)))
 {
 	//press login button worker has two duties:
 	//1: report all candidates under all configurations (upon request).
