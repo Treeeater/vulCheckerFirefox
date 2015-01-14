@@ -325,9 +325,12 @@ function VulCheckerHelper() {
 
 	function checkAccountInfoPresense(node){
 		var fullContent = node.innerHTML.toLowerCase();
-		var re = /_gig_llu=.*?;/
+		var re = /_gig_llu=.*?;/;
+		var re2 = /_gig_llu=.*?$/;
+		var re3 = /fbsr_.*?=.*?;/;
+		var re4 = /fbsr_.*?=.*?$/;
 		var temp = document.cookie;
-		fullContent = fullContent + temp.replace(re,'').toLowerCase();
+		fullContent = fullContent + temp.replace(re,'').replace(re2,'').replace(re3,'').replace(re4,'').toLowerCase();
 		var i = 0;
 		for (i = 0; i < that.account.length; i++){
 			if (fullContent.indexOf(that.account[i].fbid)!=-1) return true;
